@@ -15,6 +15,7 @@ $LOAD_PATH << File.join(File.dirname(__FILE__), '../lib')
 
 require 'erb'
 require 'fileutils'
+require 'optparse'
 require 'juli/juli_parser.tab.rb'
 
 #------------------------------------------------------------------
@@ -51,9 +52,37 @@ def init
   copy_to_output_top('juli.css')
 end
 
+def visitor_list
+  result = []
+  sorted_visitors = Dir.glob(File.join(PKG_ROOT, 'lib/juli/visitor/*.rb')).sort
+  for f in sorted_visitors do
+    next if f =~ /^\./
+    result << File.basename(f).gsub(/\.rb$/, '')
+  end
+  'generator: ' + result.join(',') + ' (default=html)'
+end
+
+def camelize(str)
+  str.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
+end
+
+# Visitor::#{str} constantize
+def visitor(str)
+  camelized = camelize(str)
+  if Visitor.const_defined?(camelized)
+    Visitor.const_get(camelize(str))
+  else
+    raise "Visitor #{camelized} is not defined."
+  end
+end
+
 
 #------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------
   init
-  JuliParser.new.parse(ARGV[0])
+  opt = OptionParser.new
+  OPTS = {:g=>'html'}
+  opt.on('-g generator', visitor_list){|v| OPTS[:g] = v}
+  opt.parse!(ARGV)
+  JuliParser.new.parse(ARGV[0], visitor(OPTS[:g]))
