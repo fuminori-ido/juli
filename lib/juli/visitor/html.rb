@@ -59,7 +59,7 @@ module Visitor
     end
   
     def visit_default(n)
-      content_tag(:div, :class=>'default') do
+      content_tag(:p, :class=>'default') do
         n.str
       end
     end

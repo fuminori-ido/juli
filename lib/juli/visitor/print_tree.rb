@@ -24,5 +24,10 @@ module Visitor
       end
       @depth -= 1
     end
+
+    # visit root to generate intermediate-tree structure.
+    def run(in_file, root)
+      root.accept(self)
+    end
   end
 end

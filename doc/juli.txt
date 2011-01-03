@@ -55,7 +55,6 @@ Example:
 
 = TODO
 
-1. paragraph
 1. blockquote
 1. list
 1. Wiki

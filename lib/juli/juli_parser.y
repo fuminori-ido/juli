@@ -114,22 +114,13 @@ class TreeBuilder < Absyn::Visitor
   end
 
   def visit_array(n)
-    # scan current level and gather DefaultNode into one
-    str = ''
     for child in n.array do
       case child
       when Absyn::DefaultNode
-        str += child.str
+        @curr_node.add(Intermediate::DefaultNode.new(child.str))
       else
-        if str != ''
-          @curr_node.add(Intermediate::DefaultNode.new(str))
-          str = ''
-        end
         build_subtree(child)
       end
-    end
-    if str != ''
-      @curr_node.add(Intermediate::DefaultNode.new(str))
     end
   end
 
@@ -176,31 +167,50 @@ end
     tree = TreeBuilder.new
     @root.accept(tree)
     Visitor::Html.new.run(in_file, tree.root)
+   #Visitor::PrintTree.new.run(in_file, tree.root)
   end
 
 private
-  def scan
+  def scan(&block)
+    @block_str = ''
     while line = @in_io.gets do
       case line
       when /^\s*$/
-        # skip empty line
+        block_break(&block)
+        @block_str = ''
+        # clear block_str and skip empty line
       when /^=\s+(.*$)$/
-        yield :H, 1; yield :STRING, $1
+        header(1, $1, &block)
       when /^==\s+(.*$)$/
-        yield :H, 2; yield :STRING, $1
+        header(2, $1, &block)
       when /^===\s+(.*$)$/
-        yield :H, 3; yield :STRING, $1
+        header(3, $1, &block)
       when /^====\s+(.*$)$/
-        yield :H, 4; yield :STRING, $1
+        header(4, $1, &block)
       when /^=====\s+(.*$)$/
-        yield :H, 5; yield :STRING, $1
+        header(5, $1, &block)
       when /^======+\s+(.*$)$/
-        yield :H, 6; yield :STRING, $1
+        header(6, $1, &block)
       else
-        yield :ANY, line
+        @block_str += line
       end
     end
+    block_break(&block)
     yield false, nil
+  end
+
+  # block break happens, so proess block
+  def block_break(&block)
+    if @block_str != ''
+      yield :ANY, @block_str
+    end
+  end
+
+  # process block, then process header
+  def header(level, string, &block)
+    block_break
+    yield :H,       level
+    yield :STRING,  string
   end
 
 ---- footer
