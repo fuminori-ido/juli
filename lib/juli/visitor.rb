@@ -1,2 +1,2 @@
 require 'juli/visitor/html'
-require 'juli/visitor/print_tree'
+require 'juli/visitor/tree'

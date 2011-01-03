@@ -76,6 +76,18 @@ module Visitor
       end
     end
 
+    def visit_ordered_list(n)
+      content_tag(:ol) do
+        n.array.inject('') do |result, child|
+          result += child.accept(self)
+        end
+      end
+    end
+
+    def visit_ordered_list_item(n)
+      content_tag(:li, n.str)
+    end
+
     # visit root to generate:
     #
     # 1st:: HTML body
@@ -120,7 +132,7 @@ module Visitor
         content_tag(:span, :class=>'juli_toggle', :onclick=>"Juli.toggle('#{id}');") do
           content_tag(:span, '[+] ', :id=>"#{id}_p", :class=>'juli_toggle_node',  :style=>'display:none;') +
           content_tag(:span, '[-] ', :id=>"#{id}_m", :class=>'juli_toggle_node') +
-          header_seq(n) + '. ' + n.name
+          header_seq(n) + '. ' + n.str
         end
       end + "\n"
     end

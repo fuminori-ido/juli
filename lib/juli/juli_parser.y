@@ -22,6 +22,7 @@ rule
   element
     : H STRING          { Absyn::HeaderNode.new(val[0], val[1]) }
     | ANY
+    | ORDERED_LIST_ITEM { Absyn::OrderedListItem.new(val[0]) }
 end
 
 ---- header
@@ -67,23 +68,36 @@ module Absyn
   end
   
   class HeaderNode < Node
-    attr_accessor :level, :name
+    attr_accessor :level, :str
   
-    def initialize(level, name)
+    def initialize(level, str)
       @level  = level
-      @name   = name
+      @str    = str
     end
   
     def accept(visitor)
       visitor.visit_header(self)
     end
   end
+
+  class OrderedListItem < Node
+    attr_accessor :str
   
+    def initialize(str)
+      @str = str
+    end
+  
+    def accept(visitor)
+      visitor.visit_ordered_list_item(self)
+    end
+  end
+
   class Visitor
     def visit_node(n); end
     def visit_array(n); end
     def visit_default(n); end
     def visit_header(n); end
+    def visit_ordered_list_item(n); end
   end
 end
 
@@ -106,7 +120,7 @@ end
 class TreeBuilder < Absyn::Visitor
   def initialize
     @curr_level = 999
-    @root = @curr_node = Intermediate::HeaderNode.new(0, '(root)')
+    @root = @curr_header = Intermediate::HeaderNode.new(0, '(root)')
   end
 
   def root
@@ -115,43 +129,55 @@ class TreeBuilder < Absyn::Visitor
 
   def visit_array(n)
     for child in n.array do
-      case child
-      when Absyn::DefaultNode
-        @curr_node.add(Intermediate::DefaultNode.new(child.str))
-      else
-        build_subtree(child)
-      end
+      child.accept(self)
     end
   end
 
-private
-  def build_subtree(absyn_header)
-    # When @curr_node points to upper (e.g. root) and parse level-1 as
-    # follows, build new node under the upper and shift @curr_node to it:
+  def visit_default(n)
+    list_break
+    @curr_header.add(Intermediate::DefaultNode.new(n.str))
+  end
+
+  def visit_header(n)
+    list_break
+    new_node = Intermediate::HeaderNode.new(n)
+
+    # When @curr_header points to upper (e.g. root) and parse level-1 as
+    # follows, build new node under the upper and shift @curr_header to it:
     #
-    #   (root)          - @curr_node
+    #   (root)          - @curr_header
     #     test
     #     = NAME        - we are here!
     #     ...
     #
-    if @curr_node.level < absyn_header.level
-      new_node = Intermediate::HeaderNode.new(absyn_header)
-      @curr_node.add(new_node)
-      @curr_node = new_node
+    if @curr_header.level < n.level
+      @curr_header.add(new_node)
 
-    # When @curr_node points to lower level (e.g. 'Option' below)
+    # When @curr_header points to lower level (e.g. 'Option' below)
     # and parses 'SEE ALSO' (level=1) as follows, find parent, 
-    # build new node under it, and shift @curr_node to the new node:
+    # build new node under it, and shift @curr_header to the new node:
     #
     #   ...
-    #   === Option      - @curr_node
+    #   === Option      - @curr_header
     #   ...
     #   = SEE ALSO      - we are here!
     else
-      new_node = Intermediate::HeaderNode.new(absyn_header)
-      @curr_node.find_upper(absyn_header.level).add(new_node)
-      @curr_node = new_node
+      @curr_header.find_upper(n.level).add(new_node)
     end
+    @curr_header = new_node
+  end
+
+  def visit_ordered_list_item(n)
+    if !@curr_list
+      @curr_list = Intermediate::OrderedList.new
+      @curr_header.add(@curr_list)
+    end
+    @curr_list.add(Intermediate::OrderedListItem.new(n.str))
+  end
+
+private
+  def list_break
+    @curr_list = nil
   end
 end
 
@@ -159,15 +185,14 @@ end
   require 'juli/visitor'
 
   # parse one file, build Intermediate tree, then generate HTML
-  def parse(in_file)
+  def parse(in_file, visitor)
     File.open(in_file) do |io|
       @in_io = io
       yyparse self, :scan
     end
     tree = TreeBuilder.new
     @root.accept(tree)
-    Visitor::Html.new.run(in_file, tree.root)
-   #Visitor::PrintTree.new.run(in_file, tree.root)
+    visitor.new.run(in_file, tree.root)
   end
 
 private
@@ -191,6 +216,9 @@ private
         header(5, $1, &block)
       when /^======+\s+(.*$)$/
         header(6, $1, &block)
+      when /^\d+\.\s+(.*$)$/
+        block_break(&block)
+        yield :ORDERED_LIST_ITEM, $1
       else
         @block_str += line
       end
