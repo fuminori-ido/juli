@@ -13,16 +13,17 @@ rule
   # Racc action returns absyn node to build absyn-tree, while
   # @curr is current node to store current node
   text
-    : elements          { @root = val[0] }
+    : elements            { @root = val[0] }
 
   elements
-    : /* none */        { Absyn::ArrayNode.new }
-    | elements element  { val[0].add(val[1]) }
+    : /* none */          { Absyn::ArrayNode.new }
+    | elements element    { val[0].add(val[1]) }
 
   element
-    : H STRING          { Absyn::HeaderNode.new(val[0], val[1]) }
+    : H STRING            { Absyn::HeaderNode.new(val[0], val[1]) }
     | ANY
-    | ORDERED_LIST_ITEM { Absyn::OrderedListItem.new(val[0]) }
+    | ORDERED_LIST_ITEM   { Absyn::OrderedListItem.new(val[0]) }
+    | UNORDERED_LIST_ITEM { Absyn::UnorderedListItem.new(val[0]) }
 end
 
 ---- header
@@ -92,12 +93,25 @@ module Absyn
     end
   end
 
+  class UnorderedListItem < Node
+    attr_accessor :str
+  
+    def initialize(str)
+      @str = str
+    end
+  
+    def accept(visitor)
+      visitor.visit_unordered_list_item(self)
+    end
+  end
+
   class Visitor
     def visit_node(n); end
     def visit_array(n); end
     def visit_default(n); end
     def visit_header(n); end
     def visit_ordered_list_item(n); end
+    def visit_unordered_list_item(n); end
   end
 end
 
@@ -175,6 +189,14 @@ class TreeBuilder < Absyn::Visitor
     @curr_list.add(Intermediate::OrderedListItem.new(n.str))
   end
 
+  def visit_unordered_list_item(n)
+    if !@curr_list
+      @curr_list = Intermediate::UnorderedList.new
+      @curr_header.add(@curr_list)
+    end
+    @curr_list.add(Intermediate::UnorderedListItem.new(n.str))
+  end
+
 private
   def list_break
     @curr_list = nil
@@ -219,6 +241,9 @@ private
       when /^\d+\.\s+(.*$)$/
         block_break(&block)
         yield :ORDERED_LIST_ITEM, $1
+      when /^\*\s+(.*$)$/
+        block_break(&block)
+        yield :UNORDERED_LIST_ITEM, $1
       else
         @block_str += line
       end

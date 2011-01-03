@@ -77,14 +77,18 @@ module Visitor
     end
 
     def visit_ordered_list(n)
-      content_tag(:ol) do
-        n.array.inject('') do |result, child|
-          result += child.accept(self)
-        end
-      end
+      visit_list(:ol, n)
     end
 
     def visit_ordered_list_item(n)
+      content_tag(:li, n.str)
+    end
+
+    def visit_unordered_list(n)
+      visit_list(:ul, n)
+    end
+
+    def visit_unordered_list_item(n)
       content_tag(:li, n.str)
     end
 
@@ -147,6 +151,14 @@ module Visitor
         h << @header_number[i].to_s
       end
       h.join('.')
+    end
+
+    def visit_list(tag, n)
+      content_tag(tag) do
+        n.array.inject('') do |result, child|
+          result += child.accept(self)
+        end
+      end
     end
 
 =begin

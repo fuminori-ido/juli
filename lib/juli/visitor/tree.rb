@@ -26,18 +26,19 @@ module Visitor
     end
 
     def visit_ordered_list(n)
-      print_depth
-      printf("OrderList\n")
-      @depth += 1
-      for child in n.array do
-        child.accept(self)
-      end
-      @depth -= 1
+      visit_list("OrderList\n", n)
     end
 
     def visit_ordered_list_item(n)
-      print_depth
-      printf("OrderedListItem(%s)\n", str_limit(n.str))
+      visit_list_item("OrderedListItem(%s)\n", n)
+    end
+
+    def visit_unordered_list(n)
+      visit_list("UnorderList\n", n)
+    end
+
+    def visit_unordered_list_item(n)
+      visit_list_item("UnorderedListItem(%s)\n", n)
     end
 
     # visit root to generate intermediate-tree structure.
@@ -48,6 +49,21 @@ module Visitor
   private
     def str_limit(str)
       str.size > 30 ? str[0..30] + '...' : str
+    end
+
+    def visit_list(class_str, n)
+      print_depth
+      printf(class_str)
+      @depth += 1
+      for child in n.array do
+        child.accept(self)
+      end
+      @depth -= 1
+    end
+
+    def visit_list_item(class_str, n)
+      print_depth
+      printf(class_str, str_limit(n.str))
     end
   end
 end

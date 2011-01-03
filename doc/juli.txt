@@ -14,8 +14,8 @@ directory.
 
 juli has the following features:
 
-1. toggle to show/hide each content.
-1. header numbering.
+* toggle to show/hide each content.
+* header numbering.
 
 Detail explanation for each feature is as follows:
 
@@ -45,6 +45,7 @@ Beggining '=' in line means header.  6 level headers can be used as follows:
 1. '==='
 1. '===='
 1. '====='
+1. '======'
 
 Example:
 
@@ -53,10 +54,31 @@ Example:
   = SYNOPSIS
   juli file
 
+=== List
+==== Ordered List
+
+The line starts with "1. " (One dot space) is recognized as ordered list.
+Not only '1' but also any number can be used.  However, actual assigned
+numbers for ordered-list starts '1' and increments 1 for each. 
+
+Example:
+
+  1. Hello
+  1. World
+
+
+==== Unordered List
+
+The line starts with "* " (astarisk space) is recognized as unordered list.
+
+Example:
+
+  * Hello
+  * World
+
 = TODO
 
 1. blockquote
-1. list
 1. Wiki
  
 

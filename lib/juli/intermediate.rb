@@ -85,6 +85,24 @@ module Intermediate
       visitor.visit_ordered_list_item(self)
     end
   end
+
+  class UnorderedList < ArrayNode
+    def accept(visitor)
+      visitor.visit_unordered_list(self)
+    end
+  end
+
+  class UnorderedListItem < Node
+    attr_accessor :str
+  
+    def initialize(str)
+      @str = str
+    end
+  
+    def accept(visitor)
+      visitor.visit_unordered_list_item(self)
+    end
+  end
   
   class Visitor
     def visit_node(n); end
@@ -92,6 +110,8 @@ module Intermediate
     def visit_header(n); end
     def visit_ordered_list(n); end
     def visit_ordered_list_item(n); end
+    def visit_unordered_list(n); end
+    def visit_unordered_list_item(n); end
 
     # run whole action for tree.  This is just sample implementation.
     # Derived class must implement this method.
