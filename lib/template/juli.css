@@ -1,0 +1,86 @@
+div.title {
+  font-size:        140%;
+  text-align:       center;
+  color:            #000088;
+}
+
+
+h1 {
+  font-size:        130%;
+  color:            #fff;
+  background:       #248;
+  padding-top:      5px;
+  padding-bottom:   5px;
+  padding-left:     5px;
+  border-left:      10px solid #248;
+  border-bottom:    2px  solid #248;
+}
+
+h2 {
+  vertical-align:   middle;
+  font-size:        120%;
+  color:            #000;
+  background:       #dfd;
+  padding-top:      3px;
+  padding-bottom:   3px;
+  padding-left:     10px;
+  border-left:      5px  solid #248;
+  border-top:       1px  solid #248;
+  border-bottom:    1px  solid #248;
+}
+
+h3 {
+  font-size:        110%;
+  color:            #000;
+  padding-top:      2px;
+  padding-bottom:   2px;
+  padding-left:     10px;
+  border-left:      5px  solid #248;
+  border-bottom:    1px  solid #248;
+}
+
+h4 {
+  font-size:        100%;
+  color:            #000;
+  padding-top:      2px;
+  padding-bottom:   2px;
+  padding-left:     10px;
+  text-decoration:  underline;
+}
+
+div.default {
+  padding-left:     10px;
+}
+
+
+/*----------------------------------------------------------------
+Toggle action on node
+----------------------------------------------------------------*/
+span.juli_toggle {
+  cursor:           pointer;
+}
+
+h1 span.juli_toggle {
+  color:            #fff;
+}
+h2 span.juli_toggle,
+h3 span.juli_toggle,
+h4 span.juli_toggle,
+h5 span.juli_toggle,
+h6 span.juli_toggle {
+  color:            #000;
+}
+span.juli_toggle_node {
+  font-size:        60%;
+  font-family:      monospace;
+}
+h1 span.juli_toggle_node {
+  color:            #ccc;
+}
+h2 span.juli_toggle_node,
+h3 span.juli_toggle_node,
+h4 span.juli_toggle_node,
+h5 span.juli_toggle_node,
+h6 span.juli_toggle_node {
+  color:            #444;
+}

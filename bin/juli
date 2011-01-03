@@ -1,0 +1,59 @@
+# = NAME
+# ruby juli    - Personal outline processor and wiki
+#
+# = SYNOPSIS
+# juli
+#
+# = DESCRIPTION
+#
+# == Feature
+# * RD subset
+# * Auto link like wiki
+# * Outline on HTML
+
+$LOAD_PATH << File.join(File.dirname(__FILE__), '../lib')
+
+require 'erb'
+require 'fileutils'
+require 'juli/juli_parser.tab.rb'
+
+#------------------------------------------------------------------
+# Configuration Part
+#------------------------------------------------------------------
+# Top directory for output HTML.  Default = $HOME/juli/
+OUTPUT_TOP    = ENV['HOME'] + '/juli'
+
+
+#------------------------------------------------------------------
+# Global variable
+#------------------------------------------------------------------
+PKG_ROOT      = File.join(File.dirname(__FILE__), '..')
+TEMPLATE_PATH = File.join(PKG_ROOT, 'lib/template')
+
+
+#------------------------------------------------------------------
+# Subroutine Part
+#------------------------------------------------------------------
+def copy_to_output_top(file)
+  dest_path = File.join(OUTPUT_TOP, file)
+  if !File.exist?(dest_path)
+    FileUtils.cp(File.join(TEMPLATE_PATH, file), dest_path,
+        :preserve=>true)
+  end
+end
+
+def init
+  if !File.directory?(OUTPUT_TOP)
+    FileUtils.mkdir_p(OUTPUT_TOP)
+  end
+  copy_to_output_top('prototype.js')
+  copy_to_output_top('juli.js')
+  copy_to_output_top('juli.css')
+end
+
+
+#------------------------------------------------------------------
+# Main
+#------------------------------------------------------------------
+  init
+  JuliParser.new.parse(ARGV[0])

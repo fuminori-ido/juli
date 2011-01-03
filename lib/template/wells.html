@@ -1,0 +1,22 @@
+<html>
+<!--
+= Required methods
+
+juli(1) template must have following methods:
+
+title::       title string
+javascript::  javascript url
+stylesheet::  stylesheet url
+body::        generate html
+
+-->
+<head>
+  <title><%= title %></title>
+  <script src="prototype.js"      type="text/javascript"></script>
+  <script src="<%= javascript %>" type="text/javascript"></script>
+  <link href="<%= stylesheet %>" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<%= body %>
+</body>
+</html>

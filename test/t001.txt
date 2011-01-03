@@ -1,0 +1,33 @@
+= NAME
+standard case
+juli    - test
+
+= SYNOPSIS
+juli command file
+
+= DESCRIPTION
+
+juli is offline wiki, personal wiki, or outline processor.
+
+== Command
+
+clean
+
+=== Option
+==== all
+all
+==== partial
+partial
+
+== Example
+
+  abc
+  def
+
+
+= SEE ALSO
+
+rd::    ruby document, similar to pod
+rdoc::  another ruby document, mainly for source comment
+pod::   Plain old document
+
