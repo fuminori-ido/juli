@@ -2,7 +2,7 @@
 juli    - Outline processor
 
 = SYNOPSIS
-juli file
+juli [-g generator] file
 
 = DESCRIPTION
 juli is an outline processor.
@@ -10,9 +10,19 @@ juli is an outline processor.
 When juli(1) command is executed, HTML is generated under OUTPUT_TOP
 directory.
 
+== Purpose
+
+Purposes of juli are:
+
+* freeze my idea as quick as possible by using my favorite editor.
+* write my idea at anytime anyplace.
+* view outline.
+* link each memo together by wiki
+* browse via web
+
 == Feature
 
-juli has the following features:
+Current juli has the following features:
 
 * toggle to show/hide each content.
 * header numbering.
@@ -66,6 +76,10 @@ Example:
   1. Hello
   1. World
 
+Restriction:
+
+1. nest is not supported yet.
+1. continous line is not supported yet.
 
 ==== Unordered List
 
@@ -76,10 +90,17 @@ Example:
   * Hello
   * World
 
+Restriction:
+
+1. nest is not supported yet.
+1. continous line is not supported yet.
+
 = TODO
 
 1. blockquote
+1. dictionaly list
 1. Wiki
+1. git
  
 
 = SEE ALSO
