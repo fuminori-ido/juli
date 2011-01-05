@@ -105,6 +105,25 @@ module Intermediate
       visitor.visit_unordered_list_item(self)
     end
   end
+
+  class DictionaryList < ArrayNode
+    def accept(visitor)
+      visitor.visit_dictionary_list(self)
+    end
+  end
+
+  class DictionaryListItem < Node
+    attr_accessor :term, :str
+  
+    def initialize(absyn_dictionary_list_item)
+      @term = absyn_dictionary_list_item.term
+      @str  = absyn_dictionary_list_item.str
+    end
+  
+    def accept(visitor)
+      visitor.visit_dictionary_list_item(self)
+    end
+  end
   
   class Visitor
     def visit_node(n); end
@@ -114,6 +133,8 @@ module Intermediate
     def visit_ordered_list_item(n); end
     def visit_unordered_list(n); end
     def visit_unordered_list_item(n); end
+    def visit_dictionary_list(n); end
+    def visit_dictionary_list_item(n); end
 
     # run whole action for tree.  This is just sample implementation.
     # Derived class must implement this method.

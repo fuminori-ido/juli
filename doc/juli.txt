@@ -95,16 +95,37 @@ Restriction:
 1. nest is not supported yet.
 1. continous line is not supported yet.
 
+==== Dictionary List
+
+The line with the following form is recognized as dictionary list:
+
+  term:: description
+
+Example:
+
+  Ruby::  programing language, or a gem
+
+
 = TODO
 
 1. blockquote
-1. dictionaly list
 1. Wiki
-1. git
- 
+1. git for version control and publish
+1. fix following situation:
+  * abc
+  * def
 
-= SEE ALSO
+  * ghi
+  * jkl
 
-rd::    ruby document, similar to pod
-rdoc::  another ruby document, mainly for source comment
-pod::   Plain old document in perl(1)
+= SIMILAR TOOLS
+
+rd::        ruby document, similar to pod
+rdoc::      another ruby document, mainly for source comment
+pod::       Plain old document in perl(1)
+tomboy::    TBD
+evernote::  TBD
+nevernote:: TBD
+WikiPad::   TBD
+iKnow::     TBD
+OneNote::   TBD

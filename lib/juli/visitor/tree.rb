@@ -26,7 +26,7 @@ module Visitor
     end
 
     def visit_ordered_list(n)
-      visit_list("OrderList\n", n)
+      visit_list("OrderedList\n", n)
     end
 
     def visit_ordered_list_item(n)
@@ -34,11 +34,20 @@ module Visitor
     end
 
     def visit_unordered_list(n)
-      visit_list("UnorderList\n", n)
+      visit_list("UnorderedList\n", n)
     end
 
     def visit_unordered_list_item(n)
       visit_list_item("UnorderedListItem(%s)\n", n)
+    end
+
+    def visit_dictionary_list(n)
+      visit_list("DictionaryList\n", n)
+    end
+
+    def visit_dictionary_list_item(n)
+      print_depth
+      printf("DictionaryListItem(%s, %s)\n", n.term, str_limit(n.str))
     end
 
     # visit root to generate intermediate-tree structure.

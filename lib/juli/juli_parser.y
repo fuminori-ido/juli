@@ -24,6 +24,7 @@ rule
     | ANY
     | ORDERED_LIST_ITEM   { Absyn::OrderedListItem.new(val[0]) }
     | UNORDERED_LIST_ITEM { Absyn::UnorderedListItem.new(val[0]) }
+    | DT STRING           { Absyn::DictionaryListItem.new(val[0], val[1]) }
 end
 
 ---- header
@@ -105,6 +106,19 @@ module Absyn
     end
   end
 
+  class DictionaryListItem < Node
+    attr_accessor :term, :str
+  
+    def initialize(term, str)
+      @term = term
+      @str  = str
+    end
+  
+    def accept(visitor)
+      visitor.visit_dictionary_list_item(self)
+    end
+  end
+
   class Visitor
     def visit_node(n); end
     def visit_array(n); end
@@ -112,6 +126,7 @@ module Absyn
     def visit_header(n); end
     def visit_ordered_list_item(n); end
     def visit_unordered_list_item(n); end
+    def visit_dictionary_list_item(n); end
   end
 end
 
@@ -197,6 +212,14 @@ class TreeBuilder < Absyn::Visitor
     @curr_list.add(Intermediate::UnorderedListItem.new(n.str))
   end
 
+  def visit_dictionary_list_item(n)
+    if !@curr_list
+      @curr_list = Intermediate::DictionaryList.new
+      @curr_header.add(@curr_list)
+    end
+    @curr_list.add(Intermediate::DictionaryListItem.new(n))
+  end
+
 private
   def list_break
     @curr_list = nil
@@ -226,24 +249,28 @@ private
         block_break(&block)
         @block_str = ''
         # clear block_str and skip empty line
-      when /^=\s+(.*$)$/
+      when /^=\s+(.*)$/
         header(1, $1, &block)
-      when /^==\s+(.*$)$/
+      when /^==\s+(.*)$/
         header(2, $1, &block)
-      when /^===\s+(.*$)$/
+      when /^===\s+(.*)$/
         header(3, $1, &block)
-      when /^====\s+(.*$)$/
+      when /^====\s+(.*)$/
         header(4, $1, &block)
-      when /^=====\s+(.*$)$/
+      when /^=====\s+(.*)$/
         header(5, $1, &block)
-      when /^======+\s+(.*$)$/
+      when /^======+\s+(.*)$/
         header(6, $1, &block)
-      when /^\d+\.\s+(.*$)$/
+      when /^\d+\.\s+(.*)$/
         block_break(&block)
         yield :ORDERED_LIST_ITEM, $1
-      when /^\*\s+(.*$)$/
+      when /^\*\s+(.*)$/
         block_break(&block)
         yield :UNORDERED_LIST_ITEM, $1
+      when /^(\S+)::\s*(.*)$/
+        block_break(&block)
+        yield :DT, $1
+        yield :STRING, $2
       else
         @block_str += line
       end

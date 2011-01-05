@@ -70,6 +70,8 @@ module Visitor
     def visit_ordered_list_item(n); ''; end
     def visit_unordered_list(n); ''; end
     def visit_unordered_list_item(n); ''; end
+    def visit_dictionary_list(n); ''; end
+    def visit_dictionary_list_item(n); ''; end
 
     def visit_header(n)
       if n.level > 0
@@ -170,6 +172,16 @@ module Visitor
       content_tag(:li, n.str)
     end
 
+    def visit_dictionary_list(n)
+      visit_list(:table, n, :class=>'juli_dictionary')
+    end
+
+    def visit_dictionary_list_item(n)
+      content_tag(:tr) do
+        content_tag(:td, n.term + ':') + content_tag(:td, n.str)
+      end
+    end
+
     # visit root to generate:
     #
     # 1st:: HTML body
@@ -223,8 +235,8 @@ module Visitor
       h.join('.')
     end
 
-    def visit_list(tag, n)
-      content_tag(tag) do
+    def visit_list(tag, n, options={})
+      content_tag(tag, options) do
         n.array.inject('') do |result, child|
           result += child.accept(self)
         end
