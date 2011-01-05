@@ -34,8 +34,10 @@ module Intermediate
   end
 
   # level==0 is top level array node.
+  #
+  # NOTE: @dom_id will be used for only Html visitor and contents helper.
   class HeaderNode < ArrayNode
-    attr_accessor :level, :str
+    attr_accessor :level, :str, :dom_id
 
     # === INPUTS
     # two patterns are considered:

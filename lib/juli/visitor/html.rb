@@ -42,18 +42,97 @@ module Visitor
 
   # define Juli specific HTML helper
   module HtmlHelper
-    def toggle_top(label = 'Toggle Top')
-      content_tag(:a, label, :onclick=>"Juli.toggle_top()")
+    # TRICKY PART: header_id is used for 'contents' helper link.
+    # Intermediate::HeaderNode.dom_id cannot be used directory for
+    # this purpose since when clicking a header of 'contents',
+    # document jumps to its contents rather than header so that
+    # header is hidden on browser.  To resolve this, header_id
+    # is required for 'contents' helper and it is set at Html visitor.
+    def header_id(n)
+      "#{n.dom_id}_header"
+    end
+
+
+    # draw contents(outline) of this document.
+    def contents
+      ContentsDrawer.new.run(nil, @root)
+    end
+  end
+
+  # generate contents
+  class ContentsDrawer < ::Intermediate::Visitor
+    include TagHelper
+    include HtmlHelper
+
+    def visit_node(n); ''; end
+    def visit_default(n); ''; end
+    def visit_ordered_list(n); ''; end
+    def visit_ordered_list_item(n); ''; end
+    def visit_unordered_list(n); ''; end
+    def visit_unordered_list_item(n); ''; end
+
+    def visit_header(n)
+      if n.level > 0
+        content_tag(:li) do
+          content_tag(:a, :href=>'#' + header_id(n)) do
+            n.str
+          end
+        end
+      else
+        ''
+      end +
+      content_tag(:ol) do
+        n.array.inject(''){|result, child|
+          result += child.accept(self)
+        }
+      end
+    end
+
+    def run(in_file, root)
+      root.accept(self)
+    end
+  end
+
+  # assign DOM id on header node.
+  #
+  # IdAssigner should be executed before running Html visitor since
+  # ContentsDrawer also refers DOM id.  That is the reason why DOM id
+  # assignment is isolated from Html visitor.
+  class IdAssigner < ::Intermediate::Visitor
+    def initialize
+      super
+      @uniq_id_seed   = 0
+    end
+  
+    def visit_header(n)
+      if n.level > 0
+        n.dom_id = uniq_id(n.level)
+      end
+      for child in n.array do
+        child.accept(self)
+      end
+    end
+
+    def run(in_file, root)
+      root.accept(self)
+    end
+
+  private
+    # generate uniq_id, and track it for each level to be used later
+    def uniq_id(level)
+      @uniq_id_seed += 1
+      result = sprintf("j%05d", @uniq_id_seed)
+      result
     end
   end
 
   # Visitor::Html visits Intermediate tree and generates HTML
   class Html < ::Intermediate::Visitor
     include TagHelper
+    include HtmlHelper
   
     def initialize
       super
-      @uniq_id_seed   = 0
       @header_number  = {}
      #@dom            = {}
     end
@@ -68,9 +147,8 @@ module Visitor
       if n.level == 0
         header_content(n)
       else
-        id = uniq_id(n.level)
-        header_link(n, id) +
-        content_tag(:div, :id=>id) do
+        header_link(n) +
+        content_tag(:div, :id=>n.dom_id) do
           header_content(n)
         end + "\n"
       end
@@ -97,6 +175,10 @@ module Visitor
     # 1st:: HTML body
     # 2nd:: whole HTML by ERB.
     def run(in_file, root)
+      IdAssigner.new.run(in_file, root)
+
+      # store to instance var for 'contents' helper
+      @root       = root
       title       = File.basename(in_file.gsub(/\.[^.]*$/, ''))
       javascript  = 'juli.js'
       stylesheet  = 'juli.css'
@@ -110,19 +192,6 @@ module Visitor
     end
 
   private
-    # generate uniq_id, and track it for each level to be used later
-    def uniq_id(level)
-      @uniq_id_seed += 1
-      result = sprintf("j%05d", @uniq_id_seed)
-=begin
-      if !@dom[level]
-        @dom[level] = []
-      end
-      @dom[level] << result
-=end
-      result
-    end
-
     # common for all h0, h1, ..., h6
     def header_content(n)
       n.array.inject(''){|result, child|
@@ -131,8 +200,9 @@ module Visitor
     end
 
     # draw <hi>... link, where i=1..6
-    def header_link(n, id)
-      content_tag("h#{n.level}") do
+    def header_link(n)
+      id = n.dom_id
+      content_tag("h#{n.level}", :id=>header_id(n)) do
         content_tag(:span, :class=>'juli_toggle', :onclick=>"Juli.toggle('#{id}');") do
           content_tag(:span, '[+] ', :id=>"#{id}_p", :class=>'juli_toggle_node',  :style=>'display:none;') +
           content_tag(:span, '[-] ', :id=>"#{id}_m", :class=>'juli_toggle_node') +

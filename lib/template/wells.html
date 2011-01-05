@@ -9,6 +9,11 @@ javascript::  javascript url
 stylesheet::  stylesheet url
 body::        generate html
 
+= Optional methods
+
+Following helper methods are optional:
+
+contents::    draw contents of page
 -->
 <head>
   <title><%= title %></title>
@@ -17,6 +22,17 @@ body::        generate html
   <link href="<%= stylesheet %>" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<center>
+  <div style='font-size:160%;'>
+    <%= title %>
+  </div>
+</center>
+<br/><br/>
+
+<b>Contents</b>:
+<%= contents %>
+<br/><br/>
+
 <%= body %>
 </body>
 </html>
