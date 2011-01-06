@@ -91,6 +91,9 @@ h6 span.juli_toggle_node {
   color:            #444;
 }
 
+ol, ul {
+  padding-left:     30px;
+}
 
 /* Dictionary list */
 table.juli_dictionary {
