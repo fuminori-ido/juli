@@ -25,6 +25,7 @@ rule
     | ORDERED_LIST_ITEM   { Absyn::OrderedListItem.new(val[0]) }
     | UNORDERED_LIST_ITEM { Absyn::UnorderedListItem.new(val[0]) }
     | DT STRING           { Absyn::DictionaryListItem.new(val[0], val[1]) }
+    | QUOTE               { Absyn::QuoteNode.new(val[0]) }
 end
 
 ---- header
@@ -119,6 +120,18 @@ module Absyn
     end
   end
 
+  class QuoteNode < Node
+    attr_accessor :str
+  
+    def initialize(str)
+      @str  = str
+    end
+  
+    def accept(visitor)
+      visitor.visit_quote(self)
+    end
+  end
+
   class Visitor
     def visit_node(n); end
     def visit_array(n); end
@@ -127,6 +140,7 @@ module Absyn
     def visit_ordered_list_item(n); end
     def visit_unordered_list_item(n); end
     def visit_dictionary_list_item(n); end
+    def visit_quote(n); end
   end
 end
 
@@ -220,9 +234,18 @@ class TreeBuilder < Absyn::Visitor
     @curr_list.add(Intermediate::DictionaryListItem.new(n))
   end
 
+  def visit_quote(n)
+    if !@curr_quote
+      @curr_quote = Intermediate::QuoteNode.new
+      @curr_header.add(@curr_quote)
+    end
+    @curr_quote.str += n.str
+  end
+
 private
   def list_break
-    @curr_list = nil
+    @curr_list  = nil
+    @curr_quote = nil
   end
 end
 
@@ -271,6 +294,8 @@ private
         block_break(&block)
         yield :DT, $1
         yield :STRING, $2
+      when /^(\s+)(.*)$/
+        yield :QUOTE, $2 + "\n"
       else
         @block_str += line
       end

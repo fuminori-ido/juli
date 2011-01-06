@@ -50,6 +50,11 @@ module Visitor
       printf("DictionaryListItem(%s, %s)\n", n.term, str_limit(n.str))
     end
 
+    def visit_quote(n)
+      print_depth
+      printf("QuoteNode(%s)\n", str_limit(n.str))
+    end
+
     # visit root to generate intermediate-tree structure.
     def run(in_file, root)
       root.accept(self)

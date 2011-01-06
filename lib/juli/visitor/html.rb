@@ -72,6 +72,7 @@ module Visitor
     def visit_unordered_list_item(n); ''; end
     def visit_dictionary_list(n); ''; end
     def visit_dictionary_list_item(n); ''; end
+    def visit_quote(n); ''; end
 
     def visit_header(n)
       if n.level > 0
@@ -180,6 +181,10 @@ module Visitor
       content_tag(:tr) do
         content_tag(:td, n.term + ':') + content_tag(:td, n.str)
       end
+    end
+
+    def visit_quote(n)
+      content_tag(:blockquote, content_tag(:pre, n.str))
     end
 
     # visit root to generate:

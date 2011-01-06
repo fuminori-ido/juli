@@ -4,6 +4,10 @@ div.title {
   color:            #000088;
 }
 
+p.default {
+  padding-left:     10px;
+}
+
 
 /*----------------------------------------------------------------
 Headers
@@ -51,16 +55,15 @@ h4 {
   text-decoration:  underline;
 }
 
-p.default {
-  padding-left:     10px;
-}
-
 
 /*----------------------------------------------------------------
 Toggle action on node
 ----------------------------------------------------------------*/
 span.juli_toggle {
   cursor:           pointer;
+}
+span.juli_toggle:hover {
+  background:       #af8;
 }
 
 h1 span.juli_toggle {
@@ -89,9 +92,16 @@ h6 span.juli_toggle_node {
 }
 
 
-/*----------------------------------------------------------------
-Dictionary list
-----------------------------------------------------------------*/
+/* Dictionary list */
 table.juli_dictionary {
-  /* currently, empty is enough */
+  padding-left:     10px;
+}
+
+/* block quote */
+blockquote {
+  background:       #eec;
+  border:           1px solid #444;
+}
+blockquote pre {
+  margin:           0px;
 }

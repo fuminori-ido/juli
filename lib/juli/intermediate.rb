@@ -124,6 +124,18 @@ module Intermediate
       visitor.visit_dictionary_list_item(self)
     end
   end
+
+  class QuoteNode < Node
+    attr_accessor :str
+
+    def initialize
+      @str = ''
+    end
+
+    def accept(visitor)
+      visitor.visit_quote(self)
+    end
+  end
   
   class Visitor
     def visit_node(n); end
@@ -135,6 +147,7 @@ module Intermediate
     def visit_unordered_list_item(n); end
     def visit_dictionary_list(n); end
     def visit_dictionary_list_item(n); end
+    def visit_quote(n); end
 
     # run whole action for tree.  This is just sample implementation.
     # Derived class must implement this method.
