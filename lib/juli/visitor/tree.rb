@@ -1,5 +1,9 @@
+require 'juli/intermediate'
+
 module Visitor
-  class Tree < Intermediate::Visitor
+  # Another VISITOR-pattern for Intermediate tree to print tree
+  # structure around each node.
+  class Tree < ::Intermediate::Visitor
     def self.run
       # do nothing
     end

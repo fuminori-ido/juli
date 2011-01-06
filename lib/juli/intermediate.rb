@@ -1,3 +1,4 @@
+# intermediate tree nodes
 module Intermediate
   class Node
     attr_accessor :parent
@@ -137,6 +138,19 @@ module Intermediate
     end
   end
   
+  # define VISITOR-pattern around Intermediate tree.
+  #
+  # === How to add new generator
+  # Document generator, which juli(1) command says, points to 'visitor'
+  # internally because it is VISITOR-pattern.
+  # When adding new visitor, for example PDF-generator,
+  # can be used by 'juli -g pdf' (let me assume the file name is pdf.rb).
+  # Here is the step how to add new visitor:
+  #
+  # 1. create lib/juli/visitor/pdf.rb.  Probably, it is easy to copy
+  #    from another visitor file (e.g. html.rb).
+  # 1. implement the pdf.rb.  Most important taks, of course...
+  #
   class Visitor
     # This method is invoked when no files are specified at juli(1) 
     # command line.  Derived class must implement this.
@@ -155,7 +169,8 @@ module Intermediate
     def visit_dictionary_list_item(n); end
     def visit_quote(n); end
 
-    # run whole action for tree.  This is just sample implementation.
+    # run whole action for tree.
+    # Here is just sample implementation.
     # Derived class must implement this method.
     #
     # === INPUTS

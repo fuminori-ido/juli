@@ -21,6 +21,8 @@ Rake::RDocTask.new('doc') do |t|
                 '--charset'       << 'utf-8'
   t.rdoc_files.include('doc/README_FOR_APP')
   t.rdoc_files.include('lib/**/*.rb')
+  t.rdoc_files.include('lib/juli/juli_parser.y')
+  t.rdoc_files.exclude('lib/juli/juli_parser.tab.rb')
   t.rdoc_files.include('bin/juli')
 end
 
