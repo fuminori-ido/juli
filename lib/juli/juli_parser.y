@@ -313,7 +313,7 @@ private
 
   # process block, then process header
   def header(level, string, &block)
-    block_break
+    block_break(&block)
     yield :H,       level
     yield :STRING,  string
   end

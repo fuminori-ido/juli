@@ -1,3 +1,4 @@
+require 'pathname'
 require 'juli/intermediate'
 
 module Visitor
@@ -56,6 +57,13 @@ module Visitor
     # draw contents(outline) of this document.
     def contents
       ContentsDrawer.new.run(nil, @root)
+    end
+
+    # return relative path from src to dest
+    def relative_from(src, dest)
+      result = []
+      Pathname.new(File.dirname(src)).descend{|dir| result << '..'}
+      File.join(result, dest)
     end
   end
 
@@ -129,11 +137,106 @@ module Visitor
     end
   end
 
+  module Util
+    JULI_ROOT_ANCHOR = '.juli'
+
+    # mkdir for out_file if necessary
+    def mkdir(path)
+      dir = File.dirname(path)
+      if !File.directory?(dir)
+        FileUtils.mkdir_p(dir)
+      end
+    end
+
+    # === INPUTS
+    # in_filename:: relative path under repository
+    #
+    # === RETURN
+    # full path of out filename
+    #
+    # === EXAMPLE
+    # diary/2010/12/31.txt -> OUTPUT_TOP/diary/2010/12/31.html
+    #
+    def out_filename(in_filename)
+      File.join(OUTPUT_TOP, in_filename.gsub(/\.[^\.]*/,'') + '.html')
+    end
+
+    # === INPUTS
+    # out_filename:: relative path under OUTPUT_TOP
+    #
+    # === RETURN
+    # relative path of in-filename, but **no extention**.
+    #
+    # === EXAMPLE
+    # diary/2010/12/31.html -> diary/2010/12/31
+    def in_filename(out_filename)
+      File.join(File.dirname(out_filename), File.basename(out_filename).gsub(/\.[^\.]*/,''))
+    end
+
+    # find juli repository root from the specified path.
+    def find_root(path = '.')
+      Pathname.new(path).ascend do |p|
+        p_str = File.join(p, JULI_ROOT_ANCHOR)
+        if File.directory?(p_str)
+          return p
+        end
+      end
+      raise "cannot find juli repository root."
+    end
+  end
+
   # Visitor::Html visits Intermediate tree and generates HTML
+  #
+  # Text files under juli-repository must have '.txt' extention.
   class Html < ::Intermediate::Visitor
     include TagHelper
     include HtmlHelper
-  
+    include Util
+    extend  Util
+
+    def self.run
+      sync
+    end
+
+    # synchronize repository and OUTPUT_TOP:
+    #
+    # 1. new file exists, generate it.
+    # 1. repo's file timestamp is newer than the one under OUTPUT_TOP, regenerate it.
+    # 1. correspondent file of OUTPUT_TOP/.../f doesn't exist in repo, delete it.
+    def self.sync
+      repo      = {}
+      repo_root = Pathname.new(find_root).realpath
+      Dir.chdir(repo_root){
+        Dir.glob('**/*.txt'){|f|
+          repo[f] = 1
+        }
+      }
+
+      # When new file exists, generate it.
+      # When repo's file timestamp is newer than OUTPUT_TOP, regenerate it.
+      for f,v in repo do
+        out_file = out_filename(f)
+        if File.exist?(out_file) &&
+           File.stat(out_file).mtime >= File.stat(File.join(repo_root,f)).mtime
+          printf("%s is already updated.\n", out_file)
+        else
+          JuliParser.new.parse(f, self)
+        end
+      end
+
+      # When correspondent file of OUTPUT_TOP/.../f doesn't exist in repo,
+      # delete it.
+      Dir.chdir(OUTPUT_TOP){
+        Dir.glob('**/*.html'){|f|
+          in_file = File.join(repo_root, in_filename(f))
+          if !File.exist?(in_file) && !File.exist?(in_file + '.txt')
+            FileUtils.rm(f)
+            printf("%s is deleted since no correspondent source text.\n", f)
+          end
+        }
+      }
+    end
+
     def initialize
       super
       @header_number  = {}
@@ -197,18 +300,22 @@ module Visitor
       # store to instance var for 'contents' helper
       @root       = root
       title       = File.basename(in_file.gsub(/\.[^.]*$/, ''))
-      javascript  = 'juli.js'
-      stylesheet  = 'juli.css'
+      prototype   = relative_from(in_file, 'prototype.js')
+      javascript  = relative_from(in_file, 'juli.js')
+      stylesheet  = relative_from(in_file, 'juli.css')
       body        = root.accept(self)
      #body       += gen_data            # add dom data
       erb         = ERB.new(File.read(File.join(PKG_ROOT, 'lib/template/wells.html')))
-      out_file    = File.join(OUTPUT_TOP, File.basename(in_file).gsub(/\.[^\.]*/,'') + '.html')
-      File.open(out_file, 'w') do |f|
+      out_path    = out_filename(in_file)
+      mkdir(out_path)
+      File.open(out_path, 'w') do |f|
         f.write(erb.result(binding))
       end
+      printf("%s is generated.\n", out_filename(in_file))
     end
 
   private
+
     # common for all h0, h1, ..., h6
     def header_content(n)
       n.array.inject(''){|result, child|

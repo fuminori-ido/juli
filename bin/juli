@@ -1,15 +1,13 @@
+#!/usr/bin/env ruby
+#
 # = NAME
-# ruby juli    - Personal outline processor and wiki
+# juli    - Personal outline processor and wiki
 #
 # = SYNOPSIS
-# juli
+# juli [options] [files]
 #
 # = DESCRIPTION
-#
-# == Feature
-# * RD subset
-# * Auto link like wiki
-# * Outline on HTML
+# see doc/juli.txt for more detail.
 
 $LOAD_PATH << File.join(File.dirname(__FILE__), '../lib')
 
@@ -85,4 +83,10 @@ end
   OPTS = {:g=>'html'}
   opt.on('-g generator', visitor_list){|v| OPTS[:g] = v}
   opt.parse!(ARGV)
-  JuliParser.new.parse(ARGV[0], visitor(OPTS[:g]))
+  if ARGV.size == 0
+    visitor(OPTS[:g]).run
+  else
+    for file in ARGV do
+      JuliParser.new.parse(file, visitor(OPTS[:g]))
+    end
+  end

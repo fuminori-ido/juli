@@ -138,6 +138,12 @@ module Intermediate
   end
   
   class Visitor
+    # This method is invoked when no files are specified at juli(1) 
+    # command line.  Derived class must implement this.
+    def self.run
+      raise "Not yet implemented."
+    end
+
     def visit_node(n); end
     def visit_default(n); end
     def visit_header(n); end

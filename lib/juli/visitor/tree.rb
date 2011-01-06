@@ -1,5 +1,9 @@
 module Visitor
   class Tree < Intermediate::Visitor
+    def self.run
+      # do nothing
+    end
+
     def initialize
       super
       @depth = 0

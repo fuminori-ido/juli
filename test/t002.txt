@@ -1,6 +1,0 @@
-case: top_elements only
-
-hello
-World
-
-I'am wells.

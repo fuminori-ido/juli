@@ -13,3 +13,13 @@ Rake::TestTask.new do |t|
   t.pattern = 'test/**/*_test.rb'
   t.verbose = true
 end
+
+Rake::RDocTask.new('doc') do |t|
+  t.rdoc_dir  = 'doc/app'
+  t.title     = 'juli API'
+  t.options  << '--line-numbers'  << '--inline-source' <<
+                '--charset'       << 'utf-8'
+  t.rdoc_files.include('doc/README_FOR_APP')
+  t.rdoc_files.include('lib/**/*.rb')
+  t.rdoc_files.include('bin/juli')
+end
