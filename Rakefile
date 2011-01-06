@@ -23,3 +23,8 @@ Rake::RDocTask.new('doc') do |t|
   t.rdoc_files.include('lib/**/*.rb')
   t.rdoc_files.include('bin/juli')
 end
+
+desc 'clean working files'
+task :clean do
+  sh "find . -name '*~' -exec rm {} \\;"
+end
