@@ -290,7 +290,7 @@ private
       when /^\*\s+(.*)$/
         block_break(&block)
         yield :UNORDERED_LIST_ITEM, $1
-      when /^(\S+)::\s*(.*)$/
+      when /^(.*)::\s*(.*)$/
         block_break(&block)
         yield :DT, $1
         yield :STRING, $2
