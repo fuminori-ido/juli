@@ -50,19 +50,23 @@ Juli document syntax is similar to rd.
 
 Beggining '=' in line means header.  6 level headers can be used as follows:
 
-1. '='
-1. '=='
-1. '==='
-1. '===='
-1. '====='
-1. '======'
+1. '= Top level header title'
+1. '== Second level header title'
+1. '=== 3rd level header title'
+1. '==== 4th level header title'
+1. '===== 5th level header title'
+1. '====== 6th level header title'
 
 Example:
 
+
   = NAME
-  juli
+  juli    - Outline processor
+
   = SYNOPSIS
-  juli file
+  juli [-g generator] file
+
+will be what you see at the top of this page...
 
 === List
 ==== Ordered List
@@ -75,6 +79,11 @@ Example:
 
   1. Hello
   1. World
+
+will be:
+
+1. Hello
+1. World
 
 Restriction:
 
@@ -89,6 +98,11 @@ Example:
 
   * Hello
   * World
+
+will be:
+
+* Hello
+* World
 
 Restriction:
 
@@ -105,10 +119,27 @@ Example:
 
   Ruby::  programing language, or a gem
 
+will be:
+
+Ruby::  programing language, or a gem
+
+==== Block Quote
+
+The line with leading spaces is recognized as blockquote.
+Example:
+
+  |   "The load to hell is paved with good intentions."
+  |   -- derived proverb from original thought of Saint Bernard of Clairvaux
+
+will be:
+
+  "The load to hell is paved with good intentions."
+  -- derived proverb from original thought of Saint Bernard of Clairvaux
+
+(Where, '|' above is to avoid deleting spaces.  Please ignore it.)
 
 = TODO
 
-1. blockquote
 1. Wiki
 1. git for version control and publish
 1. fix following situation:
