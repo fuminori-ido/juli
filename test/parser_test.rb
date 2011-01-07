@@ -5,7 +5,7 @@ class ParserTest < Test::Unit::TestCase
     stdout_to_dev_null do
       for file in ['t001.txt', 't002.txt'] do
         assert_nothing_raised do
-          JuliParser.new.parse(data_path(file), Visitor::Tree)
+          Juli::Parser.new.parse(data_path(file), Visitor::Tree)
         end
       end
     end

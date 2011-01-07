@@ -2,7 +2,7 @@
 juli    - Outline processor
 
 = SYNOPSIS
-juli [-g generator] file
+juli [-g generator] [files]
 
 = DESCRIPTION
 juli is an outline processor.
@@ -169,8 +169,6 @@ Bad Example:
 
 = TODO
 
-1. API documentation
-  1. add *.y
 1. Wiki
 1. git for version control and publish
 1. fix following situation:

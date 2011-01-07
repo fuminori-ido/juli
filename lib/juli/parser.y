@@ -3,7 +3,7 @@
 # = FIXME
 # Two pass (1. build Absyn tree, 2. build Intermediate tree) may be
 # merged into one pass, but I couldn't do that.
-class JuliParser
+class Juli::Parser
   options no_result_var
 
 rule

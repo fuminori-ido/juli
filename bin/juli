@@ -14,7 +14,8 @@ $LOAD_PATH << File.join(File.dirname(__FILE__), '../lib')
 require 'erb'
 require 'fileutils'
 require 'optparse'
-require 'juli/juli_parser.tab.rb'
+require 'juli/command'
+
 
 #------------------------------------------------------------------
 # Configuration Part
@@ -26,6 +27,7 @@ OUTPUT_TOP    = ENV['HOME'] + '/juli'
 #------------------------------------------------------------------
 # Global variable
 #------------------------------------------------------------------
+Version       = '0.01.0'
 PKG_ROOT      = File.join(File.dirname(__FILE__), '..')
 TEMPLATE_PATH = File.join(PKG_ROOT, 'lib/template')
 
@@ -60,33 +62,41 @@ def visitor_list
   'generator: ' + result.join(',') + ' (default=html)'
 end
 
-def camelize(str)
-  str.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
-end
+def usage
+  <<EOM
+USAGE: juli [general_options] COMMAND [command_options] [files]
 
-# Visitor::#{str} constantize
-def visitor(str)
-  camelized = camelize(str)
-  if Visitor.const_defined?(camelized)
-    Visitor.const_get(camelize(str))
-  else
-    raise "Visitor #{camelized} is not defined."
-  end
-end
+general_options:
+  --help
+  --version
 
+COMMAND (default = gen):
+  gen  
+
+command_options for:
+  gen:
+    -g generator
+EOM
+end
 
 #------------------------------------------------------------------
 # Main
 #------------------------------------------------------------------
+  include Juli::Command
+
   init
+  OPTS    = {:g=>'html'}
+  command = 'gen'
+
+  # parse common & default options
+  OptionParser.new(usage).order!(ARGV)
+
+  # check command
+  command = ARGV.shift if !ARGV.empty?
+
+  # parse command options
   opt = OptionParser.new
-  OPTS = {:g=>'html'}
-  opt.on('-g generator', visitor_list){|v| OPTS[:g] = v}
-  opt.parse!(ARGV)
-  if ARGV.size == 0
-    visitor(OPTS[:g]).run
-  else
-    for file in ARGV do
-      JuliParser.new.parse(file, visitor(OPTS[:g]))
-    end
-  end
+  opt.on('-g generator',  visitor_list){|v| OPTS[:g]  = v}
+  opt.order!(ARGV)
+
+  Juli::Command::run(command, OPTS)

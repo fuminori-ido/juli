@@ -41,7 +41,9 @@ module Visitor
     end
   end
 
-  # define Juli specific HTML helper
+  # define Juli specific HTML helper.
+  #
+  # Any method here can be used at html template.
   module HtmlHelper
     # TRICKY PART: header_id is used for 'contents' helper link.
     # Intermediate::HeaderNode.dom_id cannot be used directory for
