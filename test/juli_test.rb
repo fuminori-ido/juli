@@ -5,15 +5,16 @@ class JuliTest < Test::Unit::TestCase
     check(true,   '--help')
     check(true,   '--version')
     check(false,  '-z')
+    check(false,  '/etc/group')
   end
 
 private
-  def check(expected, option)
-    assert_equal expected, run_command(option)
+  def check(expected, *args)
+    assert_equal expected, run_command(args)
   end
 
-  def run_command(option)
-    system 'ruby', File.join(File.dirname(__FILE__), '../bin/juli'), option
+  def run_command(*args)
+    system *['ruby', File.join(File.dirname(__FILE__), '../bin/juli'), args].flatten
   end
 
   # redirect STDOUT in this block
