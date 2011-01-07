@@ -2,7 +2,7 @@
 juli    - Outline processor
 
 = SYNOPSIS
-juli [-g generator] [files]
+juli [general_options] COMMAND [command_options] [files]
 
 = DESCRIPTION
 juli is an outline processor.
@@ -40,7 +40,30 @@ numbering:-(
 
 == Options
 
---help::              Show help
+general options are:
+
+--help::      show help
+--version::   show version
+
+command specific options will be explaind below.
+
+== COMMAND
+
+Currently, only 'gen' command is supported, and it is default.
+When files are specified, each file will be converted by generator (default
+is html). When no files are specified, bulk mode is executed.
+
+Example:
+
+  juli                    # generate in bulk mode
+  juli gen doc/poem.txt   # generate for the file
+  juli gen -g tree        # show text tree in bulk mode
+
+Wrong Example:
+
+  juli doc/poem.txt       # the file is interpreted as command, so resulted error. 
+
+=== options for 'gen'
 -g <i>generator</i>:: Specify generator.  Supported generators are in lib/juli/visitor/ directory.  Default is html.
 
 == Configuration
