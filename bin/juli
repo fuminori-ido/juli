@@ -62,22 +62,6 @@ def visitor_list
   'generator: ' + result.join(',') + ' (default=html)'
 end
 
-def usage
-  <<EOM
-USAGE: juli [general_options] COMMAND [command_options] [files]
-
-general_options:
-  --help
-  --version
-
-COMMAND (default = gen):
-  gen  
-
-command_options for:
-  gen:
-    -g generator
-EOM
-end
 
 #------------------------------------------------------------------
 # Main
