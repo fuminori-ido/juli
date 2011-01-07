@@ -1,4 +1,6 @@
 require 'pathname'
+require 'juli'
+require 'juli/util'
 require 'juli/intermediate'
 
 module Visitor
@@ -140,8 +142,6 @@ module Visitor
   end
 
   module Util
-    JULI_ROOT_ANCHOR = '.juli'
-
     # mkdir for out_file if necessary
     def mkdir(path)
       dir = File.dirname(path)
@@ -160,7 +160,7 @@ module Visitor
     # diary/2010/12/31.txt -> OUTPUT_TOP/diary/2010/12/31.html
     #
     def out_filename(in_filename)
-      File.join(OUTPUT_TOP, in_filename.gsub(/\.[^\.]*/,'') + '.html')
+      File.join(conf['output_top'], in_filename.gsub(/\.[^\.]*/,'') + '.html')
     end
 
     # === INPUTS
@@ -174,17 +174,6 @@ module Visitor
     def in_filename(out_filename)
       File.join(File.dirname(out_filename), File.basename(out_filename).gsub(/\.[^\.]*/,''))
     end
-
-    # find juli repository root from the specified path.
-    def find_root(path = '.')
-      Pathname.new(path).ascend do |p|
-        p_str = File.join(p, JULI_ROOT_ANCHOR)
-        if File.directory?(p_str)
-          return p
-        end
-      end
-      raise "cannot find juli repository root."
-    end
   end
 
   # Visitor::Html visits Intermediate tree and generates HTML
@@ -196,6 +185,32 @@ module Visitor
     include Util
     extend  Util
 
+    def self.copy_to_output_top(file)
+      dest_path = File.join(conf['output_top'], file)
+      if !File.exist?(dest_path)
+        FileUtils.cp(File.join(Juli::TEMPLATE_PATH, file), dest_path,
+            :preserve=>true)
+      end
+    end
+    
+    # Html sepecific initialization does:
+    #
+    # 1. create output_top.
+    # 1. copy *.js, *.css files to output_top/
+    #
+    # NOTE: this is executed every juli(1) run with -g html option
+    # (usually 99% is so), so be careful to avoid multiple initialization.
+    def self.init
+      if !File.directory?(conf['output_top'])
+        FileUtils.mkdir_p(conf['output_top'])
+      end
+      copy_to_output_top('prototype.js')
+      copy_to_output_top('juli.js')
+      copy_to_output_top('juli.css')
+    end
+
+    # run in bulk-mode.  In Html visitor, it sync juli-repository and
+    # OUTPUT_TOP.
     def self.run
       sync
     end
@@ -207,8 +222,7 @@ module Visitor
     # 1. correspondent file of OUTPUT_TOP/.../f doesn't exist in repo, delete it.
     def self.sync
       repo      = {}
-      repo_root = Pathname.new(find_root).realpath
-      Dir.chdir(repo_root){
+      Dir.chdir(juli_repo){
         Dir.glob('**/*.txt'){|f|
           repo[f] = 1
         }
@@ -219,8 +233,8 @@ module Visitor
       for f,v in repo do
         out_file = out_filename(f)
         if File.exist?(out_file) &&
-           File.stat(out_file).mtime >= File.stat(File.join(repo_root,f)).mtime
-          printf("already updated: %s\n", out_file)
+           File.stat(out_file).mtime >= File.stat(File.join(juli_repo,f)).mtime
+          #printf("already updated: %s\n", out_file)
         else
           Juli::Parser.new.parse(f, self)
         end
@@ -228,9 +242,9 @@ module Visitor
 
       # When correspondent file of OUTPUT_TOP/.../f doesn't exist in repo,
       # delete it.
-      Dir.chdir(OUTPUT_TOP){
+      Dir.chdir(conf['output_top']){
         Dir.glob('**/*.html'){|f|
-          in_file = File.join(repo_root, in_filename(f))
+          in_file = File.join(juli_repo, in_filename(f))
           if !File.exist?(in_file) && !File.exist?(in_file + '.txt')
             FileUtils.rm(f)
             printf("%s is deleted since no correspondent source text.\n", f)
@@ -242,7 +256,6 @@ module Visitor
     def initialize
       super
       @header_number  = {}
-     #@dom            = {}
     end
   
     def visit_default(n)
@@ -306,8 +319,7 @@ module Visitor
       javascript  = relative_from(in_file, 'juli.js')
       stylesheet  = relative_from(in_file, 'juli.css')
       body        = root.accept(self)
-     #body       += gen_data            # add dom data
-      erb         = ERB.new(File.read(File.join(PKG_ROOT, 'lib/template/wells.html')))
+      erb         = ERB.new(File.read(File.join(Juli::PKG_ROOT, 'lib/template/wells.html')))
       out_path    = out_filename(in_file)
       mkdir(out_path)
       File.open(out_path, 'w') do |f|
@@ -356,14 +368,5 @@ module Visitor
         end
       end
     end
-
-=begin
-    # generate Javascript dom data
-    def gen_data
-      content_tag(:script) do
-        "Juli.H1 = {'#{@dom[1].join(',')}'};\n"
-      end
-    end
-=end
   end
 end

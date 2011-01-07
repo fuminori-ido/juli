@@ -18,43 +18,17 @@ require 'juli/command'
 
 
 #------------------------------------------------------------------
-# Configuration Part
-#------------------------------------------------------------------
-# Top directory for output HTML.  Default = $HOME/juli/
-OUTPUT_TOP    = ENV['HOME'] + '/juli'
-
-
-#------------------------------------------------------------------
 # Global variable
 #------------------------------------------------------------------
 Version       = '0.01.0'
-PKG_ROOT      = File.join(File.dirname(__FILE__), '..')
-TEMPLATE_PATH = File.join(PKG_ROOT, 'lib/template')
 
 
 #------------------------------------------------------------------
 # Subroutine Part
 #------------------------------------------------------------------
-def copy_to_output_top(file)
-  dest_path = File.join(OUTPUT_TOP, file)
-  if !File.exist?(dest_path)
-    FileUtils.cp(File.join(TEMPLATE_PATH, file), dest_path,
-        :preserve=>true)
-  end
-end
-
-def init
-  if !File.directory?(OUTPUT_TOP)
-    FileUtils.mkdir_p(OUTPUT_TOP)
-  end
-  copy_to_output_top('prototype.js')
-  copy_to_output_top('juli.js')
-  copy_to_output_top('juli.css')
-end
-
 def visitor_list
   result = []
-  sorted_visitors = Dir.glob(File.join(PKG_ROOT, 'lib/juli/visitor/*.rb')).sort
+  sorted_visitors = Dir.glob(File.join(Juli::PKG_ROOT, 'lib/juli/visitor/*.rb')).sort
   for f in sorted_visitors do
     next if f =~ /^\./
     result << File.basename(f).gsub(/\.rb$/, '')
@@ -68,19 +42,27 @@ end
 #------------------------------------------------------------------
   include Juli::Command
 
-  init
   OPTS    = {:g=>'html'}
   command = 'gen'
 
   # parse common & default options
-  OptionParser.new(usage).order!(ARGV)
+  parser = OptionParser.new(usage)
+
+  subparsers = Hash.new{|h,k|
+    $stderr.puts "no such juli command: #{k}"
+    exit 1
+  }
+  s = subparsers['gen'] = OptionParser.new
+  s.on('-g generator',  visitor_list){|v| OPTS[:g]  = v}
+  s = subparsers['init'] = OptionParser.new
+  s.on('-o output_top'){|v| OPTS[:o]  = v}
+
+  parser.order!(ARGV)
 
   # check command
   command = ARGV.shift if !ARGV.empty?
 
   # parse command options
-  opt = OptionParser.new
-  opt.on('-g generator',  visitor_list){|v| OPTS[:g]  = v}
-  opt.order!(ARGV)
+  subparsers[command].parse!(ARGV) if !ARGV.empty?
 
   Juli::Command::run(command, OPTS)

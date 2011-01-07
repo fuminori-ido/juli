@@ -1,0 +1,11 @@
+README
+  this file.
+
+config
+  copied to test/repo/.juli/
+
+t001.txt
+  typical text
+
+t002.txt
+  no-header text

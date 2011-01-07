@@ -1,3 +1,8 @@
+require 'pathname'
+require 'singleton'
+require 'yaml'
+require 'juli'
+
 module Juli
   module Util
     def camelize(str)
@@ -23,12 +28,57 @@ general_options:
   --version
 
 COMMAND (default = gen):
+  init
   gen  
 
 command_options for:
+  init:
+    -o output_top
   gen:
     -g generator
 EOM
+    end
+
+    # find juli-repository root from the specified path.
+    class Repo
+      attr_reader :juli_repo 
+
+      def initialize(path = '.')
+        Pathname.new(path).realpath.ascend do |p|
+          p_str = File.join(p, Juli::REPO)
+          if File.directory?(p_str)
+            @juli_repo = p
+            return
+          end
+        end
+        raise "cannot find juli repository root."
+      end
+    end
+
+    # fullpath of juli-repository
+    #
+    # it is enough to have one value in whole juli modules so
+    # SINGLETON-pattern is used.
+    def juli_repo(path='.')
+      $_repo ||= Repo.new(path)
+      $_repo.juli_repo
+    end
+
+    class Config
+      include Singleton
+      class Error < Exception; end
+      attr_reader :conf
+
+      def initialize
+        @conf = YAML::load_file(File.join(juli_repo, Juli::REPO, 'config'))
+
+        raise Error if !@conf
+      end
+    end
+
+    # return REPO/config hash
+    def conf
+      Config.instance.conf
     end
   end
 end

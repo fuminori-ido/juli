@@ -4,10 +4,6 @@ module Visitor
   # Another VISITOR-pattern for Intermediate tree to print tree
   # structure around each node.
   class Tree < ::Intermediate::Visitor
-    def self.run
-      # do nothing
-    end
-
     def initialize
       super
       @depth = 0

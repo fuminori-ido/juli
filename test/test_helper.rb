@@ -7,4 +7,8 @@ class Test::Unit::TestCase
   Dir.glob(File.join(File.dirname(__FILE__), '../lib/**/*.rb')){|f|
     require f
   }
+
+  def repo4test
+    File.join(File.dirname(__FILE__), 'repo')
+  end
 end

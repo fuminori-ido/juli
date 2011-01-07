@@ -152,11 +152,16 @@ module Intermediate
   # 1. implement the pdf.rb.  Most important taks, of course...
   #
   class Visitor
-    # This method is invoked when no files are specified at juli(1) 
-    # command line.  Derived class must implement this.
-    def self.run
-      raise "Not yet implemented."
-    end
+    # 'init' is invoked at bulk-mode on every juli(1) command execution
+    # when this generator is specified so that the calling frequency
+    # is the same as run-method.  However, the purpose is different.
+    # That is the reason why two methods exist.
+    # Derived class should implement this.
+    def self.init; end
+
+    # 'run' is invoked at bulk-mode (when no files are specified at
+    # juli(1) command line).  Derived class should implement this.
+    def self.run; end
 
     def visit_node(n); end
     def visit_default(n); end
