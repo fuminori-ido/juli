@@ -220,9 +220,9 @@ module Visitor
         out_file = out_filename(f)
         if File.exist?(out_file) &&
            File.stat(out_file).mtime >= File.stat(File.join(repo_root,f)).mtime
-          printf("%s is already updated.\n", out_file)
+          printf("already updated: %s\n", out_file)
         else
-          JuliParser.new.parse(f, self)
+          Juli::Parser.new.parse(f, self)
         end
       end
 
@@ -313,7 +313,7 @@ module Visitor
       File.open(out_path, 'w') do |f|
         f.write(erb.result(binding))
       end
-      printf("%s is generated.\n", out_filename(in_file))
+      printf("generated:       %s\n", out_filename(in_file))
     end
 
   private
