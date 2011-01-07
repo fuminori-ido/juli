@@ -110,7 +110,7 @@ Wrong Example:
 
 == Juli Document Syntax
 
-Juli document syntax is similar to rd.
+Juli document syntax is similar to but very small subset of RD.
 
 
 === Header
@@ -237,6 +237,8 @@ juli-repo/.juli/config::  config file
 = TODO
 
 1. Wiki
+1. tutorial
+1. japanese doc
 1. git for version control and publish
 1. fix following situation:
   * abc
