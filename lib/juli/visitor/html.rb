@@ -1,5 +1,4 @@
 require 'pathname'
-require 'juli'
 require 'juli/util'
 require 'juli/intermediate'
 
@@ -63,10 +62,16 @@ module Visitor
       ContentsDrawer.new.run(nil, @root)
     end
 
-    # return relative path from src to dest
+    # dest's relative path from src
+    #
+    # === EXAMPLE
+    # relative_from('a.txt',   'juli.js'):: → './juli.js'
+    # relative_from('a/b.txt', 'juli.js'):: → '../juli.js'
     def relative_from(src, dest)
       result = []
-      Pathname.new(File.dirname(src)).descend{|dir| result << '..'}
+      Pathname.new(File.dirname(src)).descend{|dir|
+        result << (dir.to_s == '.' ? '.' : '..')
+      }
       File.join(result, dest)
     end
   end
