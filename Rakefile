@@ -2,7 +2,9 @@ require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
 
-juli_parser_rb  = 'lib/juli/parser.tab.rb'
+juli_parser_rb        = 'lib/juli/parser.tab.rb'
+test_conf_outout_top  = 'test/html'
+
 task :default => juli_parser_rb
 
 file juli_parser_rb => 'lib/juli/parser.y' do |t|
@@ -28,5 +30,5 @@ end
 desc 'clean working files'
 task :clean do
   sh "find . -name '*~' -exec rm {} \\;"
-  sh 'rm', '-f', juli_parser_rb
+  sh 'rm', '-rf', juli_parser_rb, test_conf_outout_top
 end
