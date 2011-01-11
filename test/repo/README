@@ -1,11 +1,14 @@
-README
+This directory contains test repository.
+.juli/ exists already.
+
+= README
   this file.
 
-config
+= config
   copied to test/repo/.juli/
 
-t001.txt
+= t001.txt
   typical text
 
-t002.txt
+= t002.txt
   no-header text
