@@ -26,7 +26,30 @@ partial
 
 = Wiki link
 
+== Wiki link on usual text
+
 Test link to HelloWorld wiki word!
+t001 is myself.
+t002 is here.
+t001 and t002 are linked.
+
+== Wiki link on ordered list
+1. Test link to HelloWorld wiki word!
+1. t001 is myself.
+1. t002 is here.
+1. t001 and t002 are linked.
+
+== Wiki link on unordered list
+* Test link to HelloWorld wiki word!
+* t001 is myself.
+* t002 is here.
+* t001 and t002 are linked.
+
+== Wiki link on dictionary list
+HelloWorld::  Test link to HelloWorld wiki word!
+t001::        t001 is myself.
+t002::        t002 is here.
+both::        t001 and t002 are linked.
 
 = SEE ALSO
 

@@ -7,7 +7,9 @@ Main topic for Juli API is as follows:
   * Visitor::Html
   * Visitor::Tree
   * How to implement another generator, see Intermediate::Visitor.
-* JuliParser
+* Parser
+  * Juli::Parser      - parse text file
+  * Juli::LineParser  - parse line
 * Intermediate tree
 
 For general information about juli(1), please see doc/juli.txt

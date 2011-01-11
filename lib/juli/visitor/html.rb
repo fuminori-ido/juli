@@ -182,6 +182,8 @@ module Visitor
     end
   end
 
+  # visits a line of document text and generate hyper-link when
+  # wikiname exists.
   class HtmlLine < ::LineAbsyn::Visitor
     include TagHelper
     include HtmlHelper
@@ -236,8 +238,11 @@ module Visitor
 
     # run in bulk-mode.  In Html visitor, it sync juli-repository and
     # OUTPUT_TOP.
-    def self.run
-      sync
+    #
+    # === Options
+    # :f::          force update
+    def self.run(opts={})
+      sync(opts)
     end
 
     # synchronize repository and OUTPUT_TOP:
@@ -247,7 +252,7 @@ module Visitor
     # 1. correspondent file of OUTPUT_TOP/.../f doesn't exist in repo, delete it.
     # 1. if -f option is specified, don't check timestamp and always generates.
     #
-    def self.sync
+    def self.sync(opts)
       repo      = {}
       Dir.chdir(juli_repo){
         Dir.glob('**/*.txt'){|f|
@@ -259,7 +264,7 @@ module Visitor
       # When repo's file timestamp is newer than OUTPUT_TOP, regenerate it.
       for f,v in repo do
         out_file = out_filename(f)
-        if !OPTS[:f] &&
+        if !opts[:f] &&
            File.exist?(out_file) &&
            File.stat(out_file).mtime >= File.stat(File.join(juli_repo,f)).mtime
           #printf("already updated: %s\n", out_file)
@@ -308,7 +313,7 @@ module Visitor
     end
 
     def visit_ordered_list_item(n)
-      content_tag(:li, n.str)
+      content_tag(:li, n.line.accept(HtmlLine.new))
     end
 
     def visit_unordered_list(n)
@@ -316,7 +321,7 @@ module Visitor
     end
 
     def visit_unordered_list_item(n)
-      content_tag(:li, n.str)
+      content_tag(:li, n.line.accept(HtmlLine.new))
     end
 
     def visit_dictionary_list(n)
@@ -325,7 +330,8 @@ module Visitor
 
     def visit_dictionary_list_item(n)
       content_tag(:tr) do
-        content_tag(:td, n.term + ':') + content_tag(:td, n.str)
+        content_tag(:td, n.term + ':') +
+        content_tag(:td, n.line.accept(HtmlLine.new))
       end
     end
 

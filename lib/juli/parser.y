@@ -88,10 +88,10 @@ module Absyn
   end
 
   class OrderedListItem < Node
-    attr_accessor :str
+    attr_accessor :line
   
     def initialize(str)
-      @str = str
+      @line = Juli::LineParser.new.parse(str, wikinames)
     end
   
     def accept(visitor)
@@ -100,10 +100,10 @@ module Absyn
   end
 
   class UnorderedListItem < Node
-    attr_accessor :str
+    attr_accessor :line
   
     def initialize(str)
-      @str = str
+      @line = Juli::LineParser.new.parse(str, wikinames)
     end
   
     def accept(visitor)
@@ -112,11 +112,11 @@ module Absyn
   end
 
   class DictionaryListItem < Node
-    attr_accessor :term, :str
+    attr_accessor :term, :line
   
     def initialize(term, str)
       @term = term
-      @str  = str
+      @line = Juli::LineParser.new.parse(str, wikinames)
     end
   
     def accept(visitor)
@@ -219,7 +219,7 @@ class TreeBuilder < Absyn::Visitor
       @curr_list = Intermediate::OrderedList.new
       @curr_header.add(@curr_list)
     end
-    @curr_list.add(Intermediate::OrderedListItem.new(n.str))
+    @curr_list.add(Intermediate::OrderedListItem.new(n.line))
   end
 
   def visit_unordered_list_item(n)
@@ -227,7 +227,7 @@ class TreeBuilder < Absyn::Visitor
       @curr_list = Intermediate::UnorderedList.new
       @curr_header.add(@curr_list)
     end
-    @curr_list.add(Intermediate::UnorderedListItem.new(n.str))
+    @curr_list.add(Intermediate::UnorderedListItem.new(n.line))
   end
 
   def visit_dictionary_list_item(n)

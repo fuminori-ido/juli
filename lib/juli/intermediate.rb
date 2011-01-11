@@ -78,10 +78,10 @@ module Intermediate
   end
 
   class OrderedListItem < Node
-    attr_accessor :str
+    attr_accessor :line
   
-    def initialize(str)
-      @str = str
+    def initialize(line)
+      @line = line
     end
   
     def accept(visitor)
@@ -96,10 +96,10 @@ module Intermediate
   end
 
   class UnorderedListItem < Node
-    attr_accessor :str
+    attr_accessor :line
   
-    def initialize(str)
-      @str = str
+    def initialize(line)
+      @line = line
     end
   
     def accept(visitor)
@@ -114,11 +114,11 @@ module Intermediate
   end
 
   class DictionaryListItem < Node
-    attr_accessor :term, :str
+    attr_accessor :term, :line
   
     def initialize(absyn_dictionary_list_item)
       @term = absyn_dictionary_list_item.term
-      @str  = absyn_dictionary_list_item.str
+      @line = absyn_dictionary_list_item.line
     end
   
     def accept(visitor)
@@ -161,7 +161,10 @@ module Intermediate
 
     # 'run' is invoked at bulk-mode (when no files are specified at
     # juli(1) command line).  Derived class should implement this.
-    def self.run; end
+    #
+    # === INPUTS
+    # opts::  option hash
+    def self.run(opts={}); end
 
     def visit_node(n); end
     def visit_default(n); end

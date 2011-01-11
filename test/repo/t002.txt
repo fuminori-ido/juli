@@ -6,3 +6,6 @@ World
 I'am wells.
 
 Test link to HelloWorld wiki word!
+
+t001 is here.
+t002 is myself.

@@ -58,7 +58,7 @@ module Visitor
     end
 
     def visit_ordered_list_item(n)
-      visit_list_item("OrderedListItem(%s)\n", n)
+      visit_list_item("OrderedListItem\n", n)
     end
 
     def visit_unordered_list(n)
@@ -66,7 +66,7 @@ module Visitor
     end
 
     def visit_unordered_list_item(n)
-      visit_list_item("UnorderedListItem(%s)\n", n)
+      visit_list_item("UnorderedListItem\n", n)
     end
 
     def visit_dictionary_list(n)
@@ -75,7 +75,10 @@ module Visitor
 
     def visit_dictionary_list_item(n)
       print_depth
-      printf("DictionaryListItem(%s, %s)\n", n.term, str_limit(n.str))
+      printf("DictionaryListItem(%s)\n", n.term)
+      @depth += 1
+      n.line.accept(LineTree.new(@depth))
+      @depth -= 1
     end
 
     def visit_quote(n)
@@ -101,7 +104,10 @@ module Visitor
 
     def visit_list_item(class_str, n)
       print_depth
-      printf(class_str, str_limit(n.str))
+      printf(class_str)
+      @depth += 1
+      n.line.accept(LineTree.new(@depth))
+      @depth -= 1
     end
   end
 end

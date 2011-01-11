@@ -11,13 +11,14 @@ When juli(1) command is executed, HTML is generated under <i>output_top</i>
 directory.  Where, <i>output_top</i> can be configured.
 Please see 'init' command section.
 
+
 == Purpose
 
 Purposes of juli are:
 
 * write my idea as quick as possible by using my favorite editor at anytime anyplace.
 * view outline.
-* link each memo together by wiki
+* auto-link each memo together as wiki
 * browse via web
 
 == Feature
@@ -27,6 +28,7 @@ Current juli has the following features:
 * toggle to show/hide each content.
 * header numbering.
 * bulk-mode update
+* auto link between memo
 
 Detail explanation for each feature is as follows:
 
@@ -49,6 +51,26 @@ only for updated text files.
 Juli-repository is a directory which contains several memos.
 output HTML directory can be configured at any place at 'init' command
 (explained later).
+
+=== auto link between memo
+
+Similar to <a href='http://en.wikipedia.org/wiki/Wiki'>wiki</a>,
+juli(1) creates links to another page when the source memo contains 
+a <i>filename</i> (without .txt extention) and the <i>filename</i>.txt
+exists.
+Unlink usual wiki, juli(1) automatically generates this link.
+
+Example:
+
+When source memo contains following paragraph:
+
+  Do you know hello world?  It is basic words in computing world.
+
+and there is computing.txt file in the same directory, the memo will be:
+
+  Do you know hello world?  It is basic words in <a href=#>computing</a> world.
+
+and the 'computing' hyper-link links to the target page.
 
 == Options
 
@@ -236,6 +258,7 @@ juli-repo/.juli/config::  config file
 
 = TODO
 
+1. t001.txt 'Wiki link on usual text' is wrong.
 1. Wiki
 1. tutorial
 1. japanese doc
@@ -260,6 +283,10 @@ iKnow::     TBD
 OneNote::   TBD
 
 = MISC
+== Terms
+
+memo:: text file.  a.k.a. document.
+
 == Author
 Fumisky Wells, https://sourceforge.net/users/fwells00
 

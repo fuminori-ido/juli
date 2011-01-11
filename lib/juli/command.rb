@@ -55,12 +55,14 @@ module Juli
     # === OPTIONS
     # -g generator
     def gen(opts)
+      o = opts.dup
+      o.delete(:g)
       # executes each generator's init here:
       visitor(opts[:g]).init
 
       if ARGV.empty?
         print "bulk mode\n"
-        visitor(opts[:g]).run
+        visitor(opts[:g]).run(o)
       else
         for file in ARGV do
           Juli::Parser.new.parse(file, visitor(opts[:g]))

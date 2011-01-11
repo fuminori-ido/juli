@@ -21,13 +21,22 @@ class CommandTest < Test::Unit::TestCase
   end
 
   def test_init
-    assert false
+    clean_output
+    assert_nothing_raised do
+      Juli::Command.run('init', :g=>'html')
+    end
+    assert_nothing_raised do
+      Juli::Command.run('init', :g=>'tree')
+    end
   end
 
   def test_gen
     clean_output
     assert_nothing_raised do
       Juli::Command.run('gen', :g=>'html')
+    end
+    assert_nothing_raised do
+      Juli::Command.run('gen', :g=>'tree')
     end
   end
 
