@@ -35,7 +35,8 @@ command_options for:
   init:
     -o output_top
   gen:
-    -g generator
+    -g generator      specify generator
+    -f                force generate
 EOM
     end
 

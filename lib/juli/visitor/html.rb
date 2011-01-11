@@ -245,6 +245,8 @@ module Visitor
     # 1. new file exists, generate it.
     # 1. repo's file timestamp is newer than the one under OUTPUT_TOP, regenerate it.
     # 1. correspondent file of OUTPUT_TOP/.../f doesn't exist in repo, delete it.
+    # 1. if -f option is specified, don't check timestamp and always generates.
+    #
     def self.sync
       repo      = {}
       Dir.chdir(juli_repo){
@@ -257,7 +259,8 @@ module Visitor
       # When repo's file timestamp is newer than OUTPUT_TOP, regenerate it.
       for f,v in repo do
         out_file = out_filename(f)
-        if File.exist?(out_file) &&
+        if !OPTS[:f] &&
+           File.exist?(out_file) &&
            File.stat(out_file).mtime >= File.stat(File.join(juli_repo,f)).mtime
           #printf("already updated: %s\n", out_file)
         else

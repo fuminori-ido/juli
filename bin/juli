@@ -53,7 +53,9 @@ end
     exit 1
   }
   s = subparsers['gen'] = OptionParser.new
-  s.on('-g generator',  visitor_list){|v| OPTS[:g]  = v}
+  s.on('-g generator',  visitor_list) {|v| OPTS[:g]  = v}
+  s.on('-f')                          {|v| OPTS[:f]  = true}
+
   s = subparsers['init'] = OptionParser.new
   s.on('-o output_top'){|v| OPTS[:o]  = v}
 
