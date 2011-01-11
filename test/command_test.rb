@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'test_helper'
 
+include Juli::Util
 include Juli::Command
 
 class CommandTest < Test::Unit::TestCase
@@ -20,11 +21,11 @@ class CommandTest < Test::Unit::TestCase
   end
 
   def test_init
-    clean_repo
-    make_repo
+    assert false
   end
 
   def test_gen
+    clean_output
     assert_nothing_raised do
       Juli::Command.run('gen', :g=>'html')
     end
@@ -32,20 +33,35 @@ class CommandTest < Test::Unit::TestCase
 
 private
   def repo4test
-    @repo4test ||= Pathname.new(
-                        File.join(File.dirname(__FILE__), 'repo')).realpath
+    @repo4test ||= Pathname.new(File.join(File.dirname(__FILE__),
+                        'repo')).realpath.to_s
   end
 
-  def make_repo
-    if !File.directory?(repo4test)
-      repo = File.join(repo4test, Juli::REPO)
-      FileUtils.mkdir_p(repo)
-      FileUtils.cp(File.join(repo4test, '../data/config'), repo,
-          :preserve=>true)
-    end
+  def clean_output
+    FileUtils.rm_rf(conf['output_top'])
   end
 
-  def clean_repo
-    system 'rm', '-rf', repo4test
+  # delete whole test repo, rebuild & chdir to it, and run block.
+  #
+  # NOTE: when clear test repo(repo4test), current directory is disappeared.
+  # This causes Errno::ENOENT on Dir.chdir(repo4test) *block* since
+  # chdir with block requires current directory.  This is the reason why
+  # chdir to @saved_cwd first, clear repo4test, and then chdir to repo4test.
+  def reset_repo(&block)
+    yield
+=begin
+    Dir.chdir(@saved_cwd){
+      system 'rm', '-rf', repo4test
+      if !File.directory?(repo4test)
+        repo = File.join(repo4test, Juli::REPO)
+        FileUtils.mkdir_p(repo)
+        FileUtils.cp(File.join(repo4test, '../data/config'), repo,
+            :preserve=>true)
+      end
+      Dir.chdir(repo4test){
+        yield
+      }
+    }
+=end
   end
 end

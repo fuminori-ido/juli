@@ -14,7 +14,7 @@ class ParserTest < Test::Unit::TestCase
 private
   # return full path of test data file.
   def data_path(filename)
-    File.join(File.dirname(__FILE__), 'data', filename)
+    File.join(File.dirname(__FILE__), 'repo', filename)
   end
 
   # redirect STDOUT in this block
