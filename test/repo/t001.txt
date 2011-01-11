@@ -24,6 +24,9 @@ partial
   abc
   def
 
+= Wiki link
+
+Test link to HelloWorld wiki word!
 
 = SEE ALSO
 

@@ -29,18 +29,22 @@ rule
 end
 
 ---- header
+require 'juli/wiki'
+
 module Absyn
   class Node
+    include Juli::Wiki
+
     def accept(visitor)
       visitor.visit_node(self)
     end
   end
   
   class DefaultNode < Node
-    attr_accessor :str
+    attr_accessor :line
   
     def initialize(str)
-      @str = str
+      @line = Juli::LineParser.new.parse(str, wikinames)
     end
   
     def accept(visitor)
@@ -178,7 +182,7 @@ class TreeBuilder < Absyn::Visitor
 
   def visit_default(n)
     list_break
-    @curr_header.add(Intermediate::DefaultNode.new(n.str))
+    @curr_header.add(Intermediate::DefaultNode.new(n.line))
   end
 
   def visit_header(n)

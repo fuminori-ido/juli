@@ -39,6 +39,10 @@ command_options for:
 EOM
     end
 
+    def str_limit(str)
+      str.size > 30 ? str[0..30] + '...' : str
+    end
+
     # find juli-repository root from the specified path.
     class Repo
       attr_reader :juli_repo 

@@ -35,12 +35,6 @@ module LineAbsyn
   end
 
   class WikiName < StringNode
-    attr_accessor :str
-  
-    def initialize(str)
-      @str = str
-    end
-  
     def accept(visitor)
       visitor.visit_wikiname(self)
     end
@@ -67,21 +61,46 @@ module LineAbsyn
       visitor.visit_array(self)
     end
   end
-  
+
+  # define Visitor default actions
   class Visitor
     def visit_node(n); end
-    def visit_array(n); end
+
+    def visit_array(n)
+      for n in n.array do
+        n.accept(self)
+      end
+    end
+
     def visit_string(n); end
     def visit_wikiname(n); end
+  end
+
+  # visitor for debug
+  class DebugVisitor < Visitor
+    attr_reader :array
+
+    def initialize
+      @array = []
+    end
+
+    def visit_string(n)
+      @array << n.str
+    end
+
+    def visit_wikiname(n)
+      @array << sprintf("W:%s", n.str)
+    end
   end
 end
 
 ---- inner
-  # parse one line, build absyn tree
-  def parse(line)
+  # parse one line and return absyn tree for the line
+  def parse(line, wikinames)
     @remain     = line
-    @wikinames  = Juli::Wiki.gather_wikiname
+    @wikinames  = wikinames
     yyparse self, :scan
+    @root
   end
 
 private
@@ -93,17 +112,20 @@ private
   # 3. for remaining in head & trail, do 2. above recursively
   def scan(&block)
     scan_r(@remain, &block)
+    yield false, nil
   end
 
   # recursive scan
   def scan_r(str, &block)
-    for w in @wikiname do
-      if str =~ /^(.*)(#{w})(.*)$/
+    for w in @wikinames do
+      if str =~ /^(.*)#{w}(.*)$/
         scan_r($1, &block)
-        yield :WIKINAME, $2
-        scan_r($3, &block)
+        yield :WIKINAME, w
+        scan_r($2, &block)
+        return
       end
     end
     yield :STRING, str
   end
+
 ---- footer

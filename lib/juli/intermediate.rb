@@ -9,10 +9,10 @@ module Intermediate
   end
   
   class DefaultNode < Node
-    attr_accessor :str
+    attr_accessor :line
 
-    def initialize(str)
-      @str = str
+    def initialize(line)
+      @line = line
     end
 
     def accept(visitor)

@@ -1,5 +1,6 @@
 require 'pathname'
 require 'juli/util'
+require 'juli/line_parser.tab'
 require 'juli/intermediate'
 
 module Visitor
@@ -181,6 +182,25 @@ module Visitor
     end
   end
 
+  class HtmlLine < ::LineAbsyn::Visitor
+    include TagHelper
+    include HtmlHelper
+
+    def visit_array(n)
+      n.array.inject('') do |result, n|
+        result += n.accept(self)
+      end
+    end
+
+    def visit_string(n)
+      n.str
+    end
+
+    def visit_wikiname(n)
+      content_tag(:a, n.str, :class=>'wiki', :href=>n.str + '.html')
+    end
+  end
+
   # Visitor::Html visits Intermediate tree and generates HTML
   #
   # Text files under juli-repository must have '.txt' extention.
@@ -265,7 +285,7 @@ module Visitor
   
     def visit_default(n)
       content_tag(:p, :class=>'default') do
-        n.str
+        n.line.accept(HtmlLine.new)
       end
     end
   

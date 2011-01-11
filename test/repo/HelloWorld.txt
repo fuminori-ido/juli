@@ -1,0 +1,4 @@
+What is 'HelloWorld' ?
+
+'HelloWorld' is a basic idiom in computing world.
+It is mostly used for first learning of programming language.

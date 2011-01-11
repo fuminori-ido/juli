@@ -1,9 +1,33 @@
 require 'juli/intermediate'
+require 'juli/util'
+require 'juli/line_parser.tab'
 
 module Visitor
+  class LineTree < LineAbsyn::Visitor
+    def initialize(depth)
+      @depth = depth
+    end
+
+    def print_depth
+      print '| ' * @depth
+    end
+
+    def visit_string(n)
+      print_depth
+      printf "Str:  %s\n", str_limit(n.str.gsub(/\n/, ''))
+    end
+
+    def visit_wikiname(n)
+      print_depth
+      printf "Wiki: %s\n", str_limit(n.str.gsub(/\n/, ''))
+    end
+  end
+
   # Another VISITOR-pattern for Intermediate tree to print tree
   # structure around each node.
   class Tree < ::Intermediate::Visitor
+    include Juli::Util
+
     def initialize
       super
       @depth = 0
@@ -14,9 +38,9 @@ module Visitor
     end
   
     def visit_default(n)
-      print_depth
-      str = n.str.gsub(/\n/, '')
-      printf "DefaultNode(%s)\n", str_limit(str)
+      @depth += 1
+      n.line.accept(LineTree.new(@depth))
+      @depth -= 1
     end
   
     def visit_header(n)
@@ -65,10 +89,6 @@ module Visitor
     end
 
   private
-    def str_limit(str)
-      str.size > 30 ? str[0..30] + '...' : str
-    end
-
     def visit_list(class_str, n)
       print_depth
       printf(class_str)
