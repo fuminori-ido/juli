@@ -13,19 +13,19 @@ rule
   # Racc action returns absyn node to build absyn-tree, while
   # @curr is current node to store current node
   text
-    : elements            { @root = val[0] }
+    : elements                  { @root = val[0] }
 
   elements
-    : /* none */          { Absyn::ArrayNode.new }
-    | elements element    { val[0].add(val[1]) }
+    : /* none */                { Absyn::ArrayNode.new }
+    | elements element          { val[0].add(val[1]) }
 
   element
-    : H STRING            { Absyn::HeaderNode.new(val[0], val[1]) }
+    : H STRING                  { Absyn::HeaderNode.new(val[0], val[1]) }
     | ANY
-    | ORDERED_LIST_ITEM   { Absyn::OrderedListItem.new(val[0]) }
-    | UNORDERED_LIST_ITEM { Absyn::UnorderedListItem.new(val[0]) }
-    | DT STRING           { Absyn::DictionaryListItem.new(val[0], val[1]) }
-    | QUOTE               { Absyn::QuoteNode.new(val[0]) }
+    | LEVEL ORDERED_LIST_ITEM   { Absyn::OrderedListItem.new(val[0], val[1]) }
+    | LEVEL UNORDERED_LIST_ITEM { Absyn::UnorderedListItem.new(val[0], val[1]) }
+    | DT STRING                 { Absyn::DictionaryListItem.new(val[0], val[1]) }
+    | QUOTE                     { Absyn::QuoteNode.new(val[0]) }
 end
 
 ---- header
@@ -88,10 +88,11 @@ module Absyn
   end
 
   class OrderedListItem < Node
-    attr_accessor :line
+    attr_accessor :level, :line
   
-    def initialize(str)
-      @line = Juli::LineParser.new.parse(str, wikinames)
+    def initialize(level, str)
+      @level  = level
+      @line   = Juli::LineParser.new.parse(str, wikinames)
     end
   
     def accept(visitor)
@@ -100,10 +101,11 @@ module Absyn
   end
 
   class UnorderedListItem < Node
-    attr_accessor :line
+    attr_accessor :level, :line
   
-    def initialize(str)
-      @line = Juli::LineParser.new.parse(str, wikinames)
+    def initialize(level, str)
+      @level  = level
+      @line   = Juli::LineParser.new.parse(str, wikinames)
     end
   
     def accept(visitor)
@@ -152,6 +154,7 @@ end
 
 # build Intermediate tree from Absyn tree.
 #
+# Before:
 #   h1
 #   Orange
 #   h2
@@ -159,15 +162,30 @@ end
 #   h1
 # ↓
 #
+# After:
 #   h1
 #   | +- Orange
 #   | +- h2
 #   |   +- Apple
 #   h1
+#
+# === Header
+# As seen Before & After above, flat header (where i=1..6) is 
+# organized in tree by finding its level.
+#
+# === List
+# When level keeps the same, each type list item is in the same list.
+# When deeper level list item comes, create new list.
+# When shallow level list item comes, ends the list until the same level.
+# This is the same search logic as header's.
+#
 class TreeBuilder < Absyn::Visitor
   def initialize
-    @curr_level = 999
-    @root = @curr_header = Intermediate::HeaderNode.new(0, '(root)')
+    @root             = Intermediate::HeaderNode.new(0, '(root)')
+    @curr_header      = @root
+    @curr_list        = nil
+    @curr_quote       = nil
+    @curr_array       = @root   # points to header or list
   end
 
   def root
@@ -182,7 +200,7 @@ class TreeBuilder < Absyn::Visitor
 
   def visit_default(n)
     list_break
-    @curr_header.add(Intermediate::DefaultNode.new(n.line))
+    @curr_array.add(Intermediate::DefaultNode.new(n.line))
   end
 
   def visit_header(n)
@@ -211,23 +229,19 @@ class TreeBuilder < Absyn::Visitor
     else
       @curr_header.find_upper(n.level).add(new_node)
     end
-    @curr_header = new_node
+    @curr_array = @curr_header = new_node
   end
 
   def visit_ordered_list_item(n)
-    if !@curr_list
-      @curr_list = Intermediate::OrderedList.new
-      @curr_header.add(@curr_list)
-    end
-    @curr_list.add(Intermediate::OrderedListItem.new(n.line))
+    visit_list_item(n, 
+        Intermediate::OrderedList,
+        Intermediate::OrderedListItem)
   end
 
   def visit_unordered_list_item(n)
-    if !@curr_list
-      @curr_list = Intermediate::UnorderedList.new
-      @curr_header.add(@curr_list)
-    end
-    @curr_list.add(Intermediate::UnorderedListItem.new(n.line))
+    visit_list_item(n,
+        Intermediate::UnorderedList,
+        Intermediate::UnorderedListItem)
   end
 
   def visit_dictionary_list_item(n)
@@ -250,6 +264,29 @@ private
   def list_break
     @curr_list  = nil
     @curr_quote = nil
+    @curr_array = @curr_header
+  end
+
+  def visit_list_item(n, list_class, list_item_class)
+    # when same level, add to curr_list
+    if @curr_list && @curr_list.level == n.level
+      @curr_list.add(list_item_class.new(n.line))
+
+    # when @curr_list points to upper or nil and parses lower(=nested) list,
+    # build new list node under the upper and shift @curr_list to it:
+    elsif !@curr_list || @curr_list.level < n.level
+      new_list  = list_class.new(n.level)
+      @curr_array.add(new_list)
+      new_list.add(list_item_class.new(n.line))
+      @curr_list = @curr_array = new_list
+
+    # when @curr_list points to lower and parses upper, find parent,
+    # build new node under it, and shift @curr_list to it:
+    else
+      parent_list = @curr_list.find_upper_or_equal(n.level)
+      parent_list.add(list_item_class.new(n.line))
+      @curr_list = @curr_array = parent_list
+    end
   end
 end
 
@@ -262,14 +299,19 @@ end
       @in_io = io
       yyparse self, :scan
     end
-    tree = TreeBuilder.new
-    @root.accept(tree)
-    visitor.new.run(in_file, tree.root)
+    @tree = TreeBuilder.new
+    @root.accept(@tree)
+    visitor.new.run(in_file, @tree.root)
+  end
+
+  # return intermediate tree
+  def tree
+    @tree.root
   end
 
 private
   def scan(&block)
-    @block_str = ''
+    @block_str      = ''
     while line = @in_io.gets do
       case line
       when /^\s*$/
@@ -288,12 +330,14 @@ private
         header(5, $1, &block)
       when /^======+\s+(.*)$/
         header(6, $1, &block)
-      when /^\d+\.\s+(.*)$/
+      when /^(\s*)\d+\.\s+(.*)$/
         block_break(&block)
-        yield :ORDERED_LIST_ITEM, $1
-      when /^\*\s+(.*)$/
+        yield :LEVEL, $1.length
+        yield :ORDERED_LIST_ITEM, $2
+      when /^(\s*)\*\s+(.*)$/
         block_break(&block)
-        yield :UNORDERED_LIST_ITEM, $1
+        yield :LEVEL, $1.length
+        yield :UNORDERED_LIST_ITEM, $2
       when /^(.*)::\s*(.*)$/
         block_break(&block)
         yield :DT, $1

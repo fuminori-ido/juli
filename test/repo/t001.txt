@@ -51,6 +51,16 @@ t001::        t001 is myself.
 t002::        t002 is here.
 both::        t001 and t002 are linked.
 
+== test doc list
+* HelloWorld
+* t001          typical
+* t002          no header
+* t003          Wiki link in usual text
+* t004          nested ordered list
+* t005          incorrectly nested ordered list
+* t006          nested unordered list
+* t007          mixed(ordered and unordered) list
+
 = SEE ALSO
 
 rd::    ruby document, similar to pod

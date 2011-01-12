@@ -21,10 +21,11 @@ module Intermediate
   end
 
   class ArrayNode < Node
-    attr_accessor :array
+    attr_accessor :array, :level
 
-    def initialize
+    def initialize(level)
       @array  = Array.new
+      @level  = level
     end
 
     def add(child)
@@ -32,13 +33,56 @@ module Intermediate
       child.parent = self
       self
     end
+
+    # find upper node than the 'level'
+    def find_upper(level)
+      if self.level < level
+        self
+      else
+        if parent
+          parent.find_upper(level)
+        else
+          raise "No parent node"
+        end
+      end
+    end
+
+    # find upper or equal level node than the 'level'
+    #
+    # NOTE: use find_upper() to find header parent while use
+    # find_upper_or_equal() to find list parent because
+    # header is added under parent while list item is added at the same
+    # level of list as follows:
+    #
+    # Header:
+    #   = a             H(a)
+    #   == b        ->    | H(b)
+    #   = c             H(c)
+    #
+    # List:
+    #                   List
+    #   1. a              | item(a)
+    #     1. b      ->    | List
+    #   1. c              | | item(b)
+    #                     | item(c)
+    def find_upper_or_equal(level)
+      if self.level <= level
+        self
+      else
+        if parent
+          parent.find_upper_or_equal(level)
+        else
+          raise "No parent node"
+        end
+      end
+    end
   end
 
   # level==0 is top level array node.
   #
   # NOTE: @dom_id will be used for only Html visitor and contents helper.
   class HeaderNode < ArrayNode
-    attr_accessor :level, :str, :dom_id
+    attr_accessor :str, :dom_id
 
     # === INPUTS
     # two patterns are considered:
@@ -46,13 +90,14 @@ module Intermediate
     # 1. absyn_header
     # 2. level & str
     def initialize(*absyn_header_or_values)
-      super()
+      super(absyn_header_or_values[0].class == Absyn::HeaderNode ?
+          absyn_header_or_values[0].level :
+          absyn_header_or_values[0])
+
       case absyn_header_or_values[0]
       when Absyn::HeaderNode
-        @level  = absyn_header_or_values[0].level
         @str    = absyn_header_or_values[0].str
       else
-        @level  = absyn_header_or_values[0]
         @str    = absyn_header_or_values[1]
       end
     end
@@ -60,18 +105,13 @@ module Intermediate
     def accept(visitor)
       visitor.visit_header(self)
     end
-
-    # find upper header node than the 'level'
-    def find_upper(level)
-      if self.level < level
-        self
-      else
-        parent.find_upper(level)
-      end
-    end
   end
 
   class OrderedList < ArrayNode
+    def initialize(level)
+      super
+    end
+
     def accept(visitor)
       visitor.visit_ordered_list(self)
     end
@@ -90,6 +130,10 @@ module Intermediate
   end
 
   class UnorderedList < ArrayNode
+    def initialize(level)
+      super
+    end
+
     def accept(visitor)
       visitor.visit_unordered_list(self)
     end
@@ -108,6 +152,10 @@ module Intermediate
   end
 
   class DictionaryList < ArrayNode
+    def initialize
+      super(0)
+    end
+  
     def accept(visitor)
       visitor.visit_dictionary_list(self)
     end
@@ -115,7 +163,7 @@ module Intermediate
 
   class DictionaryListItem < Node
     attr_accessor :term, :line
-  
+
     def initialize(absyn_dictionary_list_item)
       @term = absyn_dictionary_list_item.term
       @line = absyn_dictionary_list_item.line

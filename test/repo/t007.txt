@@ -1,0 +1,13 @@
+1. ordered and unordered combined
+  * unordered a
+  * unordered b
+1. next ordered
+
+How about this:
+
+* unordered a
+  1. ordered a
+  1. ordered b
+  1. ordered c
+* unordered b
+
