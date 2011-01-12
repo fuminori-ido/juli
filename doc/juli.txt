@@ -258,8 +258,8 @@ juli-repo/.juli/config::  config file
 
 = TODO
 
-1. t001.txt 'Wiki link on usual text' is wrong.
 1. Wiki
+  1. support subdirectory
 1. tutorial
 1. japanese doc
 1. git for version control and publish
