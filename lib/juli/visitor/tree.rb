@@ -38,6 +38,8 @@ module Visitor
     end
   
     def visit_default(n)
+      print_depth
+      printf("Default\n")
       @depth += 1
       n.line.accept(LineTree.new(@depth))
       @depth -= 1

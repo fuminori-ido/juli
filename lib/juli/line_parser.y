@@ -118,7 +118,7 @@ private
   # recursive scan
   def scan_r(str, &block)
     for w in @wikinames do
-      if str =~ /^(.*)#{w}(.*)$/
+      if str =~ /\A(.*)#{w}(.*)\z/m
         scan_r($1, &block)
         yield :WIKINAME, w
         scan_r($2, &block)
