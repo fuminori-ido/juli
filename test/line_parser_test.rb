@@ -15,6 +15,8 @@ class LineParserTest < Test::Unit::TestCase
 [%w(abc W:test def),       'abctestdef', %w(test te)],
 # longest match has higher priority(2)
 [%w(abc W:test de W:te f), 'abctestdetef', %w(test te)],
+# multiline
+[['abc', 'W:test', "d\ne", 'W:te', 'f'], "abctestd\netef", %w(test te)],
 ]
 
     for t in tests do

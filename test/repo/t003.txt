@@ -1,0 +1,8 @@
+= Wiki link on usual text
+
+Test link to HelloWorld wiki word!
+t001 is myself.
+t002 is here.
+t001 and t002 are linked.
+
+after line break.
