@@ -85,7 +85,7 @@ module Visitor
 
     def visit_quote(n)
       print_depth
-      printf("QuoteNode(%s)\n", str_limit(n.str))
+      printf("QuoteNode(%s)\n", str_limit(n.str).gsub(/\n/m, '<\n>'))
     end
 
     # visit root to generate intermediate-tree structure.

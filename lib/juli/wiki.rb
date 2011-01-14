@@ -34,5 +34,7 @@ module Juli
     def wikinames
       $_wikinames ||= build_wikinames
     end
+
+    module_function :wikinames, :build_wikinames
   end  
 end

@@ -5,11 +5,11 @@ juli    - Outline processor
 juli [<i>general_options</i>] <i>COMMAND</i> [<i>command_options</i>] [<i>files</i>]
 
 = DESCRIPTION
-juli is an outline processor.
+juli is an outline processor + offline wiki.
 
 When juli(1) command is executed, HTML is generated under <i>output_top</i>
-directory.  Where, <i>output_top</i> can be configured.
-Please see 'init' command section.
+directory.  Where, <i>output_top</i> can be configured
+(please see 'init' command section).
 
 
 == Purpose
@@ -19,7 +19,7 @@ Purposes of juli are:
 * write my idea as quick as possible by using my favorite editor at anytime anyplace.
 * view outline.
 * auto-link each memo together as wiki
-* browse via web
+* publishing by web server
 
 == Feature
 
@@ -99,7 +99,7 @@ prepare output directory to browse at internet.  Of course, your http server
 is required to recognize /var/www/juli:
 
   $ sudo mkdir /var/www/juli
-  $ sudo chown wells /var/www/juli
+  $ sudo chown YOURNAME /var/www/juli
 
 prepare memo root directory for juli-repository:
 
@@ -119,16 +119,18 @@ is html). When no files are specified, bulk mode is executed.
 
 Example:
 
-  juli                    # generate in bulk mode
-  juli gen doc/poem.txt   # generate for the file
-  juli gen -g tree        # show text tree in bulk mode
+  juli                          # generate in bulk mode
+  juli gen doc/poem.txt         # generate for the file
+  juli gen -g tree              # show text tree in bulk mode
+  juli gen -g tree doc/poem.txt # show text tree of the file
 
 Wrong Example:
 
   juli doc/poem.txt       # the file is interpreted as command, so resulted error. 
 
 ==== options for 'gen'
--g <i>generator</i>:: Specify generator.  Supported generators are in lib/juli/visitor/ directory.  Default is html.
+-g <i>generator</i>:: specify generator.  Supported generators are in lib/juli/visitor/ directory.  Default is html.
+-f::  force update.  Even generated HTML file is newer than source text, generate again.
 
 == Juli Document Syntax
 
@@ -166,18 +168,38 @@ numbers for ordered-list starts '1' and increments 1 for each.
 
 Example:
 
-  1. Hello
-  1. World
+  |1. Hello
+  |1. World
+  |1. This is a pen.
 
 will be:
 
 1. Hello
 1. World
+1. This is a pen.
+
+(Please ignore '|' above.  It just let juli(1) interpret to quote,
+not ordered list).
+
+When putting leading spaces, it is interpreted as nested list.  Example:
+
+  |1. Hello
+  |  1. Welcome
+  |  1. juli
+  |1. World
+
+will be:
+
+1. Hello
+  1. Welcome
+  1. juli
+1. World
+
+(Where, please ignore '|' above).
 
 Restriction:
 
-1. nest is not supported yet.
-1. continous line is not supported yet.
+* continous line is not supported yet.
 
 ==== Unordered List
 
@@ -185,18 +207,52 @@ The line starts with "* " (astarisk space) is recognized as unordered list.
 
 Example:
 
-  * Hello
-  * World
+  |* Hello
+  |* World
+  |* This is a pen.
 
 will be:
 
 * Hello
 * World
+* This is a pen.
+
+When putting leading spaces, it is interpreted as nested list.  Example:
+
+  |* Hello
+  |  * Welcome
+  |  * juli
+  |* World
+
+will be:
+
+* Hello
+  * Welcome
+  * juli
+* World
+
+(Where, please ignore '|' above).
 
 Restriction:
 
-1. nest is not supported yet.
-1. continous line is not supported yet.
+* continous line is not supported yet.
+
+==== Mixture of Ordered and Unordered list
+
+Of course, both ordered and unordered list can be nested each other.
+Example:
+
+  |1. Hello
+  |  * Welcome
+  |  * juli
+  |1. World
+
+will be:
+
+1. Hello
+  * Welcome
+  * juli
+1. World
 
 ==== Dictionary List
 
@@ -215,14 +271,20 @@ Ruby::  programing language, or a gem
 === Block Quote
 
 The line with leading spaces is recognized as blockquote.
+Where, spaces should longer than Baseline.
+
+Block Quote can contain WHITELINE.
+
 Example:
 
   |   "The load to hell is paved with good intentions."
+  |
   |   -- derived proverb from original thought of Saint Bernard of Clairvaux
 
 will be:
 
   "The load to hell is paved with good intentions."
+
   -- derived proverb from original thought of Saint Bernard of Clairvaux
 
 (Where, '|' above is to avoid deleting spaces.  Please ignore it.)
@@ -255,21 +317,6 @@ Bad Example:
 juli-repo::   directory for memo.  'init' command creates it.
 output_dir::  directory for html generated files
 juli-repo/.juli/config::  config file
-
-= TODO
-
-1. Wiki
-  1. support subdirectory
-1. fix blank-line separated quote, list, etc.
-1. tutorial
-1. japanese doc
-1. git for version control and publish
-1. fix following situation:
-  * abc
-  * def
-
-  * ghi
-  * jkl
 
 = SIMILAR TOOLS
 

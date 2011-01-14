@@ -1,3 +1,5 @@
+require 'juli/wiki'
+
 # intermediate tree nodes
 module Intermediate
   class Node
@@ -11,8 +13,8 @@ module Intermediate
   class DefaultNode < Node
     attr_accessor :line
 
-    def initialize(line)
-      @line = line
+    def initialize(str)
+      @line = Juli::LineParser.new.parse(str, Juli::Wiki.wikinames)
     end
 
     def accept(visitor)
@@ -177,8 +179,9 @@ module Intermediate
   class QuoteNode < Node
     attr_accessor :str
 
-    def initialize
-      @str = ''
+    # trim last white spaces
+    def initialize(str)
+      @str = str.gsub(/\s+\z/m, '')
     end
 
     def accept(visitor)

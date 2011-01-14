@@ -60,6 +60,9 @@ both::        t001 and t002 are linked.
 * t005          incorrectly nested ordered list
 * t006          nested unordered list
 * t007          mixed(ordered and unordered) list
+* t008          line break
+* t009          quote or nested list
+* t010          quote then normal text was wrongly generated...
 
 = SEE ALSO
 

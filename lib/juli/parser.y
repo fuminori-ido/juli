@@ -13,19 +13,18 @@ rule
   # Racc action returns absyn node to build absyn-tree, while
   # @curr is current node to store current node
   text
-    : elements                  { @root = val[0] }
-
+    : elements                  { @root = val[0]; @root.add(Absyn::End.new) }
   elements
     : /* none */                { Absyn::ArrayNode.new }
     | elements element          { val[0].add(val[1]) }
 
   element
     : H STRING                  { Absyn::HeaderNode.new(val[0], val[1]) }
-    | ANY
     | LEVEL ORDERED_LIST_ITEM   { Absyn::OrderedListItem.new(val[0], val[1]) }
     | LEVEL UNORDERED_LIST_ITEM { Absyn::UnorderedListItem.new(val[0], val[1]) }
     | DT STRING                 { Absyn::DictionaryListItem.new(val[0], val[1]) }
-    | QUOTE                     { Absyn::QuoteNode.new(val[0]) }
+    | WHITELINE                 { Absyn::WhiteLine.new }
+    | LEVEL STRING              { Absyn::StringNode.new(val[0], val[1]) }
 end
 
 ---- header
@@ -39,16 +38,24 @@ module Absyn
       visitor.visit_node(self)
     end
   end
+
+  # let Visitor know end of visiting
+  class End < Node
+    def accept(visitor)
+      visitor.visit_end(self)
+    end
+  end
+
+  class StringNode < Node
+    attr_accessor :level, :str
   
-  class DefaultNode < Node
-    attr_accessor :line
-  
-    def initialize(str)
-      @line = Juli::LineParser.new.parse(str, wikinames)
+    def initialize(level, str)
+      @level  = level
+      @str    = str
     end
   
     def accept(visitor)
-      visitor.visit_default(self)
+      visitor.visit_string(self)
     end
   end
   
@@ -60,12 +67,7 @@ module Absyn
     end
   
     def add(child)
-      case child
-      when String
-        @array << DefaultNode.new(child)
-      else
-        @array << child
-      end
+      @array << child
       self
     end
   
@@ -126,27 +128,22 @@ module Absyn
     end
   end
 
-  class QuoteNode < Node
-    attr_accessor :str
-  
-    def initialize(str)
-      @str  = str
-    end
-  
+  class WhiteLine < Node
     def accept(visitor)
-      visitor.visit_quote(self)
+      visitor.visit_white_line(self)
     end
   end
 
   class Visitor
     def visit_node(n); end
     def visit_array(n); end
-    def visit_default(n); end
+    def visit_string(n); end
     def visit_header(n); end
     def visit_ordered_list_item(n); end
     def visit_unordered_list_item(n); end
     def visit_dictionary_list_item(n); end
-    def visit_quote(n); end
+    def visit_white_line(n); end
+    def visit_end(n); end
   end
 end
 
@@ -179,13 +176,21 @@ end
 # When shallow level list item comes, ends the list until the same level.
 # This is the same search logic as header's.
 #
+# === Baseline
+# Same concept as rdtools.  It is indent or offset from begging of a line.
+# deeper level string is interpreted as Quote.
+# 
 class TreeBuilder < Absyn::Visitor
   def initialize
-    @root             = Intermediate::HeaderNode.new(0, '(root)')
-    @curr_header      = @root
-    @curr_list        = nil
-    @curr_quote       = nil
-    @curr_array       = @root   # points to header or list
+    @root       = Intermediate::HeaderNode.new(0, '(root)')
+
+    # following instance vars are to keep 'current' header, list, array,
+    # str_block, and baseline while parsing Absyn tree:
+    @header     = @root
+    @list       = nil
+    @array      = @root   # points to header or list
+    @str_block  = ''
+    @baseline   = 0
   end
 
   def root
@@ -198,38 +203,46 @@ class TreeBuilder < Absyn::Visitor
     end
   end
 
-  def visit_default(n)
-    list_break
-    @curr_array.add(Intermediate::DefaultNode.new(n.line))
+  def visit_string(n)
+    if n.level > @baseline        # beginning of quote
+      str_block_break
+      @str_block = n.str
+    elsif n.level == @baseline    # same baseline
+      @str_block += n.str
+    else                          # end of quote -> flush it
+      @array.add(Intermediate::QuoteNode.new(@str_block))
+      @str_block = n.str    # beginning of new str_block
+    end
+    @baseline = n.level
   end
 
   def visit_header(n)
     list_break
     new_node = Intermediate::HeaderNode.new(n)
 
-    # When @curr_header points to upper (e.g. root) and parse level-1 as
-    # follows, build new node under the upper and shift @curr_header to it:
+    # When @header points to upper (e.g. root) and parse level-1 as
+    # follows, build new node under the upper and shift @header to it:
     #
-    #   (root)          - @curr_header
+    #   (root)          - @header
     #     test
     #     = NAME        - we are here!
     #     ...
     #
-    if @curr_header.level < n.level
-      @curr_header.add(new_node)
+    if @header.level < n.level
+      @header.add(new_node)
 
-    # When @curr_header points to lower level (e.g. 'Option' below)
+    # When @header points to lower level (e.g. 'Option' below)
     # and parses 'SEE ALSO' (level=1) as follows, find parent, 
-    # build new node under it, and shift @curr_header to the new node:
+    # build new node under it, and shift @header to the new node:
     #
     #   ...
-    #   === Option      - @curr_header
+    #   === Option      - @header
     #   ...
     #   = SEE ALSO      - we are here!
     else
-      @curr_header.find_upper(n.level).add(new_node)
+      @header.find_upper(n.level).add(new_node)
     end
-    @curr_array = @curr_header = new_node
+    @array = @header = new_node
   end
 
   def visit_ordered_list_item(n)
@@ -245,47 +258,68 @@ class TreeBuilder < Absyn::Visitor
   end
 
   def visit_dictionary_list_item(n)
-    if !@curr_list
-      @curr_list = Intermediate::DictionaryList.new
-      @curr_header.add(@curr_list)
+    if !@list
+      @list = Intermediate::DictionaryList.new
+      @header.add(@list)
     end
-    @curr_list.add(Intermediate::DictionaryListItem.new(n))
+    @list.add(Intermediate::DictionaryListItem.new(n))
   end
 
-  def visit_quote(n)
-    if !@curr_quote
-      @curr_quote = Intermediate::QuoteNode.new
-      @curr_header.add(@curr_quote)
+  # if baseline > 0, treat as continous of quote
+  def visit_white_line(n)
+    if @baseline > 0
+      @str_block += "\n"
+    else
+      list_break
     end
-    @curr_quote.str += n.str
+  end
+
+  # flush every buffer
+  def visit_end(n)
+    list_break
   end
 
 private
+  # action on end of string block
+  def str_block_break
+    if @str_block != ''
+      @array.add(
+          @baseline == 0 ?
+              Intermediate::DefaultNode.new(@str_block) :
+              Intermediate::QuoteNode.new(@str_block))
+    end
+    @str_block  = ''
+    @baseline   = 0
+  end
+
+  # action on end of list
   def list_break
-    @curr_list  = nil
-    @curr_quote = nil
-    @curr_array = @curr_header
+    str_block_break
+    @list  = nil
+    @array = @header
   end
 
   def visit_list_item(n, list_class, list_item_class)
+    str_block_break
+
     # when same level, add to curr_list
-    if @curr_list && @curr_list.level == n.level
-      @curr_list.add(list_item_class.new(n.line))
+    if @list && @list.level == n.level
+      @list.add(list_item_class.new(n.line))
 
-    # when @curr_list points to upper or nil and parses lower(=nested) list,
-    # build new list node under the upper and shift @curr_list to it:
-    elsif !@curr_list || @curr_list.level < n.level
+    # when @list points to upper or nil and parses lower(=nested) list,
+    # build new list node under the upper and shift @list to it:
+    elsif !@list || @list.level < n.level
       new_list  = list_class.new(n.level)
-      @curr_array.add(new_list)
+      @array.add(new_list)
       new_list.add(list_item_class.new(n.line))
-      @curr_list = @curr_array = new_list
+      @list = @array = new_list
 
-    # when @curr_list points to lower and parses upper, find parent,
-    # build new node under it, and shift @curr_list to it:
+    # when @list points to lower and parses upper, find parent,
+    # build new node under it, and shift @list to it:
     else
-      parent_list = @curr_list.find_upper_or_equal(n.level)
+      parent_list = @list.find_upper_or_equal(n.level)
       parent_list.add(list_item_class.new(n.line))
-      @curr_list = @curr_array = parent_list
+      @list = @array = parent_list
     end
   end
 end
@@ -310,14 +344,13 @@ end
   end
 
 private
+  class ScanError < Exception; end
+
   def scan(&block)
-    @block_str      = ''
     while line = @in_io.gets do
       case line
       when /^\s*$/
-        block_break(&block)
-        @block_str = ''
-        # clear block_str and skip empty line
+        yield :WHITELINE, nil
       when /^=\s+(.*)$/
         header(1, $1, &block)
       when /^==\s+(.*)$/
@@ -331,37 +364,26 @@ private
       when /^======+\s+(.*)$/
         header(6, $1, &block)
       when /^(\s*)\d+\.\s+(.*)$/
-        block_break(&block)
-        yield :LEVEL, $1.length
+        yield :LEVEL,             $1.length
         yield :ORDERED_LIST_ITEM, $2
       when /^(\s*)\*\s+(.*)$/
-        block_break(&block)
-        yield :LEVEL, $1.length
+        yield :LEVEL,               $1.length
         yield :UNORDERED_LIST_ITEM, $2
-      when /^(.*)::\s*(.*)$/
-        block_break(&block)
+      when /^(\S.*)::\s*(.*)$/
         yield :DT, $1
         yield :STRING, $2
-      when /^(\s+)(.*)$/
-        yield :QUOTE, $2 + "\n"
+      when /^(\s*)(.*)$/
+        yield :LEVEL,   $1.length
+        yield :STRING,  $2 + "\n"
       else
-        @block_str += line
+        raise ScanError
       end
     end
-    block_break(&block)
     yield false, nil
-  end
-
-  # block break happens, so proess block
-  def block_break(&block)
-    if @block_str != ''
-      yield :ANY, @block_str
-    end
   end
 
   # process block, then process header
   def header(level, string, &block)
-    block_break(&block)
     yield :H,       level
     yield :STRING,  string
   end

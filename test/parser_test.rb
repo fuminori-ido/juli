@@ -2,11 +2,11 @@ require 'test_helper'
 
 class ParserTest < Test::Unit::TestCase
   def setup
-    $stdout = File.open('/dev/null', 'w')
+    #$stdout = File.open('/dev/null', 'w')
   end
 
   def teardown
-    $stdout = STDOUT
+    #$stdout = STDOUT
   end
 
   def test_parse
@@ -57,6 +57,30 @@ class ParserTest < Test::Unit::TestCase
 
     # [unorder-item, order-list, unorder-item]
     assert_equal 3, t.array[2].array.size
+  end
+
+  def test_line_break
+    t = build_tree_on('t008.txt')
+
+    # [d d o o o o q h]
+    #
+    # Where, d = default, o = ordered list, q = quote, h = header
+    assert_equal 8, t.array.size
+    assert_equal Intermediate::QuoteNode,   t.array[6].class
+    assert_equal Intermediate::HeaderNode,  t.array[7].class
+  end
+
+  def test_quote_or_nested_list
+    t = build_tree_on('t009.txt')
+    assert_equal 4, t.array.size
+    assert_equal 2, t.array[1].array.size
+  end
+
+  def test_quote_and_normal
+    t = build_tree_on('t010.txt')
+    assert_equal 4, t.array.size
+    assert_equal Intermediate::DefaultNode, t.array[2].class
+    assert_equal Intermediate::QuoteNode,   t.array[3].class
   end
 
 private
