@@ -72,6 +72,9 @@ and there is computing.txt file in the same directory, the memo will be:
 
 and the 'computing' hyper-link links to the target page.
 
+Restriction:
+* file in subdirectory of juli-repo is not recognized as a wikiname.  I'll support this soon.
+
 == Options
 
 general options are:
