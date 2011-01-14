@@ -19,6 +19,16 @@ module Juli
       end
     end
 
+    def visitor_list
+      result = []
+      sorted_visitors = Dir.glob(File.join(Juli::PKG_ROOT, 'lib/juli/visitor/*.rb')).sort
+      for f in sorted_visitors do
+        next if f =~ /^\./
+        result << File.basename(f).gsub(/\.rb$/, '')
+      end
+      result.join(',')
+    end
+
     def usage
       <<EOM
 USAGE: juli [general_options] COMMAND [command_options] [files]
@@ -35,7 +45,7 @@ command_options for:
   init:
     -o output_top
   gen:
-    -g generator      specify generator
+    -g generator      specify generator (#{visitor_list}) default=html
     -f                force generate
 EOM
     end

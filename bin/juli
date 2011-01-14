@@ -26,15 +26,6 @@ Version       = '0.01.0'
 #------------------------------------------------------------------
 # Subroutine Part
 #------------------------------------------------------------------
-def visitor_list
-  result = []
-  sorted_visitors = Dir.glob(File.join(Juli::PKG_ROOT, 'lib/juli/visitor/*.rb')).sort
-  for f in sorted_visitors do
-    next if f =~ /^\./
-    result << File.basename(f).gsub(/\.rb$/, '')
-  end
-  'generator: ' + result.join(',') + ' (default=html)'
-end
 
 
 #------------------------------------------------------------------
