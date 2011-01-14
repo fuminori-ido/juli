@@ -1,5 +1,5 @@
 = NAME
-juli    - Outline processor
+juli    - Outline processor, personal &amp; offline wiki
 
 = SYNOPSIS
 juli [<i>general_options</i>] <i>COMMAND</i> [<i>command_options</i>] [<i>files</i>]
