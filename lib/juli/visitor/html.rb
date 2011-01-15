@@ -203,6 +203,32 @@ module Visitor
     end
   end
 
+  # generate '1', '1.1', '1.2', ..., '2', '2.1', ...
+  class HeaderSequence
+    def initialize
+      @header_number  = Array.new(6)
+      @curr_level     = 0
+    end
+
+    def reset(level)
+      for i in (level+1)...@header_number.size do
+        @header_number[i] = 0
+      end
+    end
+
+    def gen(level)
+      reset(level) if level < @curr_level
+      @header_number[level] = 0 if !@header_number[level]
+      @header_number[level] += 1
+      @curr_level = level
+      h = []
+      for i in 1..(level) do
+        h << @header_number[i].to_s
+      end
+      h.join('.')
+    end
+  end
+
   # Visitor::Html visits Intermediate tree and generates HTML
   #
   # Text files under juli-repository must have '.txt' extention.
@@ -288,7 +314,7 @@ module Visitor
 
     def initialize
       super
-      @header_number  = {}
+      @header_sequence  = HeaderSequence.new
     end
   
     def visit_default(n)
@@ -378,21 +404,9 @@ module Visitor
         content_tag(:span, :class=>'juli_toggle', :onclick=>"Juli.toggle('#{id}');") do
           content_tag(:span, '[+] ', :id=>"#{id}_p", :class=>'juli_toggle_node',  :style=>'display:none;') +
           content_tag(:span, '[-] ', :id=>"#{id}_m", :class=>'juli_toggle_node') +
-          header_seq(n) + '. ' + n.str
+          @header_sequence.gen(n.level) + '. ' + n.str
         end
       end + "\n"
-    end
-
-    def header_seq(n)
-      if !@header_number[n.level]
-        @header_number[n.level] = 0
-      end
-      @header_number[n.level] += 1
-      h = []
-      for i in 1..(n.level) do
-        h << @header_number[i].to_s
-      end
-      h.join('.')
     end
 
     def visit_list(tag, n, options={})

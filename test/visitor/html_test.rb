@@ -25,4 +25,17 @@ class Visitor::HtmlTest < Test::Unit::TestCase
     assert_equal '../juli.js',    relative_from('a/b.txt',    'juli.js')
     assert_equal '../../juli.js', relative_from('a/b/c.txt',  'juli.js')
   end
+
+  def test_header_sequence
+    h = Visitor::HeaderSequence.new
+    assert '1',                 h.gen(1)
+    assert '2',                 h.gen(1)
+    assert '2.1',               h.gen(2)
+    assert '2.2',               h.gen(2)
+    assert '3',                 h.gen(1)
+    assert '3.1',               h.gen(2)
+    assert '3.1.1',             h.gen(3)
+    assert '3.1.2',             h.gen(3)
+    assert '4',                 h.gen(1)
+  end
 end
