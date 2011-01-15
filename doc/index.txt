@@ -1,0 +1,361 @@
+This is top document for juli.  Introduction, installation and
+juli formatting are described here.
+
+Please read the followings for details:
+
+README_FOR_APP::  API document
+juli::            juli(1) command document
+
+
+= Introduction
+
+Do you want to memo anytime anyplace(like <b>offline</b> environment)?
+Do you want to use your <b>favorite editor</b> for wiki and/or any documentation?
+Do you want to organize your idea by <b>outline-processor</b> and/or <b>wiki</b>?
+In wiki, Did you think it's much better to <b>link</b> page <b>automatically</b>?
+
+If you say 'yes!' at least once, <b>juli</b> may be your choice.
+
+I wanted to have such a tool.
+
+== About Outline-processor
+
+Outline-processor is good.
+I prefer editor + outline-processing command wihch generates some
+pretty output (like HTML, PDF, etc).
+
+Outline-processor tells me the overview of what I'm
+thinking.  However, many outline-processing tool is not enough for me because
+usage (keybinding, etc.) is quite different from my favorite editor.
+
+== GUI for read, but not for write
+
+Outlining is necessary only when I want to browse so that it is enough
+to generate HTML and toggle to show/hide any level of contents.
+Current browser (Firefox, IE[789], etc.) has enough capability to do that.
+
+I didn't want to have any other fancy GUI since browser+HTML is enough for me.
+
+GUI tool like Word-processor or GUI outline-processor is slow to invoke to memo.
+Key-bindings for such tools don't fit me.  Editor (vi, emacs, or wahtever
+you are now using) is the most suitable for me to use.
+
+== Offline
+
+When I'm getting in a train and working/thinking on my Note-PC,
+sometimes an idea comes up in my mind so I want to memo it
+as quick and easy as possible anyplace anytime.
+In such a situation, using favorite editor is good for me to write.
+
+== About Wiki
+
+Wiki is good, but it requires online.
+It is ok for me only to link on browsing time.
+I would like to memo offline as well.
+
+I don't want to think about "link it by WikiName, or, well,
+What is the notation to link in this wiki tool?" when I'm
+editing.
+<a href='http://projects.gnome.org/tomboy/'>Tomboy</a> does so in realtime,
+but I don't need such an realtime feature.
+It's enough for me to link on browsing time.  So, some trigger
+to generate auto-linked HTML covers this needs.
+
+I looked for such a tool, 
+<a href='http://projects.gnome.org/tomboy/'>Tomboy</a>,
+<a href='http://www.evernote.com/'>Evernote</a>,
+<a href='http://en.wikipedia.org/wiki/Microsoft_OneNote'>OneNote</a>,
+but from keybinding point of view, those are not good...
+
+== Offline wiki + git = best solution?
+
+I know why almost all of wiki are online is because collaboration.
+However, offline editing and collaboration is already realized.
+One of good tool is <a href='http://git-scm.com/'>git</a>.
+
+I'm thinking offline wiki + git is the best solution.
+
+Isn't it time to create such a tool for me?
+
+= Design
+
+== Purpose
+
+Purposes of juli are:
+
+* write my idea as quick as possible by using my favorite editor at anytime anyplace.
+* view outline.
+* auto-link each memo together as wiki
+* publishing by web server
+
+== Feature
+
+Current juli has the following features:
+
+* toggle to show/hide each content.
+* header numbering.
+* bulk-mode update
+* auto link between memo
+
+Detail explanation for each feature is as follows:
+
+=== toggle to show/hide each content
+Chapter, section, sub-sction, ... can be hidden/shown by clicking headerline
+or [+]/[-] node.  This is for outline viewing. 
+
+=== header numbering
+Header is automatically  numbered.  Currently there is no option to disable this
+numbering:-(
+
+=== bulk-mode update
+
+When just enter juli(1) command without any option and no file argument,
+it searches whole juli-repository(explained below) and generates html
+only for updated text files.
+
+==== juli-repository
+
+Juli-repository is a directory which contains several memos.
+output HTML directory can be configured at any place at 'init' command
+(explained later).
+
+=== auto link between memo
+
+Similar to <a href='http://en.wikipedia.org/wiki/Wiki'>wiki</a>,
+juli(1) creates links to another page when the source memo contains 
+a <i>filename</i> (without .txt extention) and the <i>filename</i>.txt
+exists.
+Unlink usual wiki, juli(1) automatically generates this link.
+
+Example:
+
+When source memo contains following paragraph:
+
+  Do you know hello world?  It is basic words in computing world.
+
+and there is computing.txt file in the same directory, the memo will be:
+
+  Do you know hello world?  It is basic words in <a href=#>computing</a> world.
+
+and the 'computing' hyper-link links to the target page.
+
+Restriction:
+* file in subdirectory of juli-repo is not recognized as a wikiname.  I'll support this soon.
+
+== Using with git (future plan)
+
+Do you know <a href='http://git-scm.com/'>git</a>?
+It is not only for programmer, but also for any file editor.
+Git provides revision control of files, collaboration with other people.
+Yes, it is very useful.
+
+Currently juli is personal tool, but when files are controlled by git,
+you can collaborate with other people as <b>online wiki</b>(like Wikipedia)
+does.
+
+I think juli + git provides both offline and online advantages.
+
+= Install
+
+v0.01 doesn't support any installation way;-(.
+Please put bin and lib manually. 
+
+== Prerequisits
+
+* ruby-1.8 is required.
+* prototype.js is used (included in this package).
+
+= Juli Formatting
+
+Juli document format syntax is similar to but very small subset of RD.
+
+== Header
+
+Beggining '=' in line means header.  6 level headers can be used as follows:
+
+1. '= Top level header title'
+1. '== Second level header title'
+1. '=== 3rd level header title'
+1. '==== 4th level header title'
+1. '===== 5th level header title'
+1. '====== 6th level header title'
+
+Example:
+
+
+  = NAME
+  juli    - Outline processor
+
+  = SYNOPSIS
+  juli [-g generator] file
+
+will be what you see at the top of this page...
+
+== List
+=== Ordered List
+
+The line starts with "1. " (One dot space) is recognized as ordered list.
+Not only '1' but also any number can be used.  However, actual assigned
+numbers for ordered-list starts '1' and increments 1 for each. 
+
+Example:
+
+  |1. Hello
+  |1. World
+  |1. This is a pen.
+
+will be:
+
+1. Hello
+1. World
+1. This is a pen.
+
+(Please ignore '|' above.  It just let juli(1) interpret to quote,
+not ordered list).
+
+When putting leading spaces, it is interpreted as nested list.  Example:
+
+  |1. Hello
+  |  1. Welcome
+  |  1. juli
+  |1. World
+
+will be:
+
+1. Hello
+  1. Welcome
+  1. juli
+1. World
+
+(Where, please ignore '|' above).
+
+Restriction:
+
+* continous line is not supported yet.
+
+=== Unordered List
+
+The line starts with "* " (astarisk space) is recognized as unordered list.
+
+Example:
+
+  |* Hello
+  |* World
+  |* This is a pen.
+
+will be:
+
+* Hello
+* World
+* This is a pen.
+
+When putting leading spaces, it is interpreted as nested list.  Example:
+
+  |* Hello
+  |  * Welcome
+  |  * juli
+  |* World
+
+will be:
+
+* Hello
+  * Welcome
+  * juli
+* World
+
+(Where, please ignore '|' above).
+
+Restriction:
+
+* continous line is not supported yet.
+
+=== Mixture of Ordered and Unordered list
+
+Of course, both ordered and unordered list can be nested each other.
+Example:
+
+  |1. Hello
+  |  * Welcome
+  |  * juli
+  |1. World
+
+will be:
+
+1. Hello
+  * Welcome
+  * juli
+1. World
+
+=== Dictionary List
+
+The line with the following form is recognized as dictionary list:
+
+  term:: description
+
+Example:
+
+  Ruby::  programing language, or a gem
+
+will be:
+
+Ruby::  programing language, or a gem
+
+== Block Quote
+
+The line with leading spaces is recognized as blockquote.
+Where, spaces should longer than Baseline.
+
+Block Quote can contain WHITELINE.
+
+Example:
+
+  |   "The load to hell is paved with good intentions."
+  |
+  |   -- derived proverb from original thought of Saint Bernard of Clairvaux
+
+will be:
+
+  "The load to hell is paved with good intentions."
+
+  -- derived proverb from original thought of Saint Bernard of Clairvaux
+
+(Where, '|' above is to avoid deleting spaces.  Please ignore it.)
+
+== HTML Extention
+
+HTML tag can be written anyplace so you can use any html as follows:
+
+* <i>Italic</i> by &lt;i&gt;Italic&lt;/i&gt;
+* <b>Bold</b> by &lt;b&gt;Bold&lt;/b&gt;
+* <u>Underline</u> by &lt;u&gt;Underline&lt;/u&gt;
+* <s>Strikethrough</s> by &lt;s&gt;Strikethrough&lt;/s&gt;
+
+=== Restriction
+
+You can use any HTML. However, <b>juli markup syntax is higher priority</b>.
+So, for example, tag nesting doesn't work because leading space at line is
+recognized as blockquote.
+
+Bad Example:
+
+  |&lt;table&gt;
+  |  &lt;tr&gt;&lt;td&gt;A&lt;/td&gt;&lt;td&gt;B&lt;/td&gt;&lt;/tr&gt;
+  |  &lt;tr&gt;&lt;td&gt;C&lt;/td&gt;&lt;td&gt;D&lt;/td&gt;&lt;/tr&gt;
+  |&lt;/table&gt;
+
+(Where, '|' above is to avoid deleting spaces.  Please ignore it.)
+
+= TODO
+
+1. release v0.01.00
+  1. INSTALL
+  1. PREREQUITS
+  1. SUPPORT
+1. Wiki
+  1. support subdirectory
+1. tutorial
+1. image, include, more HTML extention for table support
+1. japanese doc
+1. support continuous list
+1. PDF generator
+1. git for version control and publish
