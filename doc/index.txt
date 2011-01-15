@@ -155,6 +155,9 @@ does.
 
 I think juli + git provides both offline and online advantages.
 
+Git has not been integrated to juli yet, but, of course if you know git,
+you can use git to treat juli-repo.
+ 
 = Install
 
 v0.01 doesn't support any installation way;-(.
