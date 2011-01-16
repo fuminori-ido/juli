@@ -77,8 +77,9 @@ module Visitor
 
     def visit_dictionary_list_item(n)
       print_depth
-      printf("DictionaryListItem(%s)\n", n.term)
+      printf("DictionaryListItem\n")
       @depth += 1
+      n.term.accept(LineTree.new(@depth))
       n.line.accept(LineTree.new(@depth))
       @depth -= 1
     end

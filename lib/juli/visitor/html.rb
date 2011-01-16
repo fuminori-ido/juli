@@ -199,7 +199,8 @@ module Visitor
     end
 
     def visit_wikiname(n)
-      content_tag(:a, n.str, :class=>'wiki', :href=>n.str + '.html')
+      decoded = Juli::Wiki.decode(n.str)
+      content_tag(:a, decoded, :class=>'wiki', :href=>decoded + '.html')
     end
   end
 
@@ -356,7 +357,7 @@ module Visitor
 
     def visit_dictionary_list_item(n)
       content_tag(:tr) do
-        content_tag(:td, n.term + ':') +
+        content_tag(:td, n.term.accept(HtmlLine.new) + ':') +
         content_tag(:td, n.line.accept(HtmlLine.new))
       end
     end

@@ -28,7 +28,7 @@ Rake::RDocTask.new('doc') do |t|
   t.title     = 'juli API'
   t.options  << '--line-numbers'  << '--inline-source' <<
                 '--charset'       << 'utf-8'
-  t.rdoc_files.include('doc/README_FOR_APP')
+  t.rdoc_files.include('doc/README_FOR_API.txt')
   t.rdoc_files.include('lib/**/*.rb')
   t.rdoc_files.include('bin/juli')
 end

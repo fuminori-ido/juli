@@ -17,12 +17,28 @@ module Juli
   module Wiki
     include Juli::Util
 
+    # encode(=escape) '(', ')'
+    #
+    # === EXAMPLE
+    # 'juli(1)' -> 'juli\(1\)'
+    def encode(str)
+      str.gsub(/\(/, '\(').gsub(/\)/, '\)')
+    end
+
+    # decode '(', ')'
+    #
+    # === EXAMPLE
+    # 'juli\(1\)' -> 'juli(1)'
+    def decode(str)
+      str.gsub(/\\\(/, '(').gsub(/\\\)/, ')')
+    end
+
     def build_wikinames
       wikiname = {}
       Dir.chdir(juli_repo){
         Dir.glob('**/*.txt'){|f|
           if f =~ /^(.*).txt$/
-            wikiname[$1] = 1
+            wikiname[encode($1)] = 1
           end
         }
       }
@@ -35,6 +51,6 @@ module Juli
       $_wikinames ||= build_wikinames
     end
 
-    module_function :wikinames, :build_wikinames
+    module_function :wikinames, :build_wikinames, :encode, :decode
   end  
 end

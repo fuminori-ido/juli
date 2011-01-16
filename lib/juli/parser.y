@@ -119,8 +119,8 @@ module Absyn
     attr_accessor :term, :line
   
     def initialize(term, str)
-      @term = term
-      @line = Juli::LineParser.new.parse(str, wikinames)
+      @term = Juli::LineParser.new.parse(term,  wikinames)
+      @line = Juli::LineParser.new.parse(str,   wikinames)
     end
   
     def accept(visitor)
