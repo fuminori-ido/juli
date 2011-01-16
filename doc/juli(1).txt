@@ -22,7 +22,8 @@ general options are:
 == COMMAND
 
 === init
-Initialize juli-repository.  Specify output directory with -o option.
+Initialize juli-repository(juli-repo in short).
+Specify output directory with -o option.
 When no option is specified, empy juli-repo is created and skelton
 config file is created.
 
@@ -32,7 +33,7 @@ You can edit the config file later.  It's just YAML format file.
 
 Following example creates:
 
-$HOME/my_memo_root::  juli-repository
+$HOME/my_memo_root::  juli-repo
 /var/www/juli::       output_top.  generated html can be browsed via internet if http server recognizes this.
 
 prepare output directory to browse at internet.  Of course, your http server
@@ -41,7 +42,7 @@ is required to recognize /var/www/juli:
   $ sudo mkdir /var/www/juli
   $ sudo chown YOURNAME /var/www/juli
 
-prepare memo root directory for juli-repository:
+prepare memo root directory for juli-repo:
 
   $ cd $HOME
   $ mkdir my_memo_root
