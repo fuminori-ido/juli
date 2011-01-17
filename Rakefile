@@ -38,13 +38,12 @@ task :dist do
   FileUtils.mkdir_p work_dir
   Dir.chdir work_dir do
     sh "git clone #{repo} ."
-    print "dist 1"; sleep 30
     sh 'rake'
-    print "dist 2"; sleep 30
-    sh 'tar', 'zcvf', "/tmp/juli-#{Juli::VERSION}.tgz", *[files, dirs].flatten
-    print "dist 3"; sleep 30
   end
-  FileUtils.rm_rf "/tmp/juli_dist"
+  Dir.chdir File.join(work_dir, '..') do
+    sh 'tar', 'zcvf', "/tmp/juli-#{Juli::VERSION}.tgz", *[files, dirs].flatten
+  end
+  FileUtils.rm_rf work_dir
 end
 
 Rake::RDocTask.new('doc') do |t|
