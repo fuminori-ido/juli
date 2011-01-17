@@ -28,18 +28,19 @@ end
 
 desc 'build package'
 task :dist => [:clean, parsers].flatten do
-  files = %w(Rakefile setup.rb)
-  dirs  = %w(bin lib doc test)
-
+  files     = %w(Rakefile setup.rb)
+  dirs      = %w(bin lib doc test)
   pkg_name  = "juli-#{Juli::VERSION}"
-  Dir.mkdir "/tmp/juli_dist/#{pkg_name}"
+  repo      = Pathname.new('.').realpath.to_s
+
+  Dir.mkdir_p "/tmp/juli_dist/#{pkg_name}"
   Dir.chdir "/tmp/juli_dist" do
-    sh 'git clone git://jjjuli.git.sourceforge.net/gitroot/jjjuli/jjjuli'
-    print "dist 1"; sleep 10
+    sh "git clone #{repo} ."
+    print "dist 1"; sleep 30
     sh 'rake'
-    print "dist 2"; sleep 10
+    print "dist 2"; sleep 30
     sh 'tar', 'zcvf', "/tmp/juli-#{Juli::VERSION}.tgz", *[files, dirs].flatten
-    print "dist 3"; sleep 10
+    print "dist 3"; sleep 30
   end
   FileUtils.rm_rf "/tmp/juli_dist"
 end
