@@ -27,13 +27,13 @@ Rake::TestTask.new('test' => parsers) do |t|
 end
 
 desc 'build package'
-task :dist => [:clean, parsers].flatten do
+task :dist do
   files     = %w(Rakefile setup.rb)
   dirs      = %w(bin lib doc test)
   pkg_name  = "juli-#{Juli::VERSION}"
   repo      = Pathname.new('.').realpath.to_s
 
-  Dir.mkdir_p "/tmp/juli_dist/#{pkg_name}"
+  FileUtils.mkdir_p "/tmp/juli_dist/#{pkg_name}"
   Dir.chdir "/tmp/juli_dist" do
     sh "git clone #{repo} ."
     print "dist 1"; sleep 30
