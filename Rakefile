@@ -39,7 +39,7 @@ task :dist do
     Dir.chdir pkg_name do
       sh 'rake'
     end
-    sh "tar zxvf #{work_prefix}.tgz pkg_name"
+    sh "tar zcvf #{work_prefix}.tgz #{pkg_name}"
   end
 end
 
