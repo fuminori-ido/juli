@@ -43,7 +43,8 @@ COMMAND (default = gen):
 
 command_options for:
   init:
-    -o output_top
+    -o output_top     default='./html/'
+    -t template       template at lib/juli/template/ (default='default')
   gen:
     -g generator      specify generator (#{visitor_list}) default=html
     -f                force generate

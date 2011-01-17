@@ -1,13 +1,13 @@
 This is top document for juli.  Introduction, installation and
 juli formatting are described here.
 
-(If you are reading index.txt after installing juli(1),
-please run juli(1) as follows and read /tmp/juli/index.html by browser.
-To change output directory from /tmp/juli/ to your favarite one,
+(If you are reading index.txt in juli package after installing juli(1),
+please run juli(1) as follows and read html/index.html by browser.
+To change output directory from html/ to your favarite one,
 please edit doc/.juli/config file):
   $ cd doc      # move to package's doc/ directory.
-  $ juli        # generate html files under /tmp/juli/
-  # (Now, read /tmp/juli/index.html by any browser)
+  $ juli        # generate html files under html/
+  # (Now, read html/index.html by any browser)
 
 Please read the followings for each topic:
 

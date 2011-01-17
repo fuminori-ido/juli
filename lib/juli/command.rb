@@ -39,11 +39,9 @@ module Juli
       config_file = File.join(Juli::REPO, 'config')
       if !File.exist?(config_file)
         File.open(config_file, 'w') do |f|
-          if opts[:o]
-            f.printf("output_top: %s\n", opts[:o])
-          else
-            f.printf("# TBD\n")
-          end
+          f.print "# put juli-repo config here.\n\n"
+          write_config(f, 'output_top', opts[:o])
+          write_config(f, 'template',   opts[:t])
         end
       else
         STDERR.print "WARN: config file is already created\n"
@@ -67,6 +65,13 @@ module Juli
         for file in ARGV do
           Juli::Parser.new.parse(file, visitor(opts[:g]))
         end
+      end
+    end
+
+  private
+    def write_config(f, key, value)
+      if value
+        f.printf("%s: %s\n", key, value)
       end
     end
   end

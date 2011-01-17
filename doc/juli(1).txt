@@ -24,7 +24,7 @@ general options are:
 === init
 Initialize juli-repository(juli-repo in short).
 Specify output directory with -o option.
-When no option is specified, empy juli-repo is created and skelton
+When no option is specified, empy juli-repo is created and default
 config file is created.
 
 You can edit the config file later.  It's just YAML format file.
@@ -51,7 +51,8 @@ prepare memo root directory for juli-repo:
 
 
 ==== options for 'init'
--o <i>output_top</i>:: Specify output directory, which points to the top directory for generated html files.
+-o <i>output_top</i>::  Specify output directory, which points to the top directory for generated html files. default = './html/'
+-t <i>template</i>::    Specify template under lib/juli/template/ (without .html extention). default = 'default'.
 
 === gen
 When files are specified, each file will be converted by generator (default

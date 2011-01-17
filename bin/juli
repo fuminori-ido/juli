@@ -33,7 +33,12 @@ Version       = '0.01.0'
 #------------------------------------------------------------------
   include Juli::Command
 
-  OPTS    = {:g=>'html'}
+  # default option values
+  OPTS    = {
+    :g=>'html',
+    :o=>'./html/',
+    :t=>'default'
+  }
   command = 'gen'
 
   # parse common & default options
@@ -48,7 +53,8 @@ Version       = '0.01.0'
   s.on('-f')                          {|v| OPTS[:f]  = true}
 
   s = subparsers['init'] = OptionParser.new
-  s.on('-o output_top'){|v| OPTS[:o]  = v}
+  s.on('-o output_top') {|v| OPTS[:o]  = v}
+  s.on('-t template')   {|v| OPTS[:t]  = v}
 
   parser.order!(ARGV)
 
