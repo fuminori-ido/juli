@@ -384,10 +384,6 @@ Bad Example:
 
 = TODO
 
-1. release v0.03.00
-  1. package to include *.tab.rb
-1. delete files in SF 'frs'
-1. include 'rake clobber_doc' into 'rake clean'
 1. Wiki
   1. support subdirectory
 1. tutorial
