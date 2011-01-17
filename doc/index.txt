@@ -65,7 +65,7 @@ I don't want to think about "link it by WikiName, or, well,
 What is the notation to link in this wiki tool?" when I'm
 editing.
 <a href='http://projects.gnome.org/tomboy/'>Tomboy</a> does so in realtime,
-but I don't need such an realtime feature.
+but I don't need such a realtime feature.
 It's enough for me to link on browsing time.  So, some trigger
 to generate auto-linked HTML covers this needs.
 
@@ -134,7 +134,7 @@ Similar to <a href='http://en.wikipedia.org/wiki/Wiki'>wiki</a>,
 juli(1) creates links to another page when the source memo contains 
 a <i>filename</i> (without .txt extention) and the <i>filename</i>.txt
 exists.
-Unlink usual wiki, juli(1) automatically generates this link.
+Unlike usual wiki, juli(1) automatically generates this link.
 
 Example:
 
@@ -179,7 +179,8 @@ Please put bin and lib manually.
 
 = Juli Formatting
 
-Juli document format syntax is similar to but very small subset of RD.
+Juli document format syntax is similar to but very small subset of
+<a href='http://rubyforge.org/projects/rdtool/'>RD</a>.
 
 == Header
 
@@ -361,6 +362,10 @@ Bad Example:
 
 1. release v0.01.00
   1. INSTALL, setup.rb? gem?
+    1. move lib/template/ under lib/juli/ to solve namespace on installation of lib
+1. put SourceForge log to all pages
+1. delete files in SF 'frs'
+1. include 'rake clobber_doc' into 'rake clean'
 1. Wiki
   1. support subdirectory
 1. tutorial
