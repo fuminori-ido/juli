@@ -32,9 +32,11 @@ task :dist do
   dirs      = %w(bin lib doc test)
   pkg_name  = "juli-#{Juli::VERSION}"
   repo      = Pathname.new('.').realpath.to_s
+  work_dir  = "/tmp/#{pkg_name}"
 
-  FileUtils.mkdir_p "/tmp/juli_dist/#{pkg_name}"
-  Dir.chdir "/tmp/juli_dist" do
+  File.umask(022)
+  FileUtils.mkdir_p work_dir
+  Dir.chdir work_dir do
     sh "git clone #{repo} ."
     print "dist 1"; sleep 30
     sh 'rake'
