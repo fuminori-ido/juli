@@ -36,5 +36,6 @@ end
 desc 'clean working files'
 task :clean do
   sh "find . -name '*~' -exec rm {} \\;"
-  sh 'rm', '-rf', *[parsers, test_conf_outout_top].flatten
+  sh 'rm', '-rf', *[parsers, test_conf_outout_top, 
+      'InstalledFiles', '.config'].flatten
 end

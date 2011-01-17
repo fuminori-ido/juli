@@ -20,6 +20,10 @@ class UtilTest < Test::Unit::TestCase
     assert_equal Juli::Visitor::Html, visitor('html')
   end
 
+  def test_visitor_list
+    assert_not_equal [], visitor_list
+  end
+
   def test_usage
     assert_not_nil usage
   end

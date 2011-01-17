@@ -361,6 +361,9 @@ Bad Example:
 = TODO
 
 1. release v0.01.00
+  1. "juli --help" doesn't show visitors after setup.rb run
+  1. package to include *.tab.rb
+  1. show how to download form git repository and install
   1. INSTALL, setup.rb? gem?
     1. move lib/template/ under lib/juli/ to solve namespace on installation of lib
 1. delete files in SF 'frs'

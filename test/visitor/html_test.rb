@@ -1,7 +1,5 @@
 require 'test_helper'
 
-PKG_ROOT    = File.join(File.dirname(__FILE__), '../..')
-
 include Juli::Visitor::HtmlHelper
 
 module Visitor

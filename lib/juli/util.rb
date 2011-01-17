@@ -21,7 +21,7 @@ module Juli
 
     def visitor_list
       result = []
-      sorted_visitors = Dir.glob(File.join(Juli::PKG_ROOT, 'lib/juli/visitor/*.rb')).sort
+      sorted_visitors = Dir.glob(File.join(Juli::LIB, 'visitor/*.rb')).sort
       for f in sorted_visitors do
         next if f =~ /^\./
         result << File.basename(f).gsub(/\.rb$/, '')
