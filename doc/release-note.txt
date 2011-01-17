@@ -1,0 +1,7 @@
+= v0.02.00 
+
+* support installation by setup.rb.
+* apply 'Juli::' namespace for all library modules.
+* move lib/template under lib/juli/
+* For 'juli init', add -t option and default value for -o option.
+
