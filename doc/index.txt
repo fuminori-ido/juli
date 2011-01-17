@@ -6,6 +6,7 @@ please run juli(1) as follows and read html/index.html by browser.
 To change output directory from html/ to your favarite one,
 please edit doc/.juli/config file):
   $ cd doc      # move to package's doc/ directory.
+  $ juli init   # initialize doc as juli-repository.
   $ juli        # generate html files under html/
   # (Now, read html/index.html by any browser)
 
@@ -169,12 +170,21 @@ you can use git to treat juli-repo.
  
 = Install
 
-v0.01 doesn't support any installation way;-(.
-Please put bin and lib manually. 
+== from repository
 
-== Prerequisites
-
+Prerequisites:
 * ruby-1.8 is required.
+* <a href='http://i.loveruby.net/en/projects/racc/'>racc</a>
+* rake
+
+racc tool is required when you download from Sourceforge repository
+and install it.
+
+  $ git clone git://jjjuli.git.sourceforge.net/gitroot/jjjuli/jjjuli
+  $ cd jjjuli
+  $ rake                                # generate ruby source from *.y files
+  $ ruby setup.rb
+
 * prototype.js is used (included in this package).
 
 = Juli Formatting
@@ -360,12 +370,10 @@ Bad Example:
 
 = TODO
 
-1. release v0.01.00
-  1. "juli --help" doesn't show visitors after setup.rb run
+1. release v0.02.00
   1. package to include *.tab.rb
   1. show how to download form git repository and install
   1. INSTALL, setup.rb? gem?
-    1. move lib/template/ under lib/juli/ to solve namespace on installation of lib
 1. delete files in SF 'frs'
 1. include 'rake clobber_doc' into 'rake clean'
 1. Wiki
