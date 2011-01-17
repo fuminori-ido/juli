@@ -28,22 +28,19 @@ end
 
 desc 'build package'
 task :dist do
-  files     = %w(Rakefile setup.rb)
-  dirs      = %w(bin lib doc test)
-  pkg_name  = "juli-#{Juli::VERSION}"
-  repo      = Pathname.new('.').realpath.to_s
-  work_dir  = "/tmp/#{pkg_name}"
+  pkg_name    = "juli-#{Juli::VERSION}"
+  work_prefix = "/tmp/#{pkg_name}"
+  sh "git archive --format=tar --prefix=#{pkg_name}/ HEAD | gzip >#{work_prefix}.tgz"
 
-  File.umask(022)
-  FileUtils.mkdir_p work_dir
-  Dir.chdir work_dir do
-    sh "git clone #{repo} ."
-    sh 'rake'
+  # include racc geneerated files
+  FileUtils.mkdir_p work_prefix
+  Dir.chdir work_prefix do
+    sh "tar zxvf #{work_prefix}.tgz"
+    Dir.chdir pkg_name do
+      sh 'rake'
+    end
+    sh "tar zxvf #{work_prefix}.tgz pkg_name"
   end
-  Dir.chdir File.join(work_dir, '..') do
-    sh 'tar', 'zcvf', "/tmp/juli-#{Juli::VERSION}.tgz", *[files, dirs].flatten
-  end
-  FileUtils.rm_rf work_dir
 end
 
 Rake::RDocTask.new('doc') do |t|
