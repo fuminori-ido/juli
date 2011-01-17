@@ -9,7 +9,7 @@
 # = DESCRIPTION
 # see doc/juli.txt for more detail.
 
-$LOAD_PATH << File.join(File.dirname(__FILE__), '../lib')
+$LOAD_PATH.insert(0, File.join(File.dirname(__FILE__), '../lib'))
 
 require 'erb'
 require 'fileutils'
@@ -20,7 +20,7 @@ require 'juli/command'
 #------------------------------------------------------------------
 # Global variable
 #------------------------------------------------------------------
-Version       = '0.02.00'
+Version       = Juli::VERSION
 
 
 #------------------------------------------------------------------

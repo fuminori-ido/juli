@@ -173,7 +173,8 @@ you can use git to treat juli-repo.
 == from repository
 
 Prerequisites:
-* ruby-1.8 is required.
+* git
+* ruby-1.8
 * <a href='http://i.loveruby.net/en/projects/racc/'>racc</a>
 * rake
 
@@ -370,10 +371,8 @@ Bad Example:
 
 = TODO
 
-1. release v0.02.00
+1. release v0.03.00
   1. package to include *.tab.rb
-  1. show how to download form git repository and install
-  1. INSTALL, setup.rb? gem?
 1. delete files in SF 'frs'
 1. include 'rake clobber_doc' into 'rake clean'
 1. Wiki

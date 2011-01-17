@@ -1,6 +1,9 @@
+$LOAD_PATH.insert(0, File.join(File.dirname(__FILE__), 'lib'))
+
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
+require 'juli'
 
 juli_parser_rb        = 'lib/juli/parser.tab.rb'
 juli_line_parser_rb   = 'lib/juli/line_parser.tab.rb'
@@ -23,6 +26,24 @@ Rake::TestTask.new('test' => parsers) do |t|
   t.verbose = true
 end
 
+desc 'build package'
+task :dist => [:clean, parsers].flatten do
+  files = %w(Rakefile setup.rb)
+  dirs  = %w(bin lib doc test)
+
+  pkg_name  = "juli-#{Juli::VERSION}"
+  Dir.mkdir "/tmp/juli_dist/#{pkg_name}"
+  Dir.chdir "/tmp/juli_dist" do
+    sh 'git clone git://jjjuli.git.sourceforge.net/gitroot/jjjuli/jjjuli'
+    print "dist 1"; sleep 10
+    sh 'rake'
+    print "dist 2"; sleep 10
+    sh 'tar', 'zcvf', "/tmp/juli-#{Juli::VERSION}.tgz", *[files, dirs].flatten
+    print "dist 3"; sleep 10
+  end
+  FileUtils.rm_rf "/tmp/juli_dist"
+end
+
 Rake::RDocTask.new('doc') do |t|
   t.rdoc_dir  = 'doc/app'
   t.title     = 'juli API'
@@ -34,8 +55,9 @@ Rake::RDocTask.new('doc') do |t|
 end
 
 desc 'clean working files'
-task :clean do
+task :clean => :clobber_doc do
   sh "find . -name '*~' -exec rm {} \\;"
   sh 'rm', '-rf', *[parsers, test_conf_outout_top, 
-      'InstalledFiles', '.config'].flatten
+      'InstalledFiles', '.config',    # setup.rb generated
+      'doc/html'].flatten
 end
