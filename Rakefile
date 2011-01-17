@@ -41,6 +41,7 @@ task :dist do
     end
     sh "tar zcvf #{work_prefix}.tgz #{pkg_name}"
   end
+  FileUtils.rm_rf work_prefix
 end
 
 Rake::RDocTask.new('doc') do |t|

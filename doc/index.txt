@@ -169,6 +169,19 @@ Git has not been integrated to juli yet, but, of course if you know git,
 you can use git to treat juli-repo.
  
 = Install
+== from gem
+TBD
+
+== from package
+Prerequisites:
+* ruby-1.8
+
+1. download package from http://sourceforge.net/projects/jjjuli/files/
+1. run setup.rb as follows:
+
+  $ tar zxvf juli-#.##.##.tgz
+  $ cd juli-#.##.##
+  $ ruby setup.rb                       # you may need 'sudo'
 
 == from repository
 
@@ -184,7 +197,7 @@ and install it.
   $ git clone git://jjjuli.git.sourceforge.net/gitroot/jjjuli/jjjuli
   $ cd jjjuli
   $ rake                                # generate ruby source from *.y files
-  $ ruby setup.rb
+  $ ruby setup.rb                       # you may need 'sudo'
 
 * prototype.js is used (included in this package).
 
