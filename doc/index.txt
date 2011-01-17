@@ -363,7 +363,6 @@ Bad Example:
 1. release v0.01.00
   1. INSTALL, setup.rb? gem?
     1. move lib/template/ under lib/juli/ to solve namespace on installation of lib
-1. put SourceForge log to all pages
 1. delete files in SF 'frs'
 1. include 'rake clobber_doc' into 'rake clean'
 1. Wiki

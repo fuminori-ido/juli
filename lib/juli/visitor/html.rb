@@ -380,8 +380,8 @@ module Visitor
       javascript  = relative_from(in_file, 'juli.js')
       stylesheet  = relative_from(in_file, 'juli.css')
       body        = root.accept(self)
-      erb         = ERB.new(File.read(File.join(Juli::PKG_ROOT,
-                        'lib/template/', conf['template']) + '.html'))
+      erb         = ERB.new(File.read(File.join(Juli::TEMPLATE_PATH,
+                        conf['template']) + '.html'))
       out_path    = out_filename(in_file)
       mkdir(out_path)
       File.open(out_path, 'w') do |f|
