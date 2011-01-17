@@ -13,7 +13,7 @@ class ParserTest < Test::Unit::TestCase
     stdout_to_dev_null do
       for file in ['t001.txt', 't002.txt'] do
         assert_nothing_raised do
-          Juli::Parser.new.parse(data_path(file), Visitor::Tree)
+          Juli::Parser.new.parse(data_path(file), Juli::Visitor::Tree)
         end
       end
     end
@@ -22,9 +22,9 @@ class ParserTest < Test::Unit::TestCase
   def test_nested_ordered_list
     t = build_tree_on('t004.txt')
     assert_equal 1, t.array.size
-    assert_equal Intermediate::OrderedList,     t.array[0].class
-    assert_equal Intermediate::OrderedListItem, t.array[0].array[0].class
-    assert_equal Intermediate::OrderedList,     t.array[0].array[1].class
+    assert_equal Juli::Intermediate::OrderedList,     t.array[0].class
+    assert_equal Juli::Intermediate::OrderedListItem, t.array[0].array[0].class
+    assert_equal Juli::Intermediate::OrderedList,     t.array[0].array[1].class
   end
 
   # even if list order is incorrect, parser shouldn't failed and
@@ -32,16 +32,16 @@ class ParserTest < Test::Unit::TestCase
   def test_nested_ordered_list_incorrect
     assert_nothing_raised do
       parser = Juli::Parser.new
-      parser.parse(data_path('t005.txt'), Visitor::Tree)
+      parser.parse(data_path('t005.txt'), Juli::Visitor::Tree)
     end
   end
 
   def test_nested_unordered_list
     t = build_tree_on('t006.txt')
     assert_equal 1, t.array.size
-    assert_equal Intermediate::UnorderedList,     t.array[0].class
-    assert_equal Intermediate::UnorderedListItem, t.array[0].array[0].class
-    assert_equal Intermediate::UnorderedList,     t.array[0].array[1].class
+    assert_equal Juli::Intermediate::UnorderedList,     t.array[0].class
+    assert_equal Juli::Intermediate::UnorderedListItem, t.array[0].array[0].class
+    assert_equal Juli::Intermediate::UnorderedList,     t.array[0].array[1].class
   end
 
   def test_nested_mixed_list
@@ -49,8 +49,8 @@ class ParserTest < Test::Unit::TestCase
 
     # [order-list, default, unorder-list]
     assert_equal 3, t.array.size
-    assert_equal Intermediate::OrderedList,   t.array[0].class
-    assert_equal Intermediate::UnorderedList, t.array[2].class
+    assert_equal Juli::Intermediate::OrderedList,   t.array[0].class
+    assert_equal Juli::Intermediate::UnorderedList, t.array[2].class
 
     # [order-item, unorder-list, order-item]
     assert_equal 3, t.array[0].array.size
@@ -66,8 +66,8 @@ class ParserTest < Test::Unit::TestCase
     #
     # Where, d = default, o = ordered list, q = quote, h = header
     assert_equal 8, t.array.size
-    assert_equal Intermediate::QuoteNode,   t.array[6].class
-    assert_equal Intermediate::HeaderNode,  t.array[7].class
+    assert_equal Juli::Intermediate::QuoteNode,   t.array[6].class
+    assert_equal Juli::Intermediate::HeaderNode,  t.array[7].class
   end
 
   def test_quote_or_nested_list
@@ -79,8 +79,8 @@ class ParserTest < Test::Unit::TestCase
   def test_quote_and_normal
     t = build_tree_on('t010.txt')
     assert_equal 4, t.array.size
-    assert_equal Intermediate::DefaultNode, t.array[2].class
-    assert_equal Intermediate::QuoteNode,   t.array[3].class
+    assert_equal Juli::Intermediate::DefaultNode, t.array[2].class
+    assert_equal Juli::Intermediate::QuoteNode,   t.array[3].class
   end
 
 private
@@ -98,7 +98,7 @@ private
 
   def build_tree_on(test_file)
     parser = Juli::Parser.new
-    parser.parse(data_path(test_file), Visitor::Tree)
+    parser.parse(data_path(test_file), Juli::Visitor::Tree)
     parser.tree
   end
 end

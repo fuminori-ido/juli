@@ -15,7 +15,7 @@ rule
     | WIKINAME            { LineAbsyn::WikiName.new(val[0]) }
 end
 ---- header
-module LineAbsyn
+module Juli::LineAbsyn
   class Node
     def accept(visitor)
       visitor.visit_node(self)

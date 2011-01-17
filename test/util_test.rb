@@ -17,7 +17,7 @@ class UtilTest < Test::Unit::TestCase
   end
 
   def test_visitor
-    assert_equal Visitor::Html, visitor('html')
+    assert_equal Juli::Visitor::Html, visitor('html')
   end
 
   def test_usage

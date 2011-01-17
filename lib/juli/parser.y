@@ -30,7 +30,7 @@ end
 ---- header
 require 'juli/wiki'
 
-module Absyn
+module Juli::Absyn
   class Node
     include Juli::Wiki
 

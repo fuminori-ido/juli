@@ -3,7 +3,7 @@ require 'juli/util'
 require 'juli/line_parser.tab'
 require 'juli/intermediate'
 
-module Visitor
+module Juli::Visitor
   # copied from Rails
   module TagHelper
     def tag(name, options = nil, open = false)
@@ -78,7 +78,7 @@ module Visitor
   end
 
   # generate contents
-  class ContentsDrawer < ::Intermediate::Visitor
+  class ContentsDrawer < Juli::Intermediate::Visitor
     include TagHelper
     include HtmlHelper
 
@@ -119,7 +119,7 @@ module Visitor
   # IdAssigner should be executed before running Html visitor since
   # ContentsDrawer also refers DOM id.  That is the reason why DOM id
   # assignment is isolated from Html visitor.
-  class IdAssigner < ::Intermediate::Visitor
+  class IdAssigner < Juli::Intermediate::Visitor
     def initialize
       super
       @uniq_id_seed   = 0
@@ -184,7 +184,7 @@ module Visitor
 
   # visits a line of document text and generate hyper-link when
   # wikiname exists.
-  class HtmlLine < ::LineAbsyn::Visitor
+  class HtmlLine < Juli::LineAbsyn::Visitor
     include TagHelper
     include HtmlHelper
 
@@ -233,7 +233,7 @@ module Visitor
   # Visitor::Html visits Intermediate tree and generates HTML
   #
   # Text files under juli-repository must have '.txt' extention.
-  class Html < ::Intermediate::Visitor
+  class Html < Juli::Intermediate::Visitor
     include TagHelper
     include HtmlHelper
     include Util

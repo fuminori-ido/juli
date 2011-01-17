@@ -1,7 +1,7 @@
 require 'juli/wiki'
 
 # intermediate tree nodes
-module Intermediate
+module Juli::Intermediate
   class Node
     attr_accessor :parent
 
@@ -92,12 +92,12 @@ module Intermediate
     # 1. absyn_header
     # 2. level & str
     def initialize(*absyn_header_or_values)
-      super(absyn_header_or_values[0].class == Absyn::HeaderNode ?
+      super(absyn_header_or_values[0].class == Juli::Absyn::HeaderNode ?
           absyn_header_or_values[0].level :
           absyn_header_or_values[0])
 
       case absyn_header_or_values[0]
-      when Absyn::HeaderNode
+      when Juli::Absyn::HeaderNode
         @str    = absyn_header_or_values[0].str
       else
         @str    = absyn_header_or_values[1]

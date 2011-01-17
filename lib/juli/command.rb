@@ -1,8 +1,6 @@
 require 'juli/util'
 require 'juli/parser.tab'
 
-include Juli::Util
-
 module Juli
   # juli command execution
   module Command

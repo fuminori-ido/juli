@@ -2,8 +2,8 @@ require 'juli/intermediate'
 require 'juli/util'
 require 'juli/line_parser.tab'
 
-module Visitor
-  class LineTree < LineAbsyn::Visitor
+module Juli::Visitor
+  class LineTree < Juli::LineAbsyn::Visitor
     def initialize(depth)
       @depth = depth
     end
@@ -25,7 +25,7 @@ module Visitor
 
   # Another VISITOR-pattern for Intermediate tree to print tree
   # structure around each node.
-  class Tree < ::Intermediate::Visitor
+  class Tree < Juli::Intermediate::Visitor
     include Juli::Util
 
     def initialize

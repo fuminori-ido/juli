@@ -27,7 +27,7 @@ class LineParserTest < Test::Unit::TestCase
 private
   def check_parse(expected, text, wikinames)
     assert_nothing_raised do
-      v = LineAbsyn::DebugVisitor.new
+      v = Juli::LineAbsyn::DebugVisitor.new
       Juli::LineParser.new.parse(text, wikinames).accept(v)
       assert_equal expected, v.array
     end
