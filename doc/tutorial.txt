@@ -1,0 +1,110 @@
+Several usages are explained here.
+It is assumed that installation has been already done.
+
+= Convention
+
+Before starting to explain each case, let me use the following  conventions:
+
+MY_ACCOUNT::  my login account name.
+MY_NOTE::     juli-repo directory. Example: /home/MY_ACCOUNT/juli_repo
+MY_EDITOR::   command of your favarite editor. Example: Notepad, emacs, vi, etc.
+
+= HTML publishing in your local machine
+ 
+This is the simplest case of juli usage; writing text, generate HTML,
+and read it.
+
+<center><img src='tutorial/local.png'></center>
+
+1. initialize juli-repo:
+  $ mkdir MY_NOTE
+  $ cd MY_NOTE
+  $ juli init
+1. write any memo what you want:
+  $ MY_EDITOR minutes_20110117.txt
+1. generate HTML and browse it:
+  $ juli                                        # generate HTML!
+  bulk mode                                     # brief message is displayed.
+  generated:       html/minutes_20110117.html   #   :
+  $ firefox html/minutes_20110117.html          # run firefox if it is enable
+
+As index document explains, each filename under MY_NOTE in a document is
+automatically linked.
+
+= HTML publishing for www server in your local machine
+
+This is almost the same as above since web server in your local machine
+publishes your documents to internet.
+
+Only difference is to configure web server.
+
+<center><img src='tutorial/local_httpd.png'></center>
+
+There are several ways to configure juli output_top as a web server
+directory.  Here is just one of the ways to do that in Debian/Ubuntu case.
+1. prepare httpd directory for juli output:
+  $ cd /var/www
+  $ sudo mkdir juli
+  $ sudo chown MY_ACCOUNT juli
+1. initialize juli-repo:
+  $ mkdir MY_NOTE
+  $ cd MY_NOTE
+  $ juli init -o /var/www/juli
+
+The remaining tasks are the same as above.
+
+= HTML publishing to remote web server
+
+This is more realistic case than before.  Working at local and
+publishing to remote web server.
+Actually, I'm doing so to publish this juli documents to
+<a href='http://jjjuli.sourceforge.net'>http://jjjuli.sourceforge.net</a>
+
+<center><img src='tutorial/remote_httpd.png'></center>
+
+Setting up is the same as the first one.  Only difference is
+to push generated files to server.  I'm using rsync for this purpose.
+
+Writing text and reading HTML can be done locally anytime anywhere.
+It doesn't require internet connection.
+
+= Wiki collaboration with other people.
+
+Juli + git expand its features.
+
+Do you know git?  From juli point of view, it provides:
+
+1. revision control
+1. file-base collaboration with other people
+1. local file commit(you can think it means 'save' for now) 
+
+For the detail, please refer
+<a href='http://git-scm.com/'>http://git-scm.com/</a>.
+
+By git, you can collaborate with other people:
+
+<center><img src='tutorial/using_git.png'></center>
+
+This figure is just one of use-case.
+For example, if juli+git can be installed on the web server,
+all of file transfer can be done by git and run juli at web server
+to generate HTML.
+Another case. Above figure shows just peer-to-peer,
+but as you may know, we can put central git hub for all juli users
+
+Juli supports simple wiki feature so that when a team works juli-repo
+together, juli-repo becomes a wiki world.
+The difference between juli+git and usual wiki is:
+
+== Advantage
+
+1. juli+git can be used to edit and view its HTML locally without online.
+ 
+== Disadvantage
+
+1. juli+git needs to have repository for each user while usual wiki has only one.
+
+
+Currently (v0.03.*), juli doesn't integrate git so you need to setup
+git manually.
+

@@ -13,6 +13,7 @@ rule
   element
     : STRING              { LineAbsyn::StringNode.new(val[0]) }
     | WIKINAME            { LineAbsyn::WikiName.new(val[0]) }
+    | TAG                 { LineAbsyn::StringNode.new(val[0]) }
 end
 ---- header
 module Juli::LineAbsyn
@@ -118,7 +119,14 @@ private
   # recursive scan
   def scan_r(str, &block)
     for w in @wikinames do
-      if str =~ /\A(.*)#{w}(.*)\z/m
+      case str
+      # to escape wikiname string in tag, tag is prior than wikiname
+      when /\A([^<]*)(<[^>]*>)(.*)\z/m
+        scan_r($1, &block)
+        yield :TAG, $2
+        scan_r($3, &block)
+        return
+      when /\A(.*)#{w}(.*)\z/m
         scan_r($1, &block)
         yield :WIKINAME, w
         scan_r($2, &block)

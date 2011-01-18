@@ -17,6 +17,8 @@ class LineParserTest < Test::Unit::TestCase
 [%w(abc W:test de W:te f), 'abctestdetef', %w(test te)],
 # multiline
 [['abc', 'W:test', "d\ne", 'W:te', 'f'], "abctestd\netef", %w(test te)],
+# wikiname in HTML tag should be escaped
+[['abc', '<img src="hello">', 'def'], 'abc<img src="hello">def', ['hello']],
 ]
 
     for t in tests do
