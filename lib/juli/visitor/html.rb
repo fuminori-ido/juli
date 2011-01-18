@@ -249,6 +249,8 @@ module Juli::Visitor
     
     # Html sepecific initialization does:
     #
+    # FIXME: need to check here if rsync(1) is installed
+    #
     # 1. create output_top.
     # 1. copy *.js, *.css files to output_top/
     #
@@ -272,14 +274,35 @@ module Juli::Visitor
       sync(opts)
     end
 
-    # synchronize repository and OUTPUT_TOP:
+    # synchronize repository and OUTPUT_TOP.
+    #
+    # * if text file, calls sync_txt()
+    # * for others, do rsync(1)
+    #
+    def self.sync(opts)
+      sync_txt(opts)
+      sync_others
+    end
+
+    def self.sync_others
+      Dir.chdir(juli_repo){
+        system 'rsync', '-avuzb',
+          '--exclude',  '*.txt',
+          '--exclude',  'html/',
+          '--exclude',  '*~',
+          '--exclude',  '.juli/',
+          '.',  conf['output_top']
+      }
+    end
+
+    # synchronize text file between juli-repo and OUTPUT_TOP:
     #
     # 1. new file exists, generate it.
     # 1. repo's file timestamp is newer than the one under OUTPUT_TOP, regenerate it.
     # 1. correspondent file of OUTPUT_TOP/.../f doesn't exist in repo, delete it.
     # 1. if -f option is specified, don't check timestamp and always generates.
     #
-    def self.sync(opts)
+    def self.sync_txt(opts)
       repo      = {}
       Dir.chdir(juli_repo){
         Dir.glob('**/*.txt'){|f|
