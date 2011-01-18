@@ -1,7 +1,7 @@
 require 'pathname'
 
 module Juli
-  VERSION       = '0.03.00'
+  VERSION       = '0.04.00'
 
   # sentinel to search juli-repo.  Also it's a directory name to sotre config.
   REPO          = '.juli'
