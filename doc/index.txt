@@ -176,6 +176,7 @@ TBD
 
 == from package
 Prerequisites:
+* rsync
 * ruby-1.8
 
 1. download package from http://sourceforge.net/projects/jjjuli/files/
@@ -188,10 +189,11 @@ Prerequisites:
 == from repository
 
 Prerequisites:
-* git
+* rsync
 * ruby-1.8
 * <a href='http://i.loveruby.net/en/projects/racc/'>racc</a>
 * rake
+* git
 
 racc tool is required when you download from Sourceforge repository
 and install it.
@@ -386,7 +388,7 @@ Bad Example:
 
 = TODO
 
-1. image from juli-repo to output_top 
+1. screen shot or some explanation of 'BEFORE-AFTER'
 1. line parse for http://....
 1. tutorial
 1. Wiki
