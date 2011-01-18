@@ -362,6 +362,19 @@ will be:
 
 (Where, '|' above is to avoid deleting spaces.  Please ignore it.)
 
+== URL autolink
+
+When text contains URL like http://..., it is automatically hyperlinked.
+Currently, http, https, mailto, and ftp are supported.
+
+Example:
+
+  Please look at http://w3c.org if you are not familiar with HTML.
+
+will be:
+
+Please look at http://w3c.org if you are not familiar with HTML.
+
 == HTML Extention
 
 HTML tag can be written anyplace so you can use any html as follows:
@@ -388,7 +401,6 @@ Bad Example:
 
 = TODO
 
-1. line parse for http://....
 1. escape.  For example, <a href='...'>index.txt</a> becomes doubly nested link
 1. Wiki
   1. support subdirectory
