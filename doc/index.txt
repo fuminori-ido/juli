@@ -152,6 +152,7 @@ and the 'computing' hyper-link links to the target page.
 
 Restriction:
 * file in subdirectory of juli-repo is not recognized as a wikiname.  I'll support this soon.
+* Wikiname in HTML tag is not recognized as wiki link.
 
 == Using with git (future plan)
 
