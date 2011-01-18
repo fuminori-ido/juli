@@ -14,6 +14,7 @@ rule
     : STRING              { LineAbsyn::StringNode.new(val[0]) }
     | WIKINAME            { LineAbsyn::WikiName.new(val[0]) }
     | TAG                 { LineAbsyn::StringNode.new(val[0]) }
+    | URL                 { LineAbsyn::Url.new(val[0]) }
 end
 ---- header
 module Juli::LineAbsyn
@@ -38,6 +39,12 @@ module Juli::LineAbsyn
   class WikiName < StringNode
     def accept(visitor)
       visitor.visit_wikiname(self)
+    end
+  end
+
+  class Url < StringNode
+    def accept(visitor)
+      visitor.visit_url(self)
     end
   end
   
@@ -75,6 +82,7 @@ module Juli::LineAbsyn
 
     def visit_string(n); end
     def visit_wikiname(n); end
+    def visit_url(n); end
   end
 
   # visitor for debug
@@ -91,6 +99,10 @@ module Juli::LineAbsyn
 
     def visit_wikiname(n)
       @array << sprintf("W:%s", n.str)
+    end
+
+    def visit_url(n)
+      @array << sprintf("U:%s", n.str)
     end
   end
 end
@@ -116,16 +128,26 @@ private
     yield false, nil
   end
 
+  URL = '(https?:|mailto:|ftp:)\S+'
+
   # recursive scan
   def scan_r(str, &block)
     for w in @wikinames do
       case str
-      # to escape wikiname string in tag, tag is prior than wikiname
+      # to escape wikiname string in tag, tag is prior to wikiname
       when /\A([^<]*)(<[^>]*>)(.*)\z/m
         scan_r($1, &block)
         yield :TAG, $2
         scan_r($3, &block)
         return
+
+      # URL is piror to wikiname
+      when /\A(.*\s+)(#{URL})(.*)\z/m
+        scan_r($1, &block)
+        yield :URL, $2
+        scan_r($4, &block)    # not $3 since URL itself has (...)
+        return
+
       when /\A(.*)#{w}(.*)\z/m
         scan_r($1, &block)
         yield :WIKINAME, w

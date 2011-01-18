@@ -21,6 +21,11 @@ module Juli::Visitor
       print_depth
       printf "Wiki: %s\n", str_limit(n.str.gsub(/\n/, ''))
     end
+
+    def visit_url(n)
+      print_depth
+      printf "URL:  %s\n", str_limit(n.str.gsub(/\n/, ''))
+    end
   end
 
   # Another VISITOR-pattern for Intermediate tree to print tree

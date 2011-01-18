@@ -58,7 +58,7 @@ The remaining tasks are the same as above.
 This is more realistic case than before.  Working at local and
 publishing to remote web server.
 Actually, I'm doing so to publish this juli documents to
-<a href='http://jjjuli.sourceforge.net'>http://jjjuli.sourceforge.net</a>
+http://jjjuli.sourceforge.net
 
 <center><img src='tutorial/remote_httpd.png'></center>
 
@@ -78,8 +78,7 @@ Do you know git?  From juli point of view, it provides:
 1. file-base collaboration with other people
 1. local file commit(you can think it means 'save' for now) 
 
-For the detail, please refer
-<a href='http://git-scm.com/'>http://git-scm.com/</a>.
+For the detail, please refer http://git-scm.com/ .
 
 By git, you can collaborate with other people:
 

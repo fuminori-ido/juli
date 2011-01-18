@@ -19,6 +19,17 @@ class LineParserTest < Test::Unit::TestCase
 [['abc', 'W:test', "d\ne", 'W:te', 'f'], "abctestd\netef", %w(test te)],
 # wikiname in HTML tag should be escaped
 [['abc', '<img src="hello">', 'def'], 'abc<img src="hello">def', ['hello']],
+# URL
+[['abc ','U:http://def',' ghi'],  'abc http://def ghi',   %w(test)],
+# URL https is also recognized
+[['abc ','U:https://def',' ghi'], 'abc https://def ghi',  %w(test)],
+# URL git:... is NOT recognized :-(
+[['abc git:def ghi'],             'abc git:def ghi',      %w(test)],
+# URL is high priority than wikiname
+[['abc ','U:http://def',' ghi'],'abc http://def ghi', %w(def)],
+# not isolated URL token is not recognized as URL
+[['abchttp://def ghi'],'abchttp://def ghi', %w(test)],
+[['abchttp://', 'W:def', ' ghi'],'abchttp://def ghi', %w(def)],
 ]
 
     for t in tests do

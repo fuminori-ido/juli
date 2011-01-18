@@ -202,6 +202,10 @@ module Juli::Visitor
       decoded = Juli::Wiki.decode(n.str)
       content_tag(:a, decoded, :class=>'wiki', :href=>decoded + '.html')
     end
+
+    def visit_url(n)
+      content_tag(:a, n.str, :class=>'url', :href=>n.str)
+    end
   end
 
   # generate '1', '1.1', '1.2', ..., '2', '2.1', ...
