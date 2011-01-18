@@ -87,10 +87,6 @@ doc/index::               top document for intro, install, syntax
 index::     juli top document
 
 = MISC
-== Terms
-
-memo:: text file.  a.k.a. document.
-
 == Author
 Fumisky Wells, https://sourceforge.net/users/fwells00
 
