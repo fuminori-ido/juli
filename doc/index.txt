@@ -142,13 +142,13 @@ Example:
 
 When source memo contains following paragraph:
 
-  Do you know hello world?  It is basic words in computing world.
+  Do you know 'hello world'?  It is a basic word in computing world.
 
 and there is computing.txt file in the same directory, the memo will be:
 
-  Do you know hello world?  It is basic words in <a href=#>computing</a> world.
+  Do you know 'hello world'?  It is a basic word in <a href=#>computing</a> world.
 
-and the 'computing' hyper-link links to the target page.
+and the 'computing' hyperlink referrs to the target page.
 
 Restriction:
 * file in subdirectory of juli-repo is not recognized as a wikiname.  I'll support this soon.
@@ -375,6 +375,21 @@ will be:
 
 Please look at http://w3c.org if you are not familiar with HTML.
 
+== Escaping wikiname
+
+\{...} notation escapes wikiname.  Example:
+
+  \{tutorial}, in general meaning, shouldn't link to juli's tutorial docment.
+
+will be:
+
+\{tutorial}, in general meaning, shouldn't link to juli's tutorial docment.
+
+NOTE: Following special cases are automatically escaped:
+
+1. wikiname in tag.
+1. wikiname in &lt;a&gt;...&lt;/a&gt; contents.
+
 == HTML Extention
 
 HTML tag can be written anyplace so you can use any html as follows:
@@ -401,13 +416,12 @@ Bad Example:
 
 = TODO
 
-1. escape.  For example, <a href='...'>index.txt</a> becomes doubly nested link
+1. helper like latest updated, site-map, orphaned, ...
 1. Wiki
   1. support subdirectory
-1. support continuous list
 1. screen shot or some explanation of 'BEFORE-AFTER'
+1. support continuous list
 1. japanese doc
-1. helper like latest updated, site-map, orphaned, ...
 1. include, more HTML extention for table support
 1. PDF generator
 1. roff for man generator

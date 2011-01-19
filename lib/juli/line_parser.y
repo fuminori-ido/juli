@@ -134,13 +134,36 @@ private
   def scan_r(str, &block)
     for w in @wikinames do
       case str
-      # to escape wikiname string in tag, tag is prior to wikiname
-      when /\A([^<]*)(<[^>]*>)(.*)\z/m
+      # to escape wikiname string in <a>...</a>, it is prior to wikiname
+      #
+      # If word in <a ...>word</a> tag is a wikiname, it would be produced to
+      # <a ...><a ...>word</a></a> because it is a wikiname.  In order to
+      # avoid this, two ways can be considered:
+      #
+      # 1. introduce escape notation.  e.g. rdoc \word
+      # 2. introduce special inline escape logic just for <a>...</a>
+      #
+      # I choose latter for simple usage.
+      when /\A([^<]*)(<a[^>]*>[^<]*<\/a>)(.*)\z/m
         scan_r($1, &block)
-        yield :TAG, $2
+        yield :STRING, $2     # <a>...</a> is just string even wikiname be there
         scan_r($3, &block)
         return
 
+      # to escape wikiname string in tag, tag is prior to wikiname
+      when /\A([^<]*)(<[^>]*>)(.*)\z/m
+        scan_r($1, &block)
+        yield :STRING, $2     # <a>...</a> is just string even wikiname be there
+        scan_r($3, &block)
+        return
+
+      # explicit escape by \{...}
+      when /\A([^\\]*)\\\{([^}]+)\}(.*)\z/m
+        scan_r($1, &block)
+        yield :STRING, $2
+        scan_r($3, &block)
+        return
+      
       # URL is piror to wikiname
       when /\A(.*\s+)(#{URL})(.*)\z/m
         scan_r($1, &block)

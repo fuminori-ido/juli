@@ -28,8 +28,13 @@ class LineParserTest < Test::Unit::TestCase
 # URL is high priority than wikiname
 [['abc ','U:http://def',' ghi'],'abc http://def ghi', %w(def)],
 # not isolated URL token is not recognized as URL
-[['abchttp://def ghi'],'abchttp://def ghi', %w(test)],
-[['abchttp://', 'W:def', ' ghi'],'abchttp://def ghi', %w(def)],
+[['abchttp://def ghi'],           'abchttp://def ghi', %w(test)],
+[['abchttp://', 'W:def', ' ghi'], 'abchttp://def ghi', %w(def)],
+# <a>...</a> is interpreted just string to escape wikiname in <a> contents
+[['abc', '<a href="#x">test</a>', 'def'],
+    'abc<a href="#x">test</a>def', ['test']],
+# explicit escape
+[%w(abc test def),       'abc\{test}def', %w(test)],
 ]
 
     for t in tests do
