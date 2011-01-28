@@ -335,7 +335,7 @@ end
     end
     @tree = TreeBuilder.new
     @root.accept(@tree)
-    visitor.new.run(in_file, @tree.root)
+    visitor.run_file(in_file, @tree.root)
   end
 
   # return intermediate tree

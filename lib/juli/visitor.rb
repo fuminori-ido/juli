@@ -1,4 +1,10 @@
 # import all of visitor/*.rb files
-Dir.glob(File.join(File.dirname(__FILE__), 'visitor/*.rb')){|v|
-  require File.join('juli/visitor', File.basename(v))
-}
+
+module Juli
+  # Namespace for visitors.
+  module Visitor
+    Dir.glob(File.join(File.dirname(__FILE__), 'visitor/*.rb')){|v|
+      require File.join('juli/visitor', File.basename(v))
+    }
+  end
+end

@@ -108,3 +108,14 @@ blockquote {
 blockquote pre {
   margin:           0px;
 }
+
+/*----------------------------------------------------------------
+Helpers
+----------------------------------------------------------------*/
+/* recent update */
+table.juli_recent_update {
+  border:   1px solid #a84;
+}
+table.juli_recent_update th {
+  background-color: #db6;
+}

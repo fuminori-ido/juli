@@ -1,266 +1,94 @@
+require 'fileutils'
 require 'pathname'
 require 'juli/util'
 require 'juli/line_parser.tab'
 require 'juli/intermediate'
 
 module Juli::Visitor
-  # copied from Rails
-  module TagHelper
-    def tag(name, options = nil, open = false)
-      "<#{name}#{tag_options(options) if options}#{open ? ">" : " />"}"
-    end
-  
-    def content_tag(name, content_or_options_with_block = nil, options = nil, &block)
-      if block_given?
-        options = content_or_options_with_block if content_or_options_with_block.is_a?(Hash)
-        content_tag_string(name, block.call, options)
-      else
-        content_tag_string(name, content_or_options_with_block, options)
-      end
-    end
-  
-  private
-    BOOLEAN_ATTRIBUTES = %w(disabled readonly multiple checked)
-    BOOLEAN_ATTRIBUTES << BOOLEAN_ATTRIBUTES.map(&:to_sym)
-  
-    def content_tag_string(name, content, options)
-      tag_options = tag_options(options) if options
-      "<#{name}#{tag_options}>#{content}</#{name}>"
-    end
-  
-    def tag_options(options)
-      if options != {}
-        attrs = []
-        options.each_pair do |key, value|
-          if BOOLEAN_ATTRIBUTES.include?(key)
-            attrs << key if value
-          else
-            attrs << %(#{key}="#{value}") if !value.nil?
-          end
-        end
-        " #{attrs.sort * ' '}" unless attrs.empty?
-      end
-    end
-  end
-
-  # define Juli specific HTML helper.
-  #
-  # Any method here can be used at html template.
-  module HtmlHelper
-    # TRICKY PART: header_id is used for 'contents' helper link.
-    # Intermediate::HeaderNode.dom_id cannot be used directory for
-    # this purpose since when clicking a header of 'contents',
-    # document jumps to its contents rather than header so that
-    # header is hidden on browser.  To resolve this, header_id
-    # is required for 'contents' helper and it is set at Html visitor.
-    def header_id(n)
-      "#{n.dom_id}_header"
-    end
-
-
-    # draw contents(outline) of this document.
-    def contents
-      ContentsDrawer.new.run(nil, @root)
-    end
-
-    # dest's relative path from src
-    #
-    # === EXAMPLE
-    # relative_from('a.txt',   'juli.js'):: → './juli.js'
-    # relative_from('a/b.txt', 'juli.js'):: → '../juli.js'
-    def relative_from(src, dest)
-      result = []
-      Pathname.new(File.dirname(src)).descend{|dir|
-        result << (dir.to_s == '.' ? '.' : '..')
-      }
-      File.join(result, dest)
-    end
-  end
-
-  # generate contents
-  class ContentsDrawer < Juli::Intermediate::Visitor
-    include TagHelper
-    include HtmlHelper
-
-    def visit_node(n); ''; end
-    def visit_default(n); ''; end
-    def visit_ordered_list(n); ''; end
-    def visit_ordered_list_item(n); ''; end
-    def visit_unordered_list(n); ''; end
-    def visit_unordered_list_item(n); ''; end
-    def visit_dictionary_list(n); ''; end
-    def visit_dictionary_list_item(n); ''; end
-    def visit_quote(n); ''; end
-
-    def visit_header(n)
-      if n.level > 0
-        content_tag(:li) do
-          content_tag(:a, :href=>'#' + header_id(n)) do
-            n.str
-          end
-        end
-      else
-        ''
-      end +
-      content_tag(:ol) do
-        n.array.inject(''){|result, child|
-          result += child.accept(self)
-        }
-      end
-    end
-
-    def run(in_file, root)
-      root.accept(self)
-    end
-  end
-
-  # assign DOM id on header node.
-  #
-  # IdAssigner should be executed before running Html visitor since
-  # ContentsDrawer also refers DOM id.  That is the reason why DOM id
-  # assignment is isolated from Html visitor.
-  class IdAssigner < Juli::Intermediate::Visitor
-    def initialize
-      super
-      @uniq_id_seed   = 0
-    end
-  
-    def visit_header(n)
-      if n.level > 0
-        n.dom_id = uniq_id(n.level)
-      end
-      for child in n.array do
-        child.accept(self)
-      end
-    end
-
-    def run(in_file, root)
-      root.accept(self)
-    end
-
-  private
-    # generate uniq_id, and track it for each level to be used later
-    def uniq_id(level)
-      @uniq_id_seed += 1
-      result = sprintf("j%05d", @uniq_id_seed)
-      result
-    end
-  end
-
-  module Util
-    # mkdir for out_file if necessary
-    def mkdir(path)
-      dir = File.dirname(path)
-      if !File.directory?(dir)
-        FileUtils.mkdir_p(dir)
-      end
-    end
-
-    # === INPUTS
-    # in_filename:: relative path under repository
-    #
-    # === RETURN
-    # full path of out filename
-    #
-    # === EXAMPLE
-    # diary/2010/12/31.txt -> OUTPUT_TOP/diary/2010/12/31.html
-    #
-    def out_filename(in_filename)
-      File.join(conf['output_top'], in_filename.gsub(/\.[^\.]*/,'') + '.html')
-    end
-
-    # === INPUTS
-    # out_filename:: relative path under OUTPUT_TOP
-    #
-    # === RETURN
-    # relative path of in-filename, but **no extention**.
-    #
-    # === EXAMPLE
-    # diary/2010/12/31.html -> diary/2010/12/31
-    def in_filename(out_filename)
-      File.join(File.dirname(out_filename), File.basename(out_filename).gsub(/\.[^\.]*/,''))
-    end
-  end
-
-  # visits a line of document text and generate hyper-link when
-  # wikiname exists.
-  class HtmlLine < Juli::LineAbsyn::Visitor
-    include TagHelper
-    include HtmlHelper
-
-    def visit_array(n)
-      n.array.inject('') do |result, n|
-        result += n.accept(self)
-      end
-    end
-
-    def visit_string(n)
-      n.str
-    end
-
-    def visit_wikiname(n)
-      decoded = Juli::Wiki.decode(n.str)
-      content_tag(:a, decoded, :class=>'wiki', :href=>decoded + '.html')
-    end
-
-    def visit_url(n)
-      content_tag(:a, n.str, :class=>'url', :href=>n.str)
-    end
-  end
-
-  # generate '1', '1.1', '1.2', ..., '2', '2.1', ...
-  class HeaderSequence
-    def initialize
-      @header_number  = Array.new(6)
-      @curr_level     = 0
-    end
-
-    def reset(level)
-      for i in (level+1)...@header_number.size do
-        @header_number[i] = 0
-      end
-    end
-
-    def gen(level)
-      reset(level) if level < @curr_level
-      @header_number[level] = 0 if !@header_number[level]
-      @header_number[level] += 1
-      @curr_level = level
-      h = []
-      for i in 1..(level) do
-        h << @header_number[i].to_s
-      end
-      h.join('.')
-    end
-  end
-
-  # Visitor::Html visits Intermediate tree and generates HTML
+  # This visits Intermediate tree and generates HTML
   #
   # Text files under juli-repository must have '.txt' extention.
   class Html < Juli::Intermediate::Visitor
-    include TagHelper
-    include HtmlHelper
-    include Util
-    extend  Util
+    require 'juli/visitor/html/tag_helper'
+    require 'juli/visitor/html/helper'
+    
+    include Juli::Util
+    include Juli::Visitor::Html::TagHelper
+    include Juli::Visitor::Html::Helper
 
-    def self.copy_to_output_top(file)
-      dest_path = File.join(conf['output_top'], file)
-      if !File.exist?(dest_path)
-        FileUtils.cp(File.join(Juli::TEMPLATE_PATH, file), dest_path,
-            :preserve=>true)
+    # assign DOM id on header node.
+    #
+    # IdAssigner should be executed before running Html visitor since
+    # ContentsDrawer also refers DOM id.  That is the reason why DOM id
+    # assignment is isolated from Html visitor.
+    class IdAssigner < Juli::Intermediate::Visitor
+      def initialize
+        super
+        @uniq_id_seed   = 0
+      end
+    
+      def visit_header(n)
+        if n.level > 0
+          n.dom_id = uniq_id(n.level)
+        end
+        for child in n.array do
+          child.accept(self)
+        end
+      end
+  
+      def run(in_file, root)
+        root.accept(self)
+      end
+  
+    private
+      # generate uniq_id, and track it for each level to be used later
+      def uniq_id(level)
+        @uniq_id_seed += 1
+        result = sprintf("j%05d", @uniq_id_seed)
+        result
       end
     end
-    
-    # Html sepecific initialization does:
+  
+    # visits a line of document text and generate:
     #
-    # FIXME: need to check here if rsync(1) is installed
+    # * hyperlink on wikiname.
+    # * hyperlink on url like http://...
+    class HtmlLine < Juli::LineAbsyn::Visitor
+      include TagHelper
+  
+      def visit_array(n)
+        n.array.inject('') do |result, n|
+          result += n.accept(self)
+        end
+      end
+  
+      def visit_string(n)
+        n.str
+      end
+  
+      def visit_wikiname(n)
+        decoded = Juli::Wiki.decode(n.str)
+        content_tag(:a, decoded, :class=>'wiki', :href=>decoded + '.html')
+      end
+  
+      def visit_url(n)
+        content_tag(:a, n.str, :class=>'url', :href=>n.str)
+      end
+    end
+
+    # Html sepecific initialization does:
     #
     # 1. create output_top.
     # 1. copy *.js, *.css files to output_top/
     #
     # NOTE: this is executed every juli(1) run with -g html option
     # (usually 99% is so), so be careful to avoid multiple initialization.
-    def self.init
+    #
+    # FIXME: need to check here if rsync(1) is installed
+    def initialize
+      super
+      register_helper
+
       if !File.directory?(conf['output_top'])
         FileUtils.mkdir_p(conf['output_top'])
       end
@@ -273,76 +101,38 @@ module Juli::Visitor
     # OUTPUT_TOP.
     #
     # === Options
-    # :f::          force update
-    def self.run(opts={})
+    # f::          force update
+    def run_bulk(opts={})
       sync(opts)
     end
 
-    # synchronize repository and OUTPUT_TOP.
+    # visit root to generate:
     #
-    # * if text file, calls sync_txt()
-    # * for others, do rsync(1)
-    #
-    def self.sync(opts)
-      sync_txt(opts)
-      sync_others
-    end
+    # 1st:: HTML body
+    # 2nd:: whole HTML by ERB.
+    def run_file(in_file, root)
+      @header_sequence  = HeaderSequence.new
+      IdAssigner.new.run(in_file, root)
 
-    def self.sync_others
-      Dir.chdir(juli_repo){
-        system 'rsync', '-avuzb',
-          '--exclude',  '*.txt',
-          '--exclude',  'html/',
-          '--exclude',  '*~',
-          '--exclude',  '.juli/',
-          '.',  conf['output_top']
-      }
-    end
-
-    # synchronize text file between juli-repo and OUTPUT_TOP:
-    #
-    # 1. new file exists, generate it.
-    # 1. repo's file timestamp is newer than the one under OUTPUT_TOP, regenerate it.
-    # 1. correspondent file of OUTPUT_TOP/.../f doesn't exist in repo, delete it.
-    # 1. if -f option is specified, don't check timestamp and always generates.
-    #
-    def self.sync_txt(opts)
-      repo      = {}
-      Dir.chdir(juli_repo){
-        Dir.glob('**/*.txt'){|f|
-          repo[f] = 1
-        }
-      }
-
-      # When new file exists, generate it.
-      # When repo's file timestamp is newer than OUTPUT_TOP, regenerate it.
-      for f,v in repo do
-        out_file = out_filename(f)
-        if !opts[:f] &&
-           File.exist?(out_file) &&
-           File.stat(out_file).mtime >= File.stat(File.join(juli_repo,f)).mtime
-          #printf("already updated: %s\n", out_file)
-        else
-          Juli::Parser.new.parse(f, self)
-        end
+      for helper in @_helpers do
+        helper.on_root(root)
       end
 
-      # When correspondent file of OUTPUT_TOP/.../f doesn't exist in repo,
-      # delete it.
-      Dir.chdir(conf['output_top']){
-        Dir.glob('**/*.html'){|f|
-          in_file = File.join(juli_repo, in_filename(f))
-          if !File.exist?(in_file) && !File.exist?(in_file + '.txt')
-            FileUtils.rm(f)
-            printf("%s is deleted since no correspondent source text.\n", f)
-          end
-        }
-      }
-    end
-
-    def initialize
-      super
-      @header_sequence  = HeaderSequence.new
+      # store to instance var for 'contents' helper
+      @root       = root
+      title       = File.basename(in_file.gsub(/\.[^.]*$/, ''))
+      prototype   = relative_from(in_file, 'prototype.js')
+      javascript  = relative_from(in_file, 'juli.js')
+      stylesheet  = relative_from(in_file, 'juli.css')
+      body        = root.accept(self)
+      erb         = ERB.new(File.read(File.join(Juli::TEMPLATE_PATH,
+                        conf['template']) + '.html'))
+      out_path    = out_filename(in_file)
+      mkdir(out_path)
+      File.open(out_path, 'w') do |f|
+        f.write(erb.result(binding))
+      end
+      printf("generated:       %s\n", out_filename(in_file))
     end
   
     def visit_default(n)
@@ -393,31 +183,115 @@ module Juli::Visitor
       content_tag(:blockquote, content_tag(:pre, n.str))
     end
 
-    # visit root to generate:
-    #
-    # 1st:: HTML body
-    # 2nd:: whole HTML by ERB.
-    def run(in_file, root)
-      IdAssigner.new.run(in_file, root)
+  private
+    HELPER = [
+      Juli::Visitor::Html::Helper::RecentUpdate,
+      Juli::Visitor::Html::Helper::Contents
+    ]
 
-      # store to instance var for 'contents' helper
-      @root       = root
-      title       = File.basename(in_file.gsub(/\.[^.]*$/, ''))
-      prototype   = relative_from(in_file, 'prototype.js')
-      javascript  = relative_from(in_file, 'juli.js')
-      stylesheet  = relative_from(in_file, 'juli.css')
-      body        = root.accept(self)
-      erb         = ERB.new(File.read(File.join(Juli::TEMPLATE_PATH,
-                        conf['template']) + '.html'))
-      out_path    = out_filename(in_file)
-      mkdir(out_path)
-      File.open(out_path, 'w') do |f|
-        f.write(erb.result(binding))
-      end
-      printf("generated:       %s\n", out_filename(in_file))
+    # Similar to Rails underscore() method.
+    #
+    # Example: 'A::B::HelperMethod' -> 'helper_method'
+    def self.to_method(helper_class)
+      helper_class.to_s.gsub(/.*::/,'').
+          gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+          gsub(/([a-z\d])([A-Z])/,'\1_\2').
+          tr("-", "_").
+          downcase
     end
 
-  private
+    def copy_to_output_top(file)
+      src   = File.join(Juli::TEMPLATE_PATH, file)
+      dest  = File.join(conf['output_top'], file)
+      return if File.exist?(dest) && File.stat(dest).mtime >= File.stat(src).mtime
+
+      FileUtils.cp(src, dest, :preserve=>true)
+    end
+
+    # define each XHelper instance variable as '@_helper_x_helper'.
+    # These objects will be used at helper method 'x_helper()',
+    # which is also defined below (*).
+    def register_helper
+      @_helpers = []
+      for helper_class in HELPER do
+        eval <<-end_of_dynamic_define_of_instance_var
+          @_helper_#{Html.to_method(helper_class)} = #{helper_class}.new
+          @_helpers << @_helper_#{Html.to_method(helper_class)}
+        end_of_dynamic_define_of_instance_var
+      end
+    end
+
+    # (*) define helper method 'x_helper()' from XHelper class to call
+    # @_helper_Helper1.run(*args)
+    for helper_class in HELPER do
+      class_eval <<-end_of_dynamic_method, __FILE__, __LINE__ + 1
+        def #{to_method(helper_class)}(*args)
+          @_helper_#{to_method(helper_class)}.run(*args)
+        end
+      end_of_dynamic_method
+    end
+
+    # synchronize repository and OUTPUT_TOP.
+    #
+    # * if text file, calls sync_txt()
+    # * for others, do rsync(1)
+    #
+    def sync(opts)
+      sync_txt(opts)
+      sync_others
+    end
+
+    def sync_others
+      Dir.chdir(juli_repo){
+        system 'rsync', '-avuzb',
+          '--exclude',  '*.txt',
+          '--exclude',  'html/',
+          '--exclude',  '*~',
+          '--exclude',  '.juli/',
+          '.',  conf['output_top']
+      }
+    end
+
+    # synchronize text file between juli-repo and OUTPUT_TOP:
+    #
+    # 1. new file exists, generate it.
+    # 1. repo's file timestamp is newer than the one under OUTPUT_TOP, regenerate it.
+    # 1. correspondent file of OUTPUT_TOP/.../f doesn't exist in repo, delete it.
+    # 1. if -f option is specified, don't check timestamp and always generates.
+    #
+    def sync_txt(opts)
+      repo      = {}
+      Dir.chdir(juli_repo){
+        Dir.glob('**/*.txt'){|f|
+          repo[f] = 1
+        }
+      }
+
+      # When new file exists, generate it.
+      # When repo's file timestamp is newer than OUTPUT_TOP, regenerate it.
+      for f,v in repo do
+        out_file = out_filename(f)
+        if !opts[:f] &&
+           File.exist?(out_file) &&
+           File.stat(out_file).mtime >= File.stat(File.join(juli_repo,f)).mtime
+          #printf("already updated: %s\n", out_file)
+        else
+          Juli::Parser.new.parse(f, self)
+        end
+      end
+
+      # When correspondent file of OUTPUT_TOP/.../f doesn't exist in repo,
+      # delete it.
+      Dir.chdir(conf['output_top']){
+        Dir.glob('**/*.html'){|f|
+          in_file = File.join(juli_repo, in_filename(f))
+          if !File.exist?(in_file) && !File.exist?(in_file + '.txt')
+            FileUtils.rm(f)
+            printf("%s is deleted since no correspondent source text.\n", f)
+          end
+        }
+      }
+    end
 
     # common for all h0, h1, ..., h6
     def header_content(n)
@@ -444,6 +318,36 @@ module Juli::Visitor
           result += child.accept(self)
         end
       end
+    end
+  end
+
+  # generate '1', '1.1', '1.2', ..., '2', '2.1', ...
+  #
+  # NOTE: When HeaderSequence was located before Html, rdoc generated
+  # wrong document (as Juli::Visitor::HeaderSequence::Html rather than
+  # Juli::Visitor::Html) so HeaderSequence is defined here.
+  class HeaderSequence
+    def initialize
+      @header_number  = Array.new(6)
+      @curr_level     = 0
+    end
+
+    def reset(level)
+      for i in (level+1)...@header_number.size do
+        @header_number[i] = 0
+      end
+    end
+
+    def gen(level)
+      reset(level) if level < @curr_level
+      @header_number[level] = 0 if !@header_number[level]
+      @header_number[level] += 1
+      @curr_level = level
+      h = []
+      for i in 1..(level) do
+        h << @header_number[i].to_s
+      end
+      h.join('.')
     end
   end
 end

@@ -1,8 +1,13 @@
 require 'test_helper'
 
 class ParserTest < Test::Unit::TestCase
+  include Juli::Util
+
   def setup
     #$stdout = File.open('/dev/null', 'w')
+
+    # set juli_repo since parser referes it
+    juli_repo(File.join(File.dirname(__FILE__), 'repo'))
   end
 
   def teardown
@@ -13,7 +18,7 @@ class ParserTest < Test::Unit::TestCase
     stdout_to_dev_null do
       for file in ['t001.txt', 't002.txt'] do
         assert_nothing_raised do
-          Juli::Parser.new.parse(data_path(file), Juli::Visitor::Tree)
+          Juli::Parser.new.parse(data_path(file), Juli::Visitor::Tree.new)
         end
       end
     end
@@ -32,7 +37,7 @@ class ParserTest < Test::Unit::TestCase
   def test_nested_ordered_list_incorrect
     assert_nothing_raised do
       parser = Juli::Parser.new
-      parser.parse(data_path('t005.txt'), Juli::Visitor::Tree)
+      parser.parse(data_path('t005.txt'), Juli::Visitor::Tree.new)
     end
   end
 
@@ -98,7 +103,7 @@ private
 
   def build_tree_on(test_file)
     parser = Juli::Parser.new
-    parser.parse(data_path(test_file), Juli::Visitor::Tree)
+    parser.parse(data_path(test_file), Juli::Visitor::Tree.new)
     parser.tree
   end
 end

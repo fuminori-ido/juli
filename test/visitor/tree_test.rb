@@ -1,11 +1,9 @@
 require 'test_helper'
 
-module Visitor
   class TreeTest < Test::Unit::TestCase
-    def test_class_run
+    def test_run_bulk
       assert_nothing_raised do
-        Juli::Visitor::Tree.run
+        Juli::Visitor::Tree.new.run_bulk
       end
     end
   end
-end

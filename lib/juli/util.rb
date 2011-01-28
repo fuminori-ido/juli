@@ -18,6 +18,7 @@ module Juli
         raise "Visitor #{camelized} is not defined."
       end
     end
+    module_function :visitor
 
     def visitor_list
       result = []
@@ -28,6 +29,7 @@ module Juli
       end
       result.join(',')
     end
+    module_function :visitor_list
 
     def usage
       <<EOM
@@ -50,10 +52,12 @@ command_options for:
     -f                force generate
 EOM
     end
+    module_function :usage
 
     def str_limit(str)
       str.size > 30 ? str[0..30] + '...' : str
     end
+    module_function :str_limit
 
     # find juli-repository root from the specified path.
     class Repo
@@ -79,6 +83,7 @@ EOM
       $_repo ||= Repo.new(path)
       $_repo.juli_repo
     end
+    module_function :juli_repo
 
     class Config
       include Singleton
@@ -86,7 +91,8 @@ EOM
       attr_reader :conf
 
       def initialize
-        @conf = YAML::load_file(File.join(juli_repo, Juli::REPO, 'config'))
+        @conf = YAML::load_file(
+                    File.join(Juli::Util::juli_repo, Juli::REPO, 'config'))
 
         raise Error if !@conf
       end
@@ -96,5 +102,42 @@ EOM
     def conf
       Config.instance.conf
     end
+    module_function :conf
+
+    # mkdir for out_file if necessary
+    def mkdir(path)
+      dir = File.dirname(path)
+      if !File.directory?(dir)
+        FileUtils.mkdir_p(dir)
+      end
+    end
+    module_function :mkdir
+
+    # === INPUTS
+    # in_filename:: relative path under repository
+    #
+    # === RETURN
+    # full path of out filename
+    #
+    # === EXAMPLE
+    # diary/2010/12/31.txt -> OUTPUT_TOP/diary/2010/12/31.html
+    #
+    def out_filename(in_filename)
+      File.join(conf['output_top'], in_filename.gsub(/\.[^\.]*/,'') + '.html')
+    end
+    module_function :out_filename
+
+    # === INPUTS
+    # out_filename:: relative path under OUTPUT_TOP
+    #
+    # === RETURN
+    # relative path of in-filename, but **no extention**.
+    #
+    # === EXAMPLE
+    # diary/2010/12/31.html -> diary/2010/12/31
+    def in_filename(out_filename)
+      File.join(File.dirname(out_filename), File.basename(out_filename).gsub(/\.[^\.]*/,''))
+    end
+    module_function :in_filename
   end
 end

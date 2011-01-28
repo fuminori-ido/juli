@@ -1,5 +1,6 @@
 require 'pathname'
 
+# namespace for all of Juli library elements
 module Juli
   VERSION       = '0.04.00'
 

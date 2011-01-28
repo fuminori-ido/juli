@@ -2,7 +2,8 @@ require 'juli/util'
 require 'juli/parser.tab'
 
 module Juli
-  # juli command execution
+  # This is a top level module for juli(1) command execution.
+  # Each juli(1) command corresponds to each method here.
   module Command
     class Error < Exception; end
 
@@ -54,14 +55,14 @@ module Juli
       o = opts.dup
       o.delete(:g)
       # executes each generator's init here:
-      visitor(opts[:g]).init
+      v = visitor(opts[:g]).new
 
       if ARGV.empty?
         print "bulk mode\n"
-        visitor(opts[:g]).run(o)
+        v.run_bulk(o)
       else
         for file in ARGV do
-          Juli::Parser.new.parse(file, visitor(opts[:g]))
+          Juli::Parser.new.parse(file, v)
         end
       end
     end

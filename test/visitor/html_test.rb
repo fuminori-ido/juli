@@ -1,8 +1,5 @@
 require 'test_helper'
 
-include Juli::Visitor::HtmlHelper
-
-module Visitor
   class HtmlTest < Test::Unit::TestCase
     def setup
       @saved_cwd = Dir.pwd
@@ -13,16 +10,17 @@ module Visitor
       Dir.chdir(@saved_cwd)
     end
   
-    def test_class_run
+    def test_run_bulk
       assert_nothing_raised do
-        Juli::Visitor::Html.run
+        Juli::Visitor::Html.new.run_bulk
       end
     end
   
     def test_html_helper_relative_from
-      assert_equal './juli.js',     relative_from('a.txt',      'juli.js')
-      assert_equal '../juli.js',    relative_from('a/b.txt',    'juli.js')
-      assert_equal '../../juli.js', relative_from('a/b/c.txt',  'juli.js')
+      h = Juli::Visitor::Html.new
+      assert_equal './juli.js',     h.relative_from('a.txt',      'juli.js')
+      assert_equal '../juli.js',    h.relative_from('a/b.txt',    'juli.js')
+      assert_equal '../../juli.js', h.relative_from('a/b/c.txt',  'juli.js')
     end
   
     def test_header_sequence
@@ -38,4 +36,3 @@ module Visitor
       assert '4',                 h.gen(1)
     end
   end
-end

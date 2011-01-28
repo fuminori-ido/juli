@@ -4,6 +4,8 @@ require 'juli/line_parser.tab'
 
 module Juli::Visitor
   class LineTree < Juli::LineAbsyn::Visitor
+    include Juli::Util
+
     def initialize(depth)
       @depth = depth
     end
@@ -33,13 +35,10 @@ module Juli::Visitor
   class Tree < Juli::Intermediate::Visitor
     include Juli::Util
 
-    def initialize
-      super
+    # visit root to generate intermediate-tree structure.
+    def run_file(in_file, root)
       @depth = 0
-    end
-  
-    def print_depth
-      print '| ' * @depth
+      super
     end
   
     def visit_default(n)
@@ -94,12 +93,11 @@ module Juli::Visitor
       printf("QuoteNode(%s)\n", str_limit(n.str).gsub(/\n/m, '<\n>'))
     end
 
-    # visit root to generate intermediate-tree structure.
-    def run(in_file, root)
-      root.accept(self)
-    end
-
   private
+    def print_depth
+      print '| ' * @depth
+    end
+  
     def visit_list(class_str, n)
       print_depth
       printf(class_str)

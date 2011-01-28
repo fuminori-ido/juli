@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+#
+# = NAME
+# console     - irb with Juli modules/classes
+#
+# = SYNOPSIS
+# test/console
+#
+# = DESCRIPTION
+# interactivly use juli modules/classes.
+#
+# This is, of course, inspired from Rails script/console ;-)
+#
+# = EXAMPLE
+#
+#   $ test/console
+#   >>
+#   >> h = Juli::Visitor::Html.new
+#   >> h.content_tag(:div, 'hello')     # call ..Html::TagHelper method
+
+Dir.chdir('doc/')
+$LOAD_PATH.insert(0, '../lib')
+libs  = ' -r juli'
+libs  <<' -r juli/visitor'
+libs  <<' -r juli/intermediate'
+libs  <<' -r juli/visitor/html'
+exec "irb -I ../lib #{libs}"

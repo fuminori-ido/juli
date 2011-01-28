@@ -189,34 +189,51 @@ module Juli::Intermediate
     end
   end
   
-  # define VISITOR-pattern around Intermediate tree.
+  # Abstract VISITOR-pattern around Intermediate tree.
   #
   # === How to add new generator
   # Document generator, which juli(1) command says, points to 'visitor'
   # internally because it is VISITOR-pattern.
-  # When adding new visitor, for example PDF-generator,
-  # can be used by 'juli -g pdf' (let me assume the file name is pdf.rb).
-  # Here is the step how to add new visitor:
+  # After adding new visitor, for example PDF-generator,
+  # it can be used by 'juli -g pdf' (let me assume the file name is pdf.rb).
+  # Follow the steps below to add new visitor:
   #
-  # 1. create lib/juli/visitor/pdf.rb.  Probably, it is easy to copy
-  #    from another visitor file (e.g. html.rb).
-  # 1. implement the pdf.rb.  Most important taks, of course...
+  # 1. create LIB/juli/visitor/pdf.rb.  Probably, it is easy to copy
+  #    from another visitor file (e.g. html.rb) as the skelton.
+  #    Where, LIB is 'lib/' directory in package environment, or
+  #    one of $LOAD_PATH in installed environment.
+  # 1. implement the pdf.rb.  It's the most important task, of course...
   #
   class Visitor
-    # 'init' is invoked at bulk-mode on every juli(1) command execution
-    # when this generator is specified so that the calling frequency
-    # is the same as run-method.  However, the purpose is different.
-    # That is the reason why two methods exist.
-    # Derived class should implement this.
-    def self.init; end
+    # Visitor object is initialized when juli(1) gen command is executed.
+    # In other words, it is *NOT* initialized for each input text file.
+    # Some global initialization can be done here.
+    #
+    # Take care that this is executed every juli(1) execution.
+    def initialize; end
 
-    # 'run' is invoked at bulk-mode (when no files are specified at
+    # 'run' bulk-mode (when no files are specified at
     # juli(1) command line).  Derived class should implement this.
     #
     # === INPUTS
     # opts::  option hash
-    def self.run(opts={}); end
+    def run_bulk(opts={}); end
 
+    # run for a file and it's node-tree.
+    # Here is just sample implementation.
+    # Derived class can re-implement this.
+    #
+    # === INPUTS
+    # in_file::   input filename
+    # root::      Intermediate tree root
+    def run_file(in_file, root)
+      root.accept(self)
+    end
+
+    # Method for each Intermediate node. Derived class should implement this.
+    #
+    # === INPUTS
+    # n:: Intermediate node
     def visit_node(n); end
     def visit_default(n); end
     def visit_header(n); end
@@ -227,16 +244,5 @@ module Juli::Intermediate
     def visit_dictionary_list(n); end
     def visit_dictionary_list_item(n); end
     def visit_quote(n); end
-
-    # run whole action for tree.
-    # Here is just sample implementation.
-    # Derived class must implement this method.
-    #
-    # === INPUTS
-    # in_file::   input filename
-    # root::      Intermediate tree root
-    def run(in_file, root)
-      root.accept(self)
-    end
   end
 end
