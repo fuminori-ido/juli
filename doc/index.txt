@@ -416,7 +416,7 @@ Bad Example:
 
 = TODO
 
-1. helper like latest updated, site-map, orphaned, ...
+1. 'je wikiname' tool
 1. Wiki
   1. support subdirectory
 1. screen shot or some explanation of 'BEFORE-AFTER'
