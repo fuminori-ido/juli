@@ -31,6 +31,9 @@ and read it.
 As index document explains, each filename under MY_NOTE in a document is
 automatically linked.
 
+After installing git, je(1) command provides easier way to edit &amp;
+generate HTML.  Please see it.
+
 = HTML publishing for www server in your local machine
 
 This is almost the same as above since web server in your local machine

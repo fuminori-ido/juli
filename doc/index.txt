@@ -417,14 +417,12 @@ Bad Example:
 
 = TODO
 
-1. 'je wikiname' tool
+1. support continuous list
 1. Wiki
   1. support subdirectory
 1. screen shot or some explanation of 'BEFORE-AFTER'
-1. support continuous list
 1. japanese doc
 1. include, more HTML extention for table support
 1. PDF generator
 1. roff for man generator
-1. git for version control and publish
 1. fix that quote should be able to use '&lt;', '&gt;', '&amp;', ...
