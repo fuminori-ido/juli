@@ -248,6 +248,7 @@ module Juli::Visitor
           '--exclude',  'html/',
           '--exclude',  '*~',
           '--exclude',  '.juli/',
+          '--exclude',  '.git*',
           '.',  conf['output_top']
       }
     end
