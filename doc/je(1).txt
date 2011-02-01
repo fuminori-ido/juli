@@ -1,0 +1,54 @@
+= NAME
+je    - edit wikipage and run juli(1)
+
+= SYNOPSIS
+je wikiname
+
+= DESCRIPTION
+
+je(1) is a wrapper of editor and juli(1) to edit wikipage and run juli(1).
+je(1) does the followings:
+
+1. edit a wiki file named 'wikiname.txt'
+1. commit to git repository
+1. run juli(1) to generate/update HTML
+
+== Environment
+Following environment variables are required to be set:
+
+JULI_REPO:: juli-repo directory, must be a git repository also.
+EDITOR::    editor
+
+== Setup
+
+1. install git(1).
+1. create git repository
+    $ JULI_REPO=...           # set your favorite directory like ~/juli_repo
+    $ cd $JULI_REPO
+    $ git init
+1. It is recommended to set JULI_REPO at ~/.bashrc etc. also.
+1. create juli repository also
+    $ juli init
+1. From any directory without worry about current working directory, just run followings to memo your idea:
+  $ je Eureka!
+1. After saving the file by your editor, git asks to enter commit message as follows:
+  # Please enter the commit message for your changes. Lines starting
+  # with '#' will be ignored, and an empty message aborts the commit.
+  #   :
+  diff --git ...
+  (you can see your change of this text here)
+1. You can ignore to enter any comment by just exiting this editor. Then, git aborts continued process(record your change) but juli generates HTML.
+1. Or it would be better to enter comment so you can track what you did on this change.
+1. Anyway, you can see the generated HTML file by any browser like this:
+  $ firefox file:///...
+
+== Example
+   $ je HelloWorld                             # edit HelloWorld wikipage
+   $ je 'hello world'                          # space can be included
+   $ je ウーロン茶                             # UTF-8 is ok (in Linux)
+   $ JULI_REPO=... je wikiname                 # change juli-repo at this time
+   $ JULI=DEV_DIR/bin/juli je 'hello world'    # for debug
+
+= PREREQUSITES
+ 1. git(1) is required.
+ 2. $JULI_REPO must be a git repository also.
