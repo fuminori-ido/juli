@@ -137,7 +137,7 @@ module Juli::Visitor
   
     def visit_default(n)
       content_tag(:p, :class=>'default') do
-        n.line.accept(HtmlLine.new)
+        str2html(n.str)
       end
     end
   
@@ -157,7 +157,7 @@ module Juli::Visitor
     end
 
     def visit_ordered_list_item(n)
-      content_tag(:li, n.line.accept(HtmlLine.new))
+      content_tag(:li, str2html(n.str))
     end
 
     def visit_unordered_list(n)
@@ -165,7 +165,7 @@ module Juli::Visitor
     end
 
     def visit_unordered_list_item(n)
-      content_tag(:li, n.line.accept(HtmlLine.new))
+      content_tag(:li, str2html(n.str))
     end
 
     def visit_dictionary_list(n)
@@ -174,8 +174,8 @@ module Juli::Visitor
 
     def visit_dictionary_list_item(n)
       content_tag(:tr) do
-        content_tag(:td, n.term.accept(HtmlLine.new) + ':') +
-        content_tag(:td, n.line.accept(HtmlLine.new))
+        content_tag(:td, str2html(n.term) + ':') +
+        content_tag(:td, str2html(n.str))
       end
     end
 
@@ -319,6 +319,12 @@ module Juli::Visitor
           result += child.accept(self)
         end
       end
+    end
+
+    # 1. parse str and build Juli::LineAbsyn tree
+    # 1. visit the tree by HtmlLine and generate HTML
+    def str2html(str)
+      Juli::LineParser.new.parse(str, Juli::Wiki.wikinames).accept(HtmlLine.new)
     end
   end
 

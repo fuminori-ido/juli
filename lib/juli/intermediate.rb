@@ -11,10 +11,10 @@ module Juli::Intermediate
   end
   
   class DefaultNode < Node
-    attr_accessor :line
+    attr_accessor :str
 
     def initialize(str)
-      @line = Juli::LineParser.new.parse(str, Juli::Wiki.wikinames)
+      @str = str
     end
 
     def accept(visitor)
@@ -120,10 +120,10 @@ module Juli::Intermediate
   end
 
   class OrderedListItem < Node
-    attr_accessor :line
+    attr_accessor :str
   
-    def initialize(line)
-      @line = line
+    def initialize(str)
+      @str = str
     end
   
     def accept(visitor)
@@ -142,10 +142,10 @@ module Juli::Intermediate
   end
 
   class UnorderedListItem < Node
-    attr_accessor :line
+    attr_accessor :str
   
-    def initialize(line)
-      @line = line
+    def initialize(str)
+      @str = str
     end
   
     def accept(visitor)
@@ -164,11 +164,11 @@ module Juli::Intermediate
   end
 
   class DictionaryListItem < Node
-    attr_accessor :term, :line
+    attr_accessor :term, :str
 
     def initialize(absyn_dictionary_list_item)
       @term = absyn_dictionary_list_item.term
-      @line = absyn_dictionary_list_item.line
+      @str  = absyn_dictionary_list_item.str
     end
   
     def accept(visitor)

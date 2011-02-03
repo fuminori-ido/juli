@@ -1,0 +1,13 @@
+nested continued list
+
+* hello
+  world
+    quote string?
+  * How about this?
+      more quote string?
+  * next
+    next2
+  * next3
+      more*3 quote string?
+* next4
+

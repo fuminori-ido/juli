@@ -1,0 +1,25 @@
+list, quote, quote in list, or continued list?
+
+* a
+ A
+* b
+  B
+* c
+   C
+* d
+   e
+* e
+
+1. na
+ nA
+1. nb
+  nB
+1. nc
+   nC
+1. nd
+    nD
+1. ne
+     nE
+1. nf
+
+How?

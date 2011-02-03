@@ -45,7 +45,7 @@ module Juli::Visitor
       print_depth
       printf("Default\n")
       @depth += 1
-      n.line.accept(LineTree.new(@depth))
+      visit_str(n.str)
       @depth -= 1
     end
   
@@ -83,8 +83,8 @@ module Juli::Visitor
       print_depth
       printf("DictionaryListItem\n")
       @depth += 1
-      n.term.accept(LineTree.new(@depth))
-      n.line.accept(LineTree.new(@depth))
+      visit_str(n.term)
+      visit_str(n.str)
       @depth -= 1
     end
 
@@ -112,8 +112,14 @@ module Juli::Visitor
       print_depth
       printf(class_str)
       @depth += 1
-      n.line.accept(LineTree.new(@depth))
+      visit_str(n.str)
       @depth -= 1
+    end
+
+    # str -> Juli::LineAbsyn -> print with depth
+    def visit_str(str)
+      Juli::LineParser.new.parse(str, Juli::Wiki.wikinames).
+          accept(LineTree.new(@depth))
     end
   end
 end

@@ -15,8 +15,6 @@ module Juli
   #    generate HTML.
   #
   module Wiki
-    include Juli::Util
-
     # encode(=escape) '(', ')'
     #
     # === EXAMPLE
@@ -35,7 +33,7 @@ module Juli
 
     def build_wikinames
       wikiname = {}
-      Dir.chdir(juli_repo){
+      Dir.chdir(Juli::Util.juli_repo){
         Dir.glob('**/*.txt'){|f|
           if f =~ /^(.*).txt$/
             wikiname[encode($1)] = 1

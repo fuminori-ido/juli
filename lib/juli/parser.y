@@ -20,8 +20,8 @@ rule
 
   element
     : H STRING                  { Absyn::HeaderNode.new(val[0], val[1]) }
-    | LEVEL ORDERED_LIST_ITEM   { Absyn::OrderedListItem.new(val[0], val[1]) }
-    | LEVEL UNORDERED_LIST_ITEM { Absyn::UnorderedListItem.new(val[0], val[1]) }
+    | ORDERED_LIST_ITEM         { Absyn::OrderedListItem.new(*val[0]) }
+    | UNORDERED_LIST_ITEM       { Absyn::UnorderedListItem.new(*val[0]) }
     | DT STRING                 { Absyn::DictionaryListItem.new(val[0], val[1]) }
     | WHITELINE                 { Absyn::WhiteLine.new }
     | LEVEL STRING              { Absyn::StringNode.new(val[0], val[1]) }
@@ -89,12 +89,18 @@ module Juli::Absyn
     end
   end
 
+  #   |   1. HelloWorld
+  #    <-><-><-----------
+  #             str
+  #       offset
+  #    level
   class OrderedListItem < Node
-    attr_accessor :level, :line
+    attr_accessor :level, :offset, :str
   
-    def initialize(level, str)
+    def initialize(level, offset, str)
       @level  = level
-      @line   = Juli::LineParser.new.parse(str, wikinames)
+      @offset = offset
+      @str    = str
     end
   
     def accept(visitor)
@@ -102,12 +108,18 @@ module Juli::Absyn
     end
   end
 
+  #   |   *  HelloWorld
+  #    <-><-><-----------
+  #             str
+  #       offset
+  #    level
   class UnorderedListItem < Node
-    attr_accessor :level, :line
+    attr_accessor :level, :offset, :str
   
-    def initialize(level, str)
+    def initialize(level, offset, str)
       @level  = level
-      @line   = Juli::LineParser.new.parse(str, wikinames)
+      @offset = offset
+      @str    = str
     end
   
     def accept(visitor)
@@ -116,11 +128,11 @@ module Juli::Absyn
   end
 
   class DictionaryListItem < Node
-    attr_accessor :term, :line
+    attr_accessor :term, :str
   
     def initialize(term, str)
-      @term = Juli::LineParser.new.parse(term,  wikinames)
-      @line = Juli::LineParser.new.parse(str,   wikinames)
+      @term = term
+      @str  = str
     end
   
     def accept(visitor)
@@ -171,14 +183,19 @@ end
 # organized in tree by finding its level.
 #
 # === List
-# When level keeps the same, each type list item is in the same list.
-# When deeper level list item comes, create new list.
-# When shallow level list item comes, ends the list until the same level.
+# When:
+# level keeps the same:           each type list item is in the same list.
+# deeper level list item comes:   create new list.
+# shallow level list item comes:  ends the list until the same level.
+#
 # This is the same search logic as header's.
 #
 # === Baseline
-# Same concept as rdtools.  It is indent or offset from begging of a line.
-# deeper level string is interpreted as Quote.
+# Same concept as rdtools.  It is indent or offset from beginnig of a line.
+# When:
+# list level + offset == string level:  continue of list
+# list level + offset <  string level:  quote in the list
+# list level + offset >  string level:  end of list and begin quote
 # 
 class TreeBuilder < Absyn::Visitor
   def initialize
@@ -191,6 +208,11 @@ class TreeBuilder < Absyn::Visitor
     @array      = @root   # points to header or list
     @str_block  = ''
     @baseline   = 0
+
+    # While level is kept in @list, offset is kept here because:
+    # 1. offset is only necessary on continued list.
+    # 1. level is necessary to calculate node-depth.
+    @offset     = 0
   end
 
   def root
@@ -204,14 +226,17 @@ class TreeBuilder < Absyn::Visitor
   end
 
   def visit_string(n)
-    if n.level > @baseline        # beginning of quote
+    if @list && @list.level + @offset == n.level
+                                      # continue of list?
+      @list.array.last.str += ' ' + n.str
+    elsif n.level > @baseline         # beginning of quote
       str_block_break
       @str_block = n.str
-    elsif n.level == @baseline    # same baseline
+    elsif n.level == @baseline        # same baseline
       @str_block += n.str
-    else                          # end of quote -> flush it
+    else                              # end of quote -> flush it
       @array.add(Intermediate::QuoteNode.new(@str_block))
-      @str_block = n.str    # beginning of new str_block
+      @str_block = n.str              # beginning of new str_block
     end
     @baseline = n.level
   end
@@ -304,23 +329,24 @@ private
 
     # when same level, add to curr_list
     if @list && @list.level == n.level
-      @list.add(list_item_class.new(n.line))
+      @list.add(list_item_class.new(n.str))
 
     # when @list points to upper or nil and parses lower(=nested) list,
     # build new list node under the upper and shift @list to it:
     elsif !@list || @list.level < n.level
       new_list  = list_class.new(n.level)
       @array.add(new_list)
-      new_list.add(list_item_class.new(n.line))
+      new_list.add(list_item_class.new(n.str))
       @list = @array = new_list
 
     # when @list points to lower and parses upper, find parent,
     # build new node under it, and shift @list to it:
     else
       parent_list = @list.find_upper_or_equal(n.level)
-      parent_list.add(list_item_class.new(n.line))
+      parent_list.add(list_item_class.new(n.str))
       @list = @array = parent_list
     end
+    @offset = n.offset
   end
 end
 
@@ -351,24 +377,13 @@ private
       case line
       when /^\s*$/
         yield :WHITELINE, nil
-      when /^=\s+(.*)$/
-        header(1, $1, &block)
-      when /^==\s+(.*)$/
-        header(2, $1, &block)
-      when /^===\s+(.*)$/
-        header(3, $1, &block)
-      when /^====\s+(.*)$/
-        header(4, $1, &block)
-      when /^=====\s+(.*)$/
-        header(5, $1, &block)
-      when /^======+\s+(.*)$/
-        header(6, $1, &block)
-      when /^(\s*)\d+\.\s+(.*)$/
-        yield :LEVEL,             $1.length
-        yield :ORDERED_LIST_ITEM, $2
-      when /^(\s*)\*\s+(.*)$/
-        yield :LEVEL,               $1.length
-        yield :UNORDERED_LIST_ITEM, $2
+      when /^(={1,6})\s+(.*)$/
+        yield :H,       $1.length
+        yield :STRING,  $2
+      when /^(\s*)(\d+\.\s+)(.*)$/
+        yield :ORDERED_LIST_ITEM, [$1.length, $2.length, $3]
+      when /^(\s*)(\*\s+)(.*)$/
+        yield :UNORDERED_LIST_ITEM, [$1.length, $2.length, $3]
       when /^(\S.*)::\s*(.*)$/
         yield :DT, $1
         yield :STRING, $2
@@ -381,11 +396,4 @@ private
     end
     yield false, nil
   end
-
-  # process block, then process header
-  def header(level, string, &block)
-    yield :H,       level
-    yield :STRING,  string
-  end
-
 ---- footer

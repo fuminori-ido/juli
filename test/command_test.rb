@@ -1,5 +1,7 @@
 require 'fileutils'
 require 'test_helper'
+require 'juli/util'
+require 'juli/command'
 
 include Juli::Util
 include Juli::Command

@@ -63,6 +63,9 @@ both::        t001 and t002 are linked.
 * t008          line break
 * t009          quote or nested list
 * t010          quote then normal text was wrongly generated...
+* t011          continued list
+* t012          continued list(2)
+* t013          continued list(3)
 
 = SEE ALSO
 

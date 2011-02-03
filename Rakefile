@@ -26,7 +26,7 @@ Rake::TestTask.new('test' => parsers) do |t|
   t.verbose = true
 end
 
-desc 'build package'
+desc "build package from HEAD with version #{Juli::VERSION}"
 task :dist do
   pkg_name    = "juli-#{Juli::VERSION}"
   work_prefix = "/tmp/#{pkg_name}"

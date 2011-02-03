@@ -38,11 +38,18 @@ contents::    draw contents of page
 </center>
 <br/><br/>
 
-<b>Contents</b>:
-<%= contents %>
+<table width='100%'>
+<tr>
+  <td>
+    <b>Contents</b>:
+    <%= contents %>
+  </td>
+  <td align=right valign=top>
+    <%= recent_update(10) %>
+  </td>
+</tr>
+</table>
 <br/><br/>
-<%= recent_update(2) %>
-
 <%= body %>
 </body>
 </html>

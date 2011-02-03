@@ -1,0 +1,9 @@
+continued list
+
+* hello
+  world
+* next
+
+1. hello
+   world
+1. next
