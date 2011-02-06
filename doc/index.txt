@@ -271,9 +271,50 @@ will be:
 
 (Where, please ignore '|' above).
 
-Restriction:
+When length of a list becomes longer than editor window width,
+next line can be the continued line of the list if it starts with the same
+offset as follows:
 
-* continous line is not supported yet.
+  |A group is a set, G, together with an operation • (called the
+  |group law of G) that combines any two elements a and b to form
+  |another element, denoted a • b or ab. To qualify as a group,
+  |the set and operation, (G, •), must satisfy four requirements
+  |known as the group axioms:
+  |
+  |1. For all a, b in G, the result of the operation, a • b,
+  |   is also in G.
+  |1. For all a, b and c in G, (a • b) • c = a • (b • c).
+  |1. There exists an element e in G, such that for every element a in G,
+  |   the equation e • a = a • e = a holds.
+  |   The identity element of a group G is often written as 1 or 1G,
+  |   a notation inherited from the multiplicative identity.
+  |1. For each a in G, there exists an element b in G such that
+  |   a • b = b • a = 1G.
+  |
+  |(from http://en.wikipedia.org/wiki/Group_%28mathematics%29 )
+
+will be:
+
+A group is a set, G, together with an operation • (called the
+group law of G) that combines any two elements a and b to form
+another element, denoted a • b or ab. To qualify as a group,
+the set and operation, (G, •), must satisfy four requirements
+known as the group axioms:
+
+1. For all a, b in G, the result of the operation, a • b,
+   is also in G.
+1. For all a, b and c in G, (a • b) • c = a • (b • c).
+1. There exists an element e in G, such that for every element a in G,
+   the equation e • a = a • e = a holds.
+   The identity element of a group G is often written as 1 or 1G,
+   a notation inherited from the multiplicative identity.
+1. For each a in G, there exists an element b in G such that
+   a • b = b • a = 1G.
+
+(from http://en.wikipedia.org/wiki/Group_%28mathematics%29 )
+
+
+(Where, please ignore '|' above).
 
 === Unordered List
 
@@ -417,7 +458,8 @@ Bad Example:
 
 = TODO
 
-1. support continuous list
+1. bin/juli gen test/repo/t014.txt results in the error:
+    ... cannot find juli repository root. (RuntimeError)
 1. Wiki
   1. support subdirectory
 1. screen shot or some explanation of 'BEFORE-AFTER'

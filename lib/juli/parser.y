@@ -229,16 +229,34 @@ class TreeBuilder < Absyn::Visitor
     if @list && @list.level + @offset == n.level
                                       # continue of list?
       @list.array.last.str += ' ' + n.str
+      # At this case, baseline *DOESN'T* become n.level.  It keeps
+      # @list's baseline.
     elsif n.level > @baseline         # beginning of quote
       str_block_break
       @str_block = n.str
+      @baseline = n.level
     elsif n.level == @baseline        # same baseline
+      # if same baseline but previous is array, then it's list_break
+      if @list
+        list_break
+      end
       @str_block += n.str
+
     else                              # end of quote -> flush it
-      @array.add(Intermediate::QuoteNode.new(@str_block))
+      # @str_block may contain only "\n" when following case:
+      #
+      #   |1. hello
+      #   |   a
+      #   |               <-- here!
+      #   |next...
+      #
+      # This should be ignored:
+      if @str_block !~ /\A\s*\Z/m
+        @array.add(Intermediate::QuoteNode.new(@str_block))
+      end
       @str_block = n.str              # beginning of new str_block
+      @baseline = n.level
     end
-    @baseline = n.level
   end
 
   def visit_header(n)
@@ -307,7 +325,7 @@ class TreeBuilder < Absyn::Visitor
 private
   # action on end of string block
   def str_block_break
-    if @str_block != ''
+    if @str_block !~ /\A\s*\z/m
       @array.add(
           @baseline == 0 ?
               Intermediate::DefaultNode.new(@str_block) :

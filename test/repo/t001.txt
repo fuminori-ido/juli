@@ -66,6 +66,7 @@ both::        t001 and t002 are linked.
 * t011          continued list
 * t012          continued list(2)
 * t013          continued list(3)
+* t014          continued list(4) bug
 
 = SEE ALSO
 

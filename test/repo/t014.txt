@@ -1,0 +1,7 @@
+Why is QuoteNode generated?
+
+1. a
+1. b
+   c
+
+How about this?

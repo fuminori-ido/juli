@@ -109,6 +109,12 @@ class ParserTest < Test::Unit::TestCase
     assert_equal Juli::Intermediate::UnorderedList, t.array[1].array[2].class
   end
 
+  def test_continued_list4
+    t = build_tree_on('t014.txt')
+    assert_equal 3, t.array.size
+    assert_equal 2, t.array[1].array.size
+  end
+
 private
   # return full path of test data file.
   def data_path(filename)
