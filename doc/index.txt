@@ -236,6 +236,7 @@ will be what you see at juli(1) page...
 == List
 === Ordered List
 
+==== Basic
 The line starts with "1. " (One dot space) is recognized as ordered list.
 Not only '1' but also any number can be used.  However, actual assigned
 numbers for ordered-list starts '1' and increments 1 for each. 
@@ -255,6 +256,7 @@ will be:
 (Please ignore '|' above.  It just let juli(1) interpret to quote,
 not ordered list).
 
+==== Nested list
 When putting leading spaces, it is interpreted as nested list.  Example:
 
   |1. Hello
@@ -271,6 +273,7 @@ will be:
 
 (Where, please ignore '|' above).
 
+==== Continued list
 When length of a list becomes longer than editor window width,
 next line can be the continued line of the list if it starts with the same
 offset as follows:
@@ -295,6 +298,7 @@ offset as follows:
 
 will be:
 
+<hr>
 A group is a set, G, together with an operation • (called the
 group law of G) that combines any two elements a and b to form
 another element, denoted a • b or ab. To qualify as a group,
@@ -312,14 +316,17 @@ known as the group axioms:
    a • b = b • a = 1G.
 
 (from http://en.wikipedia.org/wiki/Group_%28mathematics%29 )
+<hr>
 
 
-(Where, please ignore '|' above).
+(Where, please ignore '|' and &lt;hr&gt; line above.  Those are just
+for explanation purpose).
 
 === Unordered List
 
 The line starts with "* " (astarisk space) is recognized as unordered list.
 
+==== Basic
 Example:
 
   |* Hello
@@ -332,6 +339,7 @@ will be:
 * World
 * This is a pen.
 
+==== Nested list
 When putting leading spaces, it is interpreted as nested list.  Example:
 
   |* Hello
@@ -348,9 +356,9 @@ will be:
 
 (Where, please ignore '|' above).
 
-Restriction:
+==== Continued list
 
-* continous line is not supported yet.
+Same as ordrered list.  See ordered list.
 
 === Mixture of Ordered and Unordered list
 
@@ -458,8 +466,6 @@ Bad Example:
 
 = TODO
 
-1. bin/juli gen test/repo/t014.txt results in the error:
-    ... cannot find juli repository root. (RuntimeError)
 1. Wiki
   1. support subdirectory
 1. screen shot or some explanation of 'BEFORE-AFTER'
