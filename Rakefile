@@ -61,3 +61,38 @@ task :clean => :clobber_doc do
       'InstalledFiles', '.config',    # setup.rb generated
       'doc/html'].flatten
 end
+
+begin
+  require 'rcov/rcovtask'
+  $rcov_exist = true
+rescue LoadError
+  $stderr.puts "rcov is not installed."
+end
+
+# set rcov default options
+def set_rcov_default(t)
+  t.libs << "test"
+  t.verbose = true
+  t.rcov_opts = ["--charset=utf-8", "--rails"]
+  t.rcov_opts << ["-x", ENV["GEM_HOME"]] if ENV["GEM_HOME"] && !ENV["GEM_HOME"].empty?
+  t.rcov_opts << ["-x", File.expand_path('.gem', ENV["HOME"])]
+end
+
+namespace :test do
+  namespace :coverage do
+    desc "delete coverage data dir"
+    task(:clean) { rm_f "coverage"}
+  end
+  task :coverage => "test:coverage:clean"
+
+  if $rcov_exist
+    namespace :coverage do
+      Rcov::RcovTask.new(:juli) do |t|
+        set_rcov_default(t)
+        t.test_files = FileList["test/**/*_test.rb"]
+      end
+    end
+    task :coverage => "test:coverage:juli"
+  end
+end
+
