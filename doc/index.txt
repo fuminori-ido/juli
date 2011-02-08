@@ -208,8 +208,9 @@ and install it.
 
 = Juli Formatting
 
-Juli document format syntax is similar to but very small subset of
-<a href='http://rubyforge.org/projects/rdtool/'>RD</a>.
+Juli document format syntax is a very small subset of
+<a href='http://rubyforge.org/projects/rdtool/'>RD</a>, but
+some syntax are a little bit of different.
 
 == Header
 
