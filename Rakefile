@@ -55,7 +55,7 @@ Rake::RDocTask.new('doc') do |t|
 end
 
 desc 'clean working files'
-task :clean => :clobber_doc do
+task :clean => [:clobber_doc, :'test:coverage:clobber_juli'] do
   sh "find . -name '*~' -exec rm {} \\;"
   sh 'rm', '-rf', *[parsers, test_conf_outout_top, 
       'InstalledFiles', '.config',    # setup.rb generated
@@ -79,12 +79,6 @@ def set_rcov_default(t)
 end
 
 namespace :test do
-  namespace :coverage do
-    desc "delete coverage data dir"
-    task(:clean) { rm_f "coverage"}
-  end
-  task :coverage => "test:coverage:clean"
-
   if $rcov_exist
     namespace :coverage do
       Rcov::RcovTask.new(:juli) do |t|
