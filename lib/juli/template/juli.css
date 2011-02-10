@@ -119,3 +119,8 @@ table.juli_recent_update {
 table.juli_recent_update th {
   background-color: #db6;
 }
+
+/* sitemap */
+div.sitemap {
+  text-align:       left;
+}

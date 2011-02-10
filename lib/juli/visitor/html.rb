@@ -124,6 +124,7 @@ module Juli::Visitor
       prototype   = relative_from(in_file, 'prototype.js')
       javascript  = relative_from(in_file, 'juli.js')
       stylesheet  = relative_from(in_file, 'juli.css')
+      sitemap     = relative_from(in_file, 'sitemap.html')
       body        = root.accept(self)
       erb         = ERB.new(File.read(File.join(Juli::TEMPLATE_PATH,
                         conf['template']) + '.html'))
@@ -253,11 +254,14 @@ module Juli::Visitor
       }
     end
 
+    EXCEPTION = {'sitemap.html'=>1}
+
     # synchronize text file between juli-repo and OUTPUT_TOP:
     #
     # 1. new file exists, generate it.
     # 1. repo's file timestamp is newer than the one under OUTPUT_TOP, regenerate it.
-    # 1. correspondent file of OUTPUT_TOP/.../f doesn't exist in repo, delete it.
+    # 1. correspondent file of OUTPUT_TOP/.../f doesn't exist in repo
+    #    and not in EXCEPTION list above, delete it.
     # 1. if -f option is specified, don't check timestamp and always generates.
     #
     def sync_txt(opts)
@@ -282,9 +286,10 @@ module Juli::Visitor
       end
 
       # When correspondent file of OUTPUT_TOP/.../f doesn't exist in repo,
-      # delete it.
+      # and not in EXCEPTION list above, delete it.
       Dir.chdir(conf['output_top']){
         Dir.glob('**/*.html'){|f|
+          next if EXCEPTION[f]
           in_file = File.join(juli_repo, in_filename(f))
           if !File.exist?(in_file) && !File.exist?(in_file + '.txt')
             FileUtils.rm(f)

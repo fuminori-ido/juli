@@ -11,8 +11,9 @@ module Juli
     # dispatched to each method.
     def run(command_str, opts = {})
       case command_str
-      when 'init';  init(opts)
-      when 'gen';   gen(opts)
+      when 'init';    init(opts)
+      when 'gen';     gen(opts)
+      when 'sitemap'; sitemap(opts)
       else
         STDERR.print "Unknown juli command: '#{command_str}'\n\n", usage, "\n"
         raise Error
@@ -65,6 +66,32 @@ module Juli
           Juli::Parser.new.parse(file, v)
         end
       end
+    end
+
+    # generate $JULI_REPO/sitemap.html
+    def sitemap(opts)
+      Dir.chdir(juli_repo) {
+        outdir = File.join(conf['output_top'])
+        FileUtils.mkdir(outdir) if !File.directory?(outdir)
+        body = ''
+        for textfile in Dir.glob('**/*.txt').sort do
+          html = textfile.gsub(/.txt$/, '.html')
+          body += sprintf("<a href='%s'>%s</a><br/>\n",
+                      textfile.gsub(/.txt$/, '.html'),    # url
+                      textfile.gsub(/.txt$/, ''))         # label
+        end
+
+      title       = 'Sitemap'
+      prototype   = 'prototype.js'
+      javascript  = 'juli.js'
+      stylesheet  = 'juli.css'
+      erb         = ERB.new(File.read(File.join(Juli::TEMPLATE_PATH,
+                        'sitemap.html')))
+      out_path    = 'sitemap.html'
+      File.open(File.join(outdir, 'sitemap.html'), 'w') do |f|
+        f.write(erb.result(binding))
+      end
+      }
     end
 
   private

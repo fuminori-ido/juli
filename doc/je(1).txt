@@ -9,15 +9,17 @@ je wikiname
 je(1) is a wrapper of editor and juli(1), to edit wikipage and run juli(1).
 je(1) does the followings:
 
-1. edit a wiki file named 'wikiname.txt'
-1. commit to git repository
-1. run juli(1) to generate/update HTML
+1. edit a wiki file named 'wikiname.txt'.
+1. commit to git repository.
+1. run juli(1) to generate/update HTML.
+1. if wikiname is new, generate sitemap.
 
 == Environment
 Following environment variables are required to be set:
 
 JULI_REPO:: juli-repo directory, must be a git repository also.
 EDITOR::    editor
+JULI::      for debug (only for developer)
 
 == Setup
 

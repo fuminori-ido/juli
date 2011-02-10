@@ -1,3 +1,4 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <!--
 
@@ -25,6 +26,7 @@ Following helper methods are optional:
 contents::    draw contents of page
 %>
 <head>
+  <meta http-equiv="Content-Type"        content="text/html; charset=UTF-8">
   <title><%= title %></title>
   <script src="<%= prototype %>"  type="text/javascript"></script>
   <script src="<%= javascript %>" type="text/javascript"></script>
@@ -45,7 +47,15 @@ contents::    draw contents of page
     <%= contents %>
   </td>
   <td align=right valign=top>
-    <%= recent_update(10) %>
+    <table>
+    <tr><td align=left valign=top>
+          <div class=sitemap>
+            <a href="<%= sitemap %>">Sitemap</a>
+          </div>
+          <br/>
+          <%= recent_update(10) %>
+        </td></tr>
+    </table>
   </td>
 </tr>
 </table>

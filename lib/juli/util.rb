@@ -42,6 +42,7 @@ general_options:
 COMMAND (default = gen):
   init
   gen  
+  sitemap             generate sitemap to $JULI_REPO/sitemap.html
 
 command_options for:
   init:

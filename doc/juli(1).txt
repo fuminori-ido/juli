@@ -74,6 +74,9 @@ Wrong Example:
 -g <i>generator</i>:: specify generator.  Supported generators are in lib/juli/visitor/ directory.  Default is html.
 -f::  force update.  Even generated HTML file is newer than source text, generate again.
 
+=== sitemap
+generates sitemap.html under <i>output_top</i>/.
+je(1) supports when executes this sitemap command semi-automatically.
 
 = FILES
 

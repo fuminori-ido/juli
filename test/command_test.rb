@@ -42,6 +42,12 @@ class CommandTest < Test::Unit::TestCase
     end
   end
 
+  def test_sitemap
+    assert_nothing_raised do
+      Juli::Command.run('sitemap')
+    end
+  end
+
 private
   def repo4test
     @repo4test ||= Pathname.new(File.join(File.dirname(__FILE__),
