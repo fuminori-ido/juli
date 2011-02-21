@@ -136,10 +136,14 @@ module Juli::Visitor
       printf("generated:       %s\n", out_filename(in_file))
     end
   
-    def visit_default(n)
+    def visit_paragraph(n)
       content_tag(:p, :class=>'default') do
         str2html(n.str)
       end
+    end
+
+    def visit_str(n)
+      str2html(n.str)
     end
   
     def visit_header(n)
@@ -158,7 +162,11 @@ module Juli::Visitor
     end
 
     def visit_ordered_list_item(n)
-      content_tag(:li, str2html(n.str))
+      content_tag(:li) do
+        n.array.inject('') do |result, str_or_quote|
+          result += str_or_quote.accept(self)
+        end
+      end
     end
 
     def visit_unordered_list(n)
@@ -166,7 +174,11 @@ module Juli::Visitor
     end
 
     def visit_unordered_list_item(n)
-      content_tag(:li, str2html(n.str))
+      content_tag(:li) do
+        n.array.inject('') do |result, str_or_quote|
+          result += str_or_quote.accept(self)
+        end
+      end
     end
 
     def visit_dictionary_list(n)

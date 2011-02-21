@@ -63,7 +63,7 @@ module Juli::Absyn
     attr_accessor :array
   
     def initialize
-      @array      = Array.new
+      @array  = Array.new
     end
   
     def add(child)
@@ -201,17 +201,13 @@ class TreeBuilder < Absyn::Visitor
   def initialize
     @root       = Intermediate::HeaderNode.new(0, '(root)')
 
-    # following instance vars are to keep 'current' header, list, array,
-    # str_block, and baseline while parsing Absyn tree:
+    # following instance vars are to keep 'current' header, list_item, 
+    # array, str_node, and baseline while parsing Absyn tree:
     @header     = @root
-    @list       = nil
-    @array      = @root   # points to header or list
-    @str_block  = ''
+    @list_item  = nil
+    @array      = @root   # points to header, list, or even list-item
+    @str_node   = Intermediate::ParagraphNode.new; @root.add(@str_node)
     @baseline   = 0
-
-    # While level is kept in @list, offset is kept here because:
-    # 1. offset is only necessary on continued list.
-    # 1. level is necessary to calculate node-depth.
     @offset     = 0
   end
 
@@ -226,37 +222,18 @@ class TreeBuilder < Absyn::Visitor
   end
 
   def visit_string(n)
-    if @list && @list.level + @offset == n.level
-                                      # continue of list?
-      @list.array.last.str += ' ' + n.str
-      # At this case, baseline *DOESN'T* become n.level.  It keeps
-      # @list's baseline.
-    elsif n.level > @baseline         # beginning of quote
-      str_block_break
-      @str_block = n.str
-      @baseline = n.level
-    elsif n.level == @baseline        # same baseline
-      # if same baseline but previous is array, then it's list_break
-      if @list
-        list_break
+      if @baseline + @offset < n.level
+        vs_debug('beginning of quote', n.str)
+        @str_node = Intermediate::QuoteNode.new(n.str)
+        @array.add(@str_node)
+        @baseline = n.level
+      elsif @baseline + @offset == n.level
+        vs_debug('same baseline', n.str)
+        @str_node.concat(n.str)
+      else
+        vs_debug('end of quote', n.str)
+        end_of_quote(n)
       end
-      @str_block += n.str
-
-    else                              # end of quote -> flush it
-      # @str_block may contain only "\n" when following case:
-      #
-      #   |1. hello
-      #   |   a
-      #   |               <-- here!
-      #   |next...
-      #
-      # This should be ignored:
-      if @str_block !~ /\A\s*\Z/m
-        @array.add(Intermediate::QuoteNode.new(@str_block))
-      end
-      @str_block = n.str              # beginning of new str_block
-      @baseline = n.level
-    end
   end
 
   def visit_header(n)
@@ -301,17 +278,21 @@ class TreeBuilder < Absyn::Visitor
   end
 
   def visit_dictionary_list_item(n)
-    if !@list
-      @list = Intermediate::DictionaryList.new
-      @header.add(@list)
-    end
-    @list.add(Intermediate::DictionaryListItem.new(n))
+    list = if !@list_item
+              l = Intermediate::DictionaryList.new
+              @header.add(l)
+              l
+           else
+             @list_item.parent
+           end
+    @list_item = Intermediate::DictionaryListItem.new(n)
+    list.add(@list_item)
   end
 
-  # if baseline > 0, treat as continous of quote
   def visit_white_line(n)
+p 'visit_white_line'
     if @baseline > 0
-      @str_block += "\n"
+      @str_node.concat("\n")
     else
       list_break
     end
@@ -323,48 +304,102 @@ class TreeBuilder < Absyn::Visitor
   end
 
 private
+  # print debug info when DEBUG environment is set.
+  def vs_debug(tag, str, method='visit_string')
+    return if !ENV['DEBUG']
+
+    printf("%-20.20s %-20.20s %s\n",
+        method,
+        tag,
+        str_limit(str).gsub(/\n/, '\n'))
+  end
+
   # action on end of string block
   def str_block_break
+    return
+
+    p "  str_block_break: #{str_limit(@str_block)}"
     if @str_block !~ /\A\s*\z/m
       @array.add(
           @baseline == 0 ?
-              Intermediate::DefaultNode.new(@str_block) :
+              Intermediate::ParagraphNode.new(@str_block) :
               Intermediate::QuoteNode.new(@str_block))
     end
     @str_block  = ''
     @baseline   = 0
   end
 
+  def list_level
+    @list_item.parent.level
+  end
+
   # action on end of list
   def list_break
+p 'list_break'
+    return if !@list_item
+
     str_block_break
-    @list  = nil
-    @array = @header
+    @list_item  = nil
+    @array      = @header
+
+    # same as TreeBuilder#initialize
+    @str_node   = Intermediate::ParagraphNode.new; @array.add(@str_node)
+    @baseline   = 0
+  end
+
+  def end_of_quote(n)
+    @array    = @array.find_upper_or_equal(n.level)
+    @str_node = if n.level > 0
+                  Intermediate::QuoteNode.new(n.str)
+                else
+                  Intermediate::ParagraphNode.new(n.str)
+                end
+    @array.add(@str_node)
+    @baseline = n.level
   end
 
   def visit_list_item(n, list_class, list_item_class)
     str_block_break
 
+    @str_node = Intermediate::StrNode.new(n.str)
+    list_item = list_item_class.new
+    list_item.add(@str_node)
+
     # when same level, add to curr_list
-    if @list && @list.level == n.level
-      @list.add(list_item_class.new(n.str))
+    if @list_item && list_level == n.level
+      vs_debug('same level', n.str, 'visit_list_item')
+      @list_item.parent.add(list_item)
 
-    # when @list points to upper or nil and parses lower(=nested) list,
-    # build new list node under the upper and shift @list to it:
-    elsif !@list || @list.level < n.level
+    # when list points to upper or nil and parses lower(=nested) list,
+    # build new list node under the upper and shift list to it:
+    elsif !@list_item || list_level < n.level
+      vs_debug('deeper level', n.str, 'visit_list_item')
       new_list  = list_class.new(n.level)
-      @array.add(new_list)
-      new_list.add(list_item_class.new(n.str))
-      @list = @array = new_list
+      add_list_to_array(new_list)
+      new_list.add(list_item)
 
-    # when @list points to lower and parses upper, find parent,
-    # build new node under it, and shift @list to it:
+    # when list points to lower and parses upper, find parent,
+    # build new node under it, and shift list to it:
     else
-      parent_list = @list.find_upper_or_equal(n.level)
-      parent_list.add(list_item_class.new(n.str))
-      @list = @array = parent_list
+      vs_debug('shallow level', n.str, 'visit_list_item')
+      parent_list = @list_item.parent.find_upper_or_equal(n.level)
+      parent_list.add(list_item)
     end
-    @offset = n.offset
+    @array    = @list_item  = list_item
+    @baseline = n.level
+    @offset   = n.offset
+  end
+
+  # if array is Header, add to it.
+  # if array is ListItem, add to the parent.
+  def add_list_to_array(list)
+    if @array.is_a?(Juli::Intermediate::HeaderNode)
+      @array.add(list)
+    elsif @array.is_a?(Juli::Intermediate::ListItem)
+      @array.parent.add(list)
+    else
+      raise "unknown array class"
+    end
   end
 end
 

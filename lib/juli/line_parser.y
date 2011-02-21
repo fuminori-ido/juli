@@ -56,12 +56,7 @@ module Juli::LineAbsyn
     end
   
     def add(child)
-      case child
-      when String
-        @array << DefaultNode.new(child)
-      else
-        @array << child
-      end
+      @array << child
       self
     end
   

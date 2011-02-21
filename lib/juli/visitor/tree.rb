@@ -16,17 +16,17 @@ module Juli::Visitor
 
     def visit_string(n)
       print_depth
-      printf "Str:  %s\n", str_limit(n.str.gsub(/\n/, ''))
+      printf "str:  %s\n", str_limit(n.str.gsub(/\n/, ''))
     end
 
     def visit_wikiname(n)
       print_depth
-      printf "Wiki: %s\n", str_limit(n.str.gsub(/\n/, ''))
+      printf "wiki: %s\n", str_limit(n.str.gsub(/\n/, ''))
     end
 
     def visit_url(n)
       print_depth
-      printf "URL:  %s\n", str_limit(n.str.gsub(/\n/, ''))
+      printf "url:  %s\n", str_limit(n.str.gsub(/\n/, ''))
     end
   end
 
@@ -41,14 +41,22 @@ module Juli::Visitor
       super
     end
   
-    def visit_default(n)
+    def visit_paragraph(n)
       print_depth
-      printf("Default\n")
+      printf("Paragraph\n")
       @depth += 1
-      visit_str(n.str)
+      process_str(n.str)
       @depth -= 1
     end
-  
+
+    def visit_str(n)
+      print_depth
+      printf("StrNode\n")
+      @depth += 1
+      process_str(n.str)
+      @depth -= 1
+    end
+
     def visit_header(n)
       print_depth
       printf("HeaderNode(%d %s)\n", n.level, n.str)
@@ -83,8 +91,8 @@ module Juli::Visitor
       print_depth
       printf("DictionaryListItem\n")
       @depth += 1
-      visit_str(n.term)
-      visit_str(n.str)
+      process_str(n.term)
+      process_str(n.str)
       @depth -= 1
     end
 
@@ -112,12 +120,14 @@ module Juli::Visitor
       print_depth
       printf(class_str)
       @depth += 1
-      visit_str(n.str)
+      for str_or_quote in n.array do
+        str_or_quote.accept(self)
+      end
       @depth -= 1
     end
 
     # str -> Juli::LineAbsyn -> print with depth
-    def visit_str(str)
+    def process_str(str)
       Juli::LineParser.new.parse(str, Juli::Wiki.wikinames).
           accept(LineTree.new(@depth))
     end

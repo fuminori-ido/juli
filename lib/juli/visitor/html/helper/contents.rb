@@ -6,7 +6,7 @@ module Juli::Visitor::Html::Helper
       include Juli::Visitor::Html::Helper
   
       def visit_node(n); ''; end
-      def visit_default(n); ''; end
+      def visit_paragraph(n); ''; end
       def visit_ordered_list(n); ''; end
       def visit_ordered_list_item(n); ''; end
       def visit_unordered_list(n); ''; end

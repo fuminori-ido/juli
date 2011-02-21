@@ -9,19 +9,47 @@ module Juli::Intermediate
       visitor.visit_node(self)
     end
   end
-  
-  class DefaultNode < Node
+
+  # StrNode adds 'concat' string manupilation method
+  #
+  # StrNode is also an element of ListItem
+  class StrNode < Node
     attr_accessor :str
 
     def initialize(str)
       @str = str
     end
 
+    def concat(str)
+      @str += str
+    end
+
     def accept(visitor)
-      visitor.visit_default(self)
+      visitor.visit_str(self)
     end
   end
 
+  class ParagraphNode < StrNode
+    def initialize(str = '')
+      super
+    end
+
+    def accept(visitor)
+      visitor.visit_paragraph(self)
+    end
+  end
+
+  class QuoteNode < StrNode
+    # trim last white spaces
+    def initialize(str = '')
+      @str = str.gsub(/\s+\z/m, '')
+    end
+
+    def accept(visitor)
+      visitor.visit_quote(self)
+    end
+  end
+  
   class ArrayNode < Node
     attr_accessor :array, :level
 
@@ -49,10 +77,10 @@ module Juli::Intermediate
       end
     end
 
-    # find upper or equal level node than the 'level'
+    # find upper or equal node than the 'level'
     #
-    # NOTE: use find_upper() to find header parent while use
-    # find_upper_or_equal() to find list parent because
+    # NOTE: use find_upper() to find parent header while use
+    # find_upper_or_equal() to find parent list because
     # header is added under parent while list item is added at the same
     # level of list as follows:
     #
@@ -68,6 +96,7 @@ module Juli::Intermediate
     #   1. c              | | item(b)
     #                     | item(c)
     def find_upper_or_equal(level)
+      p "  #{self.class.to_s}.find_upper_or_equal(#{level})"
       if self.level <= level
         self
       else
@@ -109,7 +138,24 @@ module Juli::Intermediate
     end
   end
 
-  class OrderedList < ArrayNode
+  # abstract List.
+  #
+  # find_upper_or_equal() is Array method because to find parent
+  # even if string is the following level:
+  #
+  #   |1. list item
+  #   |Hello World
+  #
+  # On the other side, above 'Hello World' level is zero so
+  # it must be added to header, not list.  In order to do that,
+  # list level is calculated as depth + offset.
+  class List < ArrayNode
+    def initialize(level)
+      super(level)
+    end
+  end
+
+  class OrderedList < List
     def initialize(level)
       super
     end
@@ -119,19 +165,25 @@ module Juli::Intermediate
     end
   end
 
-  class OrderedListItem < Node
-    attr_accessor :str
-  
-    def initialize(str)
-      @str = str
+  # ListItem is also an array-node, but it consists from only
+  # StrNode and QuoteNode.
+  class ListItem < ArrayNode
+    def initialize
+      super(0)
     end
-  
+
+    def find_upper_or_equal(level)
+      parent.find_upper_or_equal(level)
+    end
+  end
+
+  class OrderedListItem < ListItem
     def accept(visitor)
       visitor.visit_ordered_list_item(self)
     end
   end
 
-  class UnorderedList < ArrayNode
+  class UnorderedList < List
     def initialize(level)
       super
     end
@@ -141,13 +193,7 @@ module Juli::Intermediate
     end
   end
 
-  class UnorderedListItem < Node
-    attr_accessor :str
-  
-    def initialize(str)
-      @str = str
-    end
-  
+  class UnorderedListItem < ListItem
     def accept(visitor)
       visitor.visit_unordered_list_item(self)
     end
@@ -176,19 +222,6 @@ module Juli::Intermediate
     end
   end
 
-  class QuoteNode < Node
-    attr_accessor :str
-
-    # trim last white spaces
-    def initialize(str)
-      @str = str.gsub(/\s+\z/m, '')
-    end
-
-    def accept(visitor)
-      visitor.visit_quote(self)
-    end
-  end
-  
   # Abstract VISITOR-pattern around Intermediate tree.
   #
   # === How to add new generator
@@ -235,7 +268,8 @@ module Juli::Intermediate
     # === INPUTS
     # n:: Intermediate node
     def visit_node(n); end
-    def visit_default(n); end
+    def visit_paragraph(n); end
+    def visit_str(n); end
     def visit_header(n); end
     def visit_ordered_list(n); end
     def visit_ordered_list_item(n); end

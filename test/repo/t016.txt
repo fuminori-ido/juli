@@ -1,0 +1,8 @@
+quote in list is bug.
+
+1. hello
+    a
+    b
+    c
+1. world
+How?

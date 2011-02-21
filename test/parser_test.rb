@@ -80,10 +80,16 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 2, t.array[1].array.size
   end
 
+  def test_quote_in_list
+    t = build_tree_on('t016.txt')
+    assert_equal 3, t.array.size
+    assert_match /a.*b.*c/, t.array[1].array[0].array[1].str
+  end
+
   def test_quote_and_normal
     t = build_tree_on('t010.txt')
     assert_equal 4, t.array.size
-    assert_equal Juli::Intermediate::DefaultNode, t.array[2].class
+    assert_equal Juli::Intermediate::ParagraphNode, t.array[2].class
     assert_equal Juli::Intermediate::QuoteNode,   t.array[3].class
   end
 
@@ -91,8 +97,8 @@ class ParserTest < Test::Unit::TestCase
     t = build_tree_on('t011.txt')
     assert_equal 3, t.array.size
     assert_equal 2, t.array[1].array.size
-    assert_match /hello/, t.array[1].array[0].str
-    assert_match /world/, t.array[1].array[0].str
+    assert_match /hello/, t.array[1].array[0].array[0].str
+    assert_match /world/, t.array[1].array[0].array[0].str
     assert_equal 2, t.array[2].array.size
     assert_equal Juli::Intermediate::UnorderedList,     t.array[1].class
     assert_equal Juli::Intermediate::UnorderedListItem, t.array[1].array[1].class
@@ -100,19 +106,27 @@ class ParserTest < Test::Unit::TestCase
 
   def test_continued_list2
     t = build_tree_on('t012.txt')
-    assert_match /b/, t.array[1].array[2].str
-    assert_match /B/, t.array[1].array[2].str
+    assert_match /b/, t.array[3].array[0].array[0].str
+    assert_match /B/, t.array[3].array[0].array[0].str
   end
 
   def test_continued_list3
     t = build_tree_on('t013.txt')
-    assert_equal Juli::Intermediate::UnorderedList, t.array[1].array[2].class
+    assert_equal Juli::Intermediate::UnorderedList, t.array[1].array[1].class
+    assert_equal Juli::Intermediate::UnorderedListItem, t.array[1].array[2].class
   end
 
   def test_continued_list4
     t = build_tree_on('t014.txt')
     assert_equal 3, t.array.size
     assert_equal 2, t.array[1].array.size
+  end
+
+  def test_line_break_with_same_baseline
+    t = build_tree_on('t015.txt')
+    assert_equal 2,         t.array.size
+    assert_equal 2,         t.array[0].array.size
+    assert_match /^c\s*$/,  t.array[1].str
   end
 
 private
