@@ -208,7 +208,7 @@ class TreeBuilder < Absyn::Visitor
     @array      = @root   # points to header, list, or even list-item
     @str_node   = Intermediate::ParagraphNode.new; @root.add(@str_node)
     @baseline   = 0
-    @offset     = 0
+    @offset     = 0       # FIXME: not used now (always zero)
   end
 
   def root
@@ -222,18 +222,19 @@ class TreeBuilder < Absyn::Visitor
   end
 
   def visit_string(n)
-      if @baseline + @offset < n.level
-        vs_debug('beginning of quote', n.str)
-        @str_node = Intermediate::QuoteNode.new(n.str)
-        @array.add(@str_node)
-        @baseline = n.level
-      elsif @baseline + @offset == n.level
-        vs_debug('same baseline', n.str)
-        @str_node.concat(n.str)
-      else
-        vs_debug('end of quote', n.str)
-        end_of_quote(n)
-      end
+    vs_debug("#{@baseline} #{@offset} #{n.level}", '')
+    if @baseline + @offset < n.level
+      vs_debug('beginning of quote', n.str)
+      @str_node = Intermediate::QuoteNode.new(n.str)
+      @array.add(@str_node)
+      @baseline = n.level
+    elsif @baseline + @offset == n.level
+      vs_debug('same baseline', n.str)
+      @str_node.concat(n.str)
+    else
+      vs_debug('end of quote', n.str)
+      end_of_quote(n)
+    end
   end
 
   def visit_header(n)
@@ -290,8 +291,8 @@ class TreeBuilder < Absyn::Visitor
   end
 
   def visit_white_line(n)
-p 'visit_white_line'
-    if @baseline > 0
+    vs_debug('', '', 'visit_white_line')
+    if in_quote?
       @str_node.concat("\n")
     else
       list_break
@@ -304,6 +305,10 @@ p 'visit_white_line'
   end
 
 private
+  def in_quote?
+    @str_node && @str_node.class == Intermediate::QuoteNode
+  end
+
   # print debug info when DEBUG environment is set.
   def vs_debug(tag, str, method='visit_string')
     return if !ENV['DEBUG']
@@ -314,31 +319,15 @@ private
         str_limit(str).gsub(/\n/, '\n'))
   end
 
-  # action on end of string block
-  def str_block_break
-    return
-
-    p "  str_block_break: #{str_limit(@str_block)}"
-    if @str_block !~ /\A\s*\z/m
-      @array.add(
-          @baseline == 0 ?
-              Intermediate::ParagraphNode.new(@str_block) :
-              Intermediate::QuoteNode.new(@str_block))
-    end
-    @str_block  = ''
-    @baseline   = 0
-  end
-
   def list_level
     @list_item.parent.level
   end
 
   # action on end of list
   def list_break
-p 'list_break'
+    vs_debug('', '', 'list_break')
     return if !@list_item
 
-    str_block_break
     @list_item  = nil
     @array      = @header
 
@@ -348,6 +337,7 @@ p 'list_break'
   end
 
   def end_of_quote(n)
+    list_break
     @array    = @array.find_upper_or_equal(n.level)
     @str_node = if n.level > 0
                   Intermediate::QuoteNode.new(n.str)
@@ -358,23 +348,22 @@ p 'list_break'
     @baseline = n.level
   end
 
+  # FIXME: level + offset should be merged to level
   def visit_list_item(n, list_class, list_item_class)
-    str_block_break
-
     @str_node = Intermediate::StrNode.new(n.str)
     list_item = list_item_class.new
     list_item.add(@str_node)
 
     # when same level, add to curr_list
-    if @list_item && list_level == n.level
+    if @list_item && list_level == n.level + n.offset
       vs_debug('same level', n.str, 'visit_list_item')
       @list_item.parent.add(list_item)
 
     # when list points to upper or nil and parses lower(=nested) list,
     # build new list node under the upper and shift list to it:
-    elsif !@list_item || list_level < n.level
+    elsif !@list_item || list_level < n.level + n.offset
       vs_debug('deeper level', n.str, 'visit_list_item')
-      new_list  = list_class.new(n.level)
+      new_list  = list_class.new(n.level + n.offset)
       add_list_to_array(new_list)
       new_list.add(list_item)
 
@@ -382,12 +371,11 @@ p 'list_break'
     # build new node under it, and shift list to it:
     else
       vs_debug('shallow level', n.str, 'visit_list_item')
-      parent_list = @list_item.parent.find_upper_or_equal(n.level)
+      parent_list = @list_item.parent.find_upper_or_equal(n.level + n.offset)
       parent_list.add(list_item)
     end
     @array    = @list_item  = list_item
-    @baseline = n.level
-    @offset   = n.offset
+    @baseline = n.level + n.offset
   end
 
   # if array is Header, add to it.
