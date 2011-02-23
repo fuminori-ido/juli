@@ -66,12 +66,12 @@ class ParserTest < Test::Unit::TestCase
   def test_line_break
     t = build_tree_on('t008.txt')
 
-    # [d d o o o o q h]
+    # [s o o o o q h]
     #
-    # Where, d = default, o = ordered list, q = quote, h = header
-    assert_equal 8, t.array.size
-    assert_equal Juli::Intermediate::QuoteNode,   t.array[6].class
-    assert_equal Juli::Intermediate::HeaderNode,  t.array[7].class
+    # Where, s = str, o = ordered list, q = quote, h = header
+    assert_equal 7, t.array.size
+    assert_equal Juli::Intermediate::QuoteNode,   t.array[5].class
+    assert_equal Juli::Intermediate::HeaderNode,  t.array[6].class
   end
 
   def test_quote_or_nested_list
@@ -83,7 +83,7 @@ class ParserTest < Test::Unit::TestCase
   def test_quote_in_list
     t = build_tree_on('t016.txt')
     assert_equal 3, t.array.size
-    assert_match /a.*b.*c/, t.array[1].array[0].array[1].str
+    assert_match /a.*b.*c/m, t.array[1].array[0].array[1].str
   end
 
   def test_quote_and_normal

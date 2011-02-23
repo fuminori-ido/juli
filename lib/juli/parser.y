@@ -206,7 +206,10 @@ class TreeBuilder < Absyn::Visitor
     @header     = @root
     @list_item  = nil
     @array      = @root   # points to header, list, or even list-item
-    @str_node   = Intermediate::ParagraphNode.new; @root.add(@str_node)
+
+    # str_node is a buffer.  Adding to node tree is differred
+    # as possible.
+    @str_node   = Intermediate::ParagraphNode.new; #@root.add(@str_node)
     @baseline   = 0
     @offset     = 0       # FIXME: not used now (always zero)
   end
@@ -224,6 +227,7 @@ class TreeBuilder < Absyn::Visitor
   def visit_string(n)
     vs_debug("#{@baseline} #{@offset} #{n.level}", '')
     if @baseline + @offset < n.level
+      str_node_break
       vs_debug('beginning of quote', n.str)
       @str_node = Intermediate::QuoteNode.new(n.str)
       @array.add(@str_node)
@@ -301,7 +305,7 @@ class TreeBuilder < Absyn::Visitor
 
   # flush every buffer
   def visit_end(n)
-    list_break
+    str_node_break
   end
 
 private
@@ -313,10 +317,24 @@ private
   def vs_debug(tag, str, method='visit_string')
     return if !ENV['DEBUG']
 
-    printf("%-20.20s %-20.20s %s\n",
+    printf("%-20.20s %-20.20s '%s'\n",
         method,
         tag,
         str_limit(str).gsub(/\n/, '\n'))
+  end
+
+  # str_node_break is called when:
+  # 1. beginning of quote
+  # 1. 
+  #
+  # When parent is not set, add to @array.
+  # (There is a case parent is already set when it is list item)
+  def str_node_break
+    vs_debug('', @str_node.str, 'str_node_break')
+    if @str_node.str !~ /\A\s*\z/m && !@str_node.parent
+      @array.add(@str_node)
+      vs_debug('↑add to parent', '', 'str_node_break')
+    end
   end
 
   def list_level
@@ -325,14 +343,13 @@ private
 
   # action on end of list
   def list_break
+    str_node_break
     vs_debug('', '', 'list_break')
     return if !@list_item
 
     @list_item  = nil
     @array      = @header
-
-    # same as TreeBuilder#initialize
-    @str_node   = Intermediate::ParagraphNode.new; @array.add(@str_node)
+    @str_node   = Intermediate::ParagraphNode.new;
     @baseline   = 0
   end
 
@@ -344,12 +361,13 @@ private
                 else
                   Intermediate::ParagraphNode.new(n.str)
                 end
-    @array.add(@str_node)
+   #@array.add(@str_node)
     @baseline = n.level
   end
 
   # FIXME: level + offset should be merged to level
   def visit_list_item(n, list_class, list_item_class)
+    str_node_break
     @str_node = Intermediate::StrNode.new(n.str)
     list_item = list_item_class.new
     list_item.add(@str_node)
@@ -422,9 +440,9 @@ private
         yield :H,       $1.length
         yield :STRING,  $2
       when /^(\s*)(\d+\.\s+)(.*)$/
-        yield :ORDERED_LIST_ITEM, [$1.length, $2.length, $3]
+        yield :ORDERED_LIST_ITEM, [$1.length, $2.length, $3 + "\n"]
       when /^(\s*)(\*\s+)(.*)$/
-        yield :UNORDERED_LIST_ITEM, [$1.length, $2.length, $3]
+        yield :UNORDERED_LIST_ITEM, [$1.length, $2.length, $3 + "\n"]
       when /^(\S.*)::\s*(.*)$/
         yield :DT, $1
         yield :STRING, $2

@@ -67,7 +67,8 @@ both::        t001 and t002 are linked.
 * t012          continued list(2)
 * t013          continued list(3)
 * t014          continued list(4) bug
-* t015          quote in list bug
+* t015          list item then string without whiteline
+* t016          quote in list bug
 
 = SEE ALSO
 

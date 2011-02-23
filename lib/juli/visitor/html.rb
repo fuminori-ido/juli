@@ -193,7 +193,8 @@ module Juli::Visitor
     end
 
     def visit_quote(n)
-      content_tag(:blockquote, content_tag(:pre, n.str))
+      # trim last white spaces at generating phase
+      content_tag(:blockquote, content_tag(:pre, n.str.gsub(/\s+\z/m, '')))
     end
 
   private

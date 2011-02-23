@@ -16,17 +16,17 @@ module Juli::Visitor
 
     def visit_string(n)
       print_depth
-      printf "str:  %s\n", str_limit(n.str.gsub(/\n/, ''))
+      printf "str:  %s\n", str_limit(n.str.gsub(/\n/, '\n'))
     end
 
     def visit_wikiname(n)
       print_depth
-      printf "wiki: %s\n", str_limit(n.str.gsub(/\n/, ''))
+      printf "wiki: %s\n", str_limit(n.str.gsub(/\n/, '\n'))
     end
 
     def visit_url(n)
       print_depth
-      printf "url:  %s\n", str_limit(n.str.gsub(/\n/, ''))
+      printf "url:  %s\n", str_limit(n.str.gsub(/\n/, '\n'))
     end
   end
 

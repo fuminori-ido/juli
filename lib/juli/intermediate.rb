@@ -40,9 +40,8 @@ module Juli::Intermediate
   end
 
   class QuoteNode < StrNode
-    # trim last white spaces
     def initialize(str = '')
-      @str = str.gsub(/\s+\z/m, '')
+      super
     end
 
     def accept(visitor)
@@ -96,7 +95,6 @@ module Juli::Intermediate
     #   1. c              | | item(b)
     #                     | item(c)
     def find_upper_or_equal(level)
-      p "  #{self.class.to_s}.find_upper_or_equal(#{level})"
       if self.level <= level
         self
       else
