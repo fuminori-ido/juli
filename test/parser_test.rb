@@ -69,9 +69,9 @@ class ParserTest < Test::Unit::TestCase
     # [s o o o o q h]
     #
     # Where, s = str, o = ordered list, q = quote, h = header
-    assert_equal 7, t.array.size
-    assert_equal Juli::Intermediate::QuoteNode,   t.array[5].class
-    assert_equal Juli::Intermediate::HeaderNode,  t.array[6].class
+    assert_equal 8, t.array.size
+    assert_equal Juli::Intermediate::QuoteNode,   t.array[6].class
+    assert_equal Juli::Intermediate::HeaderNode,  t.array[7].class
   end
 
   def test_quote_or_nested_list
@@ -127,6 +127,26 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 2,         t.array.size
     assert_equal 2,         t.array[0].array.size
     assert_match /^c\s*$/,  t.array[1].str
+  end
+
+  def test_str_node_break_on_sub_header
+    t = build_tree_on('t018.txt')
+    assert_equal 1,         t.array.size
+    assert_match /^hi\s*$/, t.array[0].array[0].str
+    assert_match /^ho\s*$/, t.array[0].array[1].array[0].str
+  end
+
+  def test_paragraph_break_on_whiteline
+    t = build_tree_on('t019.txt')
+    assert_equal 2,         t.array.size
+    assert_match /^a\s*$/,  t.array[0].str
+    assert_match /^b\s*$/,  t.array[1].str
+  end
+
+  def test_nested_header
+    t = build_tree_on('t020.txt')
+    assert_equal 1,         t.array.size
+    assert_match /will be/, t.array[0].array[2].str
   end
 
 private

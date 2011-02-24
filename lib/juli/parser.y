@@ -90,16 +90,13 @@ module Juli::Absyn
   end
 
   #   |   1. HelloWorld
-  #    <-><-><-----------
-  #             str
-  #       offset
-  #    level
+  #    <----><-----------
+  #    level    str
   class OrderedListItem < Node
-    attr_accessor :level, :offset, :str
+    attr_accessor :level, :str
   
-    def initialize(level, offset, str)
+    def initialize(level, str)
       @level  = level
-      @offset = offset
       @str    = str
     end
   
@@ -109,16 +106,13 @@ module Juli::Absyn
   end
 
   #   |   *  HelloWorld
-  #    <-><-><-----------
-  #             str
-  #       offset
-  #    level
+  #    <----><-----------
+  #    level    str
   class UnorderedListItem < Node
-    attr_accessor :level, :offset, :str
+    attr_accessor :level, :str
   
-    def initialize(level, offset, str)
+    def initialize(level, str)
       @level  = level
-      @offset = offset
       @str    = str
     end
   
@@ -193,9 +187,9 @@ end
 # === Baseline
 # Same concept as rdtools.  It is indent or offset from beginnig of a line.
 # When:
-# list level + offset == string level:  continue of list
-# list level + offset <  string level:  quote in the list
-# list level + offset >  string level:  end of list and begin quote
+# list level == string level:  continue of list
+# list level <  string level:  quote in the list
+# list level >  string level:  end of list and begin quote
 # 
 class TreeBuilder < Absyn::Visitor
   def initialize
@@ -207,11 +201,10 @@ class TreeBuilder < Absyn::Visitor
     @list_item  = nil
     @array      = @root   # points to header, list, or even list-item
 
-    # str_node is a buffer.  Adding to node tree is differred
-    # as possible.
-    @str_node   = Intermediate::ParagraphNode.new; #@root.add(@str_node)
+    # NOTE: str_node is a buffer.  Adding to node tree is differred
+    # as possible since there is no actual string right now.
+    @str_node   = Intermediate::ParagraphNode.new
     @baseline   = 0
-    @offset     = 0       # FIXME: not used now (always zero)
   end
 
   def root
@@ -225,23 +218,35 @@ class TreeBuilder < Absyn::Visitor
   end
 
   def visit_string(n)
-    vs_debug("#{@baseline} #{@offset} #{n.level}", '')
-    if @baseline + @offset < n.level
+    vs_debug("start #{@baseline} to #{n.level}", '')
+    if @baseline < n.level
       str_node_break
       vs_debug('beginning of quote', n.str)
-      @str_node = Intermediate::QuoteNode.new(n.str)
-      @array.add(@str_node)
+      @str_node = Intermediate::QuoteNode.new(n.str); @array.add(@str_node)
       @baseline = n.level
-    elsif @baseline + @offset == n.level
+    elsif @baseline == n.level
       vs_debug('same baseline', n.str)
       @str_node.concat(n.str)
     else
       vs_debug('end of quote', n.str)
-      end_of_quote(n)
+      list_break
+#      @array    = @array.find_upper_or_equal(n.level)
+      vs_debug('add to array',  @array.class.to_s.split('::').last +
+                                "level(#{@array.level})")
+      @str_node = if n.level > 0
+                    Intermediate::QuoteNode.new(n.str)
+                  else
+                    Intermediate::ParagraphNode.new(n.str)
+                  end
+
+      # NOTE: add to parent here since n.str exists
+      @array.add(@str_node)
+      @baseline = n.level
     end
   end
 
   def visit_header(n)
+    vs_debug('', n.str, 'visit_header')
     list_break
     new_node = Intermediate::HeaderNode.new(n)
 
@@ -268,6 +273,10 @@ class TreeBuilder < Absyn::Visitor
       @header.find_upper(n.level).add(new_node)
     end
     @array = @header = new_node
+
+    # NOTE: Adding to node tree is differred
+    # as possible since there is no actual string right now.
+    @str_node   = Intermediate::ParagraphNode.new
   end
 
   def visit_ordered_list_item(n)
@@ -325,17 +334,23 @@ private
 
   # str_node_break is called when:
   # 1. beginning of quote
-  # 1. 
+  # 1. list break
+  # 1. end of input file
   #
-  # When parent is not set, add to @array.
-  # (There is a case parent is already set when it is list item)
+  # to do:
+  # 1. if parent is not set, add to @array.
+  #    This happens for example at the beginning of text.
+  # 1. create new str_node
   def str_node_break
-    vs_debug('', @str_node.str, 'str_node_break')
     if @str_node.str !~ /\A\s*\z/m && !@str_node.parent
       @array.add(@str_node)
-      vs_debug('↑add to parent', '', 'str_node_break')
+      vs_debug('add to parent:', @str_node.str, 'str_node_break')
     end
+
+    @str_node = Intermediate::ParagraphNode.new
   end
+
+  # FIXME: Intermediate::ParagraphNode and QuoteNode maybe merged?
 
   def list_level
     @list_item.parent.level
@@ -353,19 +368,6 @@ private
     @baseline   = 0
   end
 
-  def end_of_quote(n)
-    list_break
-    @array    = @array.find_upper_or_equal(n.level)
-    @str_node = if n.level > 0
-                  Intermediate::QuoteNode.new(n.str)
-                else
-                  Intermediate::ParagraphNode.new(n.str)
-                end
-   #@array.add(@str_node)
-    @baseline = n.level
-  end
-
-  # FIXME: level + offset should be merged to level
   def visit_list_item(n, list_class, list_item_class)
     str_node_break
     @str_node = Intermediate::StrNode.new(n.str)
@@ -373,15 +375,15 @@ private
     list_item.add(@str_node)
 
     # when same level, add to curr_list
-    if @list_item && list_level == n.level + n.offset
+    if @list_item && list_level == n.level
       vs_debug('same level', n.str, 'visit_list_item')
       @list_item.parent.add(list_item)
 
     # when list points to upper or nil and parses lower(=nested) list,
     # build new list node under the upper and shift list to it:
-    elsif !@list_item || list_level < n.level + n.offset
+    elsif !@list_item || list_level < n.level
       vs_debug('deeper level', n.str, 'visit_list_item')
-      new_list  = list_class.new(n.level + n.offset)
+      new_list  = list_class.new(n.level)
       add_list_to_array(new_list)
       new_list.add(list_item)
 
@@ -389,11 +391,11 @@ private
     # build new node under it, and shift list to it:
     else
       vs_debug('shallow level', n.str, 'visit_list_item')
-      parent_list = @list_item.parent.find_upper_or_equal(n.level + n.offset)
+      parent_list = @list_item.parent.find_upper_or_equal(n.level)
       parent_list.add(list_item)
     end
     @array    = @list_item  = list_item
-    @baseline = n.level + n.offset
+    @baseline = n.level
   end
 
   # if array is Header, add to it.
@@ -440,9 +442,9 @@ private
         yield :H,       $1.length
         yield :STRING,  $2
       when /^(\s*)(\d+\.\s+)(.*)$/
-        yield :ORDERED_LIST_ITEM, [$1.length, $2.length, $3 + "\n"]
+        yield :ORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
       when /^(\s*)(\*\s+)(.*)$/
-        yield :UNORDERED_LIST_ITEM, [$1.length, $2.length, $3 + "\n"]
+        yield :UNORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
       when /^(\S.*)::\s*(.*)$/
         yield :DT, $1
         yield :STRING, $2

@@ -1,0 +1,6 @@
+= A
+Example:
+  a:Hello world
+will be:
+  b:Hello world
+== B

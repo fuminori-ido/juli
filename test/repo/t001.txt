@@ -69,6 +69,10 @@ both::        t001 and t002 are linked.
 * t014          continued list(4) bug
 * t015          list item then string without whiteline
 * t016          quote in list bug
+* t017          continued list(5)
+* t018          nested header and paragraph
+* t019          whiteline
+* t020          nested header and paragraph(2)
 
 = SEE ALSO
 
