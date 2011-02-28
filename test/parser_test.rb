@@ -149,6 +149,14 @@ class ParserTest < Test::Unit::TestCase
     assert_match /will be/, t.array[0].array[2].str
   end
 
+  # v0.06.00 feature
+  def test_quote_in_list
+    t = build_tree_on('t021.txt')
+    assert_equal 1,         t.array.size
+    assert_equal 2,         t.array[0].array.size
+    assert_equal 3,         t.array[0].array[0].array.size
+  end
+
 private
   # return full path of test data file.
   def data_path(filename)

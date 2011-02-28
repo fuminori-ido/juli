@@ -413,6 +413,24 @@ will be:
 
 (Where, '|' above is to avoid deleting spaces.  Please ignore it.)
 
+=== Block Quote and List
+
+Block Quote can be written in list.
+
+Example:
+
+  |1. A
+  |     B
+  |   What did you do?
+  |1. C
+
+will be:
+
+1. A
+     B
+   What did you do?
+1. C
+
 == URL autolink
 
 When text contains URL like http://..., it is automatically hyperlinked.

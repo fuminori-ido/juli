@@ -76,34 +76,9 @@ module Juli::Intermediate
       end
     end
 
-    # find upper or equal node than the 'level'
-    #
-    # NOTE: use find_upper() to find parent header while use
-    # find_upper_or_equal() to find parent list because
-    # header is added under parent while list item is added at the same
-    # level of list as follows:
-    #
-    # Header:
-    #   = a             H(a)
-    #   == b        ->    | H(b)
-    #   = c             H(c)
-    #
-    # List:
-    #                   List
-    #   1. a              | item(a)
-    #     1. b      ->    | List
-    #   1. c              | | item(b)
-    #                     | item(c)
-    def find_upper_or_equal(level)
-      if self.level <= level
-        self
-      else
-        if parent
-          parent.find_upper_or_equal(level)
-        else
-          raise "No parent node"
-        end
-      end
+    # fallback when no list parent on list.find_list
+    def find_list(level)
+      self
     end
   end
 
@@ -138,7 +113,7 @@ module Juli::Intermediate
 
   # abstract List.
   #
-  # find_upper_or_equal() is Array method because to find parent
+  # find_list() is Array method because to find parent
   # even if string is the following level:
   #
   #   |1. list item
@@ -150,6 +125,37 @@ module Juli::Intermediate
   class List < ArrayNode
     def initialize(level)
       super(level)
+    end
+    # find upper or equal *list* node than the 'level'
+    #
+    # NOTE: use find_upper() to find parent header while use
+    # find_upper_list() to find parent *list* but implement here because:
+    #
+    # 1. header is added under parent while list item is added at the same
+    #    level of list as follows:
+    #
+    #
+    # Header:
+    #   = a             H(a)
+    #   == b        ->    | H(b)
+    #   = c             H(c)
+    #
+    # List:
+    #                   List
+    #   1. a              | item(a)
+    #     1. b      ->    | List
+    #   1. c              | | item(b)
+    #                     | item(c)
+    def find_list(level)
+      if self.level <= level
+        self
+      else
+        if parent
+          parent.find_list(level)
+        else
+          raise "No parent node"
+        end
+      end
     end
   end
 
@@ -165,13 +171,15 @@ module Juli::Intermediate
 
   # ListItem is also an array-node, but it consists from only
   # StrNode and QuoteNode.
+  #
+  # ListItem has also level to track depth of child string.
   class ListItem < ArrayNode
-    def initialize
-      super(0)
+    def initialize(level)
+      super(level)
     end
 
-    def find_upper_or_equal(level)
-      parent.find_upper_or_equal(level)
+    def find_list(level)
+      parent.find_list(level)
     end
   end
 

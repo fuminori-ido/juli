@@ -219,6 +219,8 @@ class TreeBuilder < Absyn::Visitor
 
   def visit_string(n)
     vs_debug("start #{@baseline} to #{n.level}", '')
+    vs_debug('array is: ',  @array.class.to_s.split('::').last +
+                                " level-#{@array.level}")
     if @baseline < n.level
       str_node_break
       vs_debug('beginning of quote', n.str)
@@ -229,16 +231,30 @@ class TreeBuilder < Absyn::Visitor
       @str_node.concat(n.str)
     else
       vs_debug('end of quote', n.str)
-      list_break
-#      @array    = @array.find_upper_or_equal(n.level)
+
+      # break list(= discard current @array) if n level is upper
+      # than @array.level.
+      list_break if n.level < @array.level
+
+      case @array
+      when Intermediate::ListItem
+        @str_node = if n.level > @array.level
+                      Intermediate::QuoteNode.new(n.str)
+                    else
+                      Intermediate::ParagraphNode.new(n.str)
+                    end
+      when Intermediate::HeaderNode
+        @str_node = if n.level > 0
+                      Intermediate::QuoteNode.new(n.str)
+                    else
+                      Intermediate::ParagraphNode.new(n.str)
+                    end
+      else
+        raise "unknown array on end of quote"
+      end
+
       vs_debug('add to array',  @array.class.to_s.split('::').last +
                                 "level(#{@array.level})")
-      @str_node = if n.level > 0
-                    Intermediate::QuoteNode.new(n.str)
-                  else
-                    Intermediate::ParagraphNode.new(n.str)
-                  end
-
       # NOTE: add to parent here since n.str exists
       @array.add(@str_node)
       @baseline = n.level
@@ -371,7 +387,7 @@ private
   def visit_list_item(n, list_class, list_item_class)
     str_node_break
     @str_node = Intermediate::StrNode.new(n.str)
-    list_item = list_item_class.new
+    list_item = list_item_class.new(n.level)
     list_item.add(@str_node)
 
     # when same level, add to curr_list
@@ -391,7 +407,7 @@ private
     # build new node under it, and shift list to it:
     else
       vs_debug('shallow level', n.str, 'visit_list_item')
-      parent_list = @list_item.parent.find_upper_or_equal(n.level)
+      parent_list = @list_item.parent.find_list(n.level)
       parent_list.add(list_item)
     end
     @array    = @list_item  = list_item
