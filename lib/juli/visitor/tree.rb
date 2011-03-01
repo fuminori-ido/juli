@@ -41,20 +41,31 @@ module Juli::Visitor
       super
     end
   
-    def visit_paragraph(n)
-      print_depth
-      printf("Paragraph\n")
-      @depth += 1
-      process_str(n.str)
-      @depth -= 1
-    end
-
     def visit_str(n)
       print_depth
-      printf("StrNode\n")
-      @depth += 1
-      process_str(n.str)
-      @depth -= 1
+      printf("StrNode(%d)\n", n.level)
+      case n.parent
+      when Juli::Intermediate::ListItem
+        if n.level > n.parent.level
+          # quote
+          printf("quote: %s\n", str_limit(n.str).gsub(/\n/m, '<\n>'))
+        else
+          # just string
+          @depth += 1
+          process_str(n.str)
+          @depth -= 1
+        end
+      else
+        if n.level > 0
+          # quote
+          printf("quote: %s\n", str_limit(n.str).gsub(/\n/m, '<\n>'))
+        else
+          # paragraph
+          @depth += 1
+          process_str(n.str)
+          @depth -= 1
+        end
+      end
     end
 
     def visit_header(n)

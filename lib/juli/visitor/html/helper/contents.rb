@@ -6,14 +6,13 @@ module Juli::Visitor::Html::Helper
       include Juli::Visitor::Html::Helper
   
       def visit_node(n); ''; end
-      def visit_paragraph(n); ''; end
+      def visit_str(n); ''; end
       def visit_ordered_list(n); ''; end
       def visit_ordered_list_item(n); ''; end
       def visit_unordered_list(n); ''; end
       def visit_unordered_list_item(n); ''; end
       def visit_dictionary_list(n); ''; end
       def visit_dictionary_list_item(n); ''; end
-      def visit_quote(n); ''; end
   
       def visit_header(n)
         if n.level > 0

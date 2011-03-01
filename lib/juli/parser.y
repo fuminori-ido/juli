@@ -203,7 +203,8 @@ class TreeBuilder < Absyn::Visitor
 
     # NOTE: str_node is a buffer.  Adding to node tree is differred
     # as possible since there is no actual string right now.
-    @str_node   = Intermediate::ParagraphNode.new
+    @str_node   = Intermediate::StrNode.new
+    @in_quote   = false
     @baseline   = 0
   end
 
@@ -224,7 +225,8 @@ class TreeBuilder < Absyn::Visitor
     if @baseline < n.level
       str_node_break
       vs_debug('beginning of quote', n.str)
-      @str_node = Intermediate::QuoteNode.new(n.str); @array.add(@str_node)
+      @in_quote = true
+      @str_node = Intermediate::StrNode.new(n.str, n.level); @array.add(@str_node)
       @baseline = n.level
     elsif @baseline == n.level
       vs_debug('same baseline', n.str)
@@ -236,22 +238,15 @@ class TreeBuilder < Absyn::Visitor
       # than @array.level.
       list_break if n.level < @array.level
 
-      case @array
-      when Intermediate::ListItem
-        @str_node = if n.level > @array.level
-                      Intermediate::QuoteNode.new(n.str)
-                    else
-                      Intermediate::ParagraphNode.new(n.str)
-                    end
-      when Intermediate::HeaderNode
-        @str_node = if n.level > 0
-                      Intermediate::QuoteNode.new(n.str)
-                    else
-                      Intermediate::ParagraphNode.new(n.str)
-                    end
-      else
-        raise "unknown array on end of quote"
-      end
+      @in_quote = case @array
+                  when Intermediate::ListItem
+                    n.level > @array.level
+                  when  Intermediate::HeaderNode
+                    n.level > 0
+                  else
+                    false
+                  end
+      @str_node = Intermediate::StrNode.new(n.str, n.level)
 
       vs_debug('add to array',  @array.class.to_s.split('::').last +
                                 "level(#{@array.level})")
@@ -292,7 +287,8 @@ class TreeBuilder < Absyn::Visitor
 
     # NOTE: Adding to node tree is differred
     # as possible since there is no actual string right now.
-    @str_node   = Intermediate::ParagraphNode.new
+    @str_node = Intermediate::StrNode.new
+    @in_quote = false
   end
 
   def visit_ordered_list_item(n)
@@ -335,7 +331,7 @@ class TreeBuilder < Absyn::Visitor
 
 private
   def in_quote?
-    @str_node && @str_node.class == Intermediate::QuoteNode
+    @in_quote
   end
 
   # print debug info when DEBUG environment is set.
@@ -363,10 +359,9 @@ private
       vs_debug('add to parent:', @str_node.str, 'str_node_break')
     end
 
-    @str_node = Intermediate::ParagraphNode.new
+    @str_node = Intermediate::StrNode.new
+    @in_quote = false
   end
-
-  # FIXME: Intermediate::ParagraphNode and QuoteNode maybe merged?
 
   def list_level
     @list_item.parent.level
@@ -380,7 +375,8 @@ private
 
     @list_item  = nil
     @array      = @header
-    @str_node   = Intermediate::ParagraphNode.new;
+    @str_node   = Intermediate::StrNode.new
+    @in_quote   = false
     @baseline   = 0
   end
 

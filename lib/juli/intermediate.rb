@@ -14,10 +14,11 @@ module Juli::Intermediate
   #
   # StrNode is also an element of ListItem
   class StrNode < Node
-    attr_accessor :str
+    attr_accessor :str, :level
 
-    def initialize(str)
-      @str = str
+    def initialize(str = '', level = 0)
+      @str    = str
+      @level  = level
     end
 
     def concat(str)
@@ -29,26 +30,6 @@ module Juli::Intermediate
     end
   end
 
-  class ParagraphNode < StrNode
-    def initialize(str = '')
-      super
-    end
-
-    def accept(visitor)
-      visitor.visit_paragraph(self)
-    end
-  end
-
-  class QuoteNode < StrNode
-    def initialize(str = '')
-      super
-    end
-
-    def accept(visitor)
-      visitor.visit_quote(self)
-    end
-  end
-  
   class ArrayNode < Node
     attr_accessor :array, :level
 
@@ -274,7 +255,6 @@ module Juli::Intermediate
     # === INPUTS
     # n:: Intermediate node
     def visit_node(n); end
-    def visit_paragraph(n); end
     def visit_str(n); end
     def visit_header(n); end
     def visit_ordered_list(n); end
@@ -283,6 +263,5 @@ module Juli::Intermediate
     def visit_unordered_list_item(n); end
     def visit_dictionary_list(n); end
     def visit_dictionary_list_item(n); end
-    def visit_quote(n); end
   end
 end

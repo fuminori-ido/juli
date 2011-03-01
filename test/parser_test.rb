@@ -1,6 +1,5 @@
 require 'test_helper'
 
-
 class ParserTest < Test::Unit::TestCase
   def setup
     #$stdout = File.open('/dev/null', 'w')
@@ -70,7 +69,7 @@ class ParserTest < Test::Unit::TestCase
     #
     # Where, s = str, o = ordered list, q = quote, h = header
     assert_equal 8, t.array.size
-    assert_equal Juli::Intermediate::QuoteNode,   t.array[6].class
+    assert_equal Juli::Intermediate::StrNode,     t.array[6].class
     assert_equal Juli::Intermediate::HeaderNode,  t.array[7].class
   end
 
@@ -89,8 +88,8 @@ class ParserTest < Test::Unit::TestCase
   def test_quote_and_normal
     t = build_tree_on('t010.txt')
     assert_equal 4, t.array.size
-    assert_equal Juli::Intermediate::ParagraphNode, t.array[2].class
-    assert_equal Juli::Intermediate::QuoteNode,   t.array[3].class
+    assert_equal Juli::Intermediate::StrNode, t.array[2].class
+    assert_equal Juli::Intermediate::StrNode,   t.array[3].class
   end
 
   def test_continued_list

@@ -136,14 +136,27 @@ module Juli::Visitor
       printf("generated:       %s\n", out_filename(in_file))
     end
   
-    def visit_paragraph(n)
-      content_tag(:p, :class=>'default') do
-        str2html(n.str)
-      end
-    end
-
     def visit_str(n)
-      str2html(n.str)
+      case n.parent
+      when Juli::Intermediate::ListItem
+        if n.level > n.parent.level
+          # quote; trim last white spaces at generating phase
+          content_tag(:blockquote, content_tag(:pre, n.str.gsub(/\s+\z/m, '')))
+        else
+          # just string (no quote, no paragraph)
+          str2html(n.str)
+        end
+      else
+        if n.level > 0
+          # quote; trim last white spaces at generating phase
+          content_tag(:blockquote, content_tag(:pre, n.str.gsub(/\s+\z/m, '')))
+        else
+          # paragraph
+          content_tag(:p, :class=>'default') do
+            str2html(n.str)
+          end
+        end
+      end
     end
   
     def visit_header(n)
@@ -190,11 +203,6 @@ module Juli::Visitor
         content_tag(:td, str2html(n.term) + ':') +
         content_tag(:td, str2html(n.str))
       end
-    end
-
-    def visit_quote(n)
-      # trim last white spaces at generating phase
-      content_tag(:blockquote, content_tag(:pre, n.str.gsub(/\s+\z/m, '')))
     end
 
   private
