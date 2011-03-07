@@ -488,6 +488,7 @@ Bad Example:
 1. Wiki
   1. support subdirectory
 1. screen shot or some explanation of 'BEFORE-AFTER'
+1. merge je(1) and juli(1)
 1. japanese doc
 1. include, more HTML extention for table support
 1. PDF generator

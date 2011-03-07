@@ -32,17 +32,17 @@ JULI::      for debug (only for developer)
 1. create juli repository also
     $ juli init
 1. From any directory without worry about current working directory, just run followings to memo your idea:
-  $ je Eureka!
+    $ je Eureka!
 1. After saving the file by your editor, git asks to enter commit message as follows:
-  # Please enter the commit message for your changes. Lines starting
-  # with '#' will be ignored, and an empty message aborts the commit.
-  #   :
-  diff --git ...
-  (you can see your change of this text here)
+    # Please enter the commit message for your changes. Lines starting
+    # with '#' will be ignored, and an empty message aborts the commit.
+    #   :
+    diff --git ...
+    (you can see your change of this text here)
 1. You can ignore to enter any comment by just exiting the editor. Then, git aborts continued process(record your change) but juli generates HTML.
 1. Or it would be better to enter comment so you can track what you did on this change.
 1. Anyway, you can see the generated HTML file by any browser like this:
-  $ firefox file:///...
+    $ firefox file:///...
 
 == Example
    $ je HelloWorld                             # edit HelloWorld wikipage
