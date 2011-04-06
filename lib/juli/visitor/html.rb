@@ -207,7 +207,6 @@ module Juli::Visitor
 
   private
     HELPER = [
-      Juli::Visitor::Html::Helper::RecentUpdate,
       Juli::Visitor::Html::Helper::Contents
     ]
 
