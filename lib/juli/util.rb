@@ -43,11 +43,14 @@ COMMAND (default = gen):
   init
   gen  
   sitemap             generate sitemap to $JULI_REPO/sitemap.html
+  recent_update       generate reent updates to $JULI_REPO/recent_update.html
 
 command_options for:
   init:
     -o output_top     default='./html/'
     -t template       template at lib/juli/template/ (default='default')
+    -e ext            generating html file extention (default='.shtml')
+
   gen:
     -g generator      specify generator (#{visitor_list}) default=html
     -f                force generate
@@ -124,7 +127,7 @@ EOM
     # diary/2010/12/31.txt -> OUTPUT_TOP/diary/2010/12/31.html
     #
     def out_filename(in_filename)
-      File.join(conf['output_top'], in_filename.gsub(/\.[^\.]*/,'') + '.html')
+      File.join(conf['output_top'], in_filename.gsub(/\.[^\.]*/,'') + '.shtml')
     end
     module_function :out_filename
 

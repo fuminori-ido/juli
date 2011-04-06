@@ -127,7 +127,7 @@ module Juli::Visitor
       sitemap     = relative_from(in_file, 'sitemap.html')
       body        = root.accept(self)
       erb         = ERB.new(File.read(File.join(Juli::TEMPLATE_PATH,
-                        conf['template']) + '.html'))
+                        conf['template'] + '.html')))
       out_path    = out_filename(in_file)
       mkdir(out_path)
       File.open(out_path, 'w') do |f|
@@ -309,7 +309,7 @@ module Juli::Visitor
       # When correspondent file of OUTPUT_TOP/.../f doesn't exist in repo,
       # and not in EXCEPTION list above, delete it.
       Dir.chdir(conf['output_top']){
-        Dir.glob('**/*.html'){|f|
+        Dir.glob('**/*' + conf['ext']){|f|
           next if EXCEPTION[f]
           in_file = File.join(juli_repo, in_filename(f))
           if !File.exist?(in_file) && !File.exist?(in_file + '.txt')

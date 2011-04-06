@@ -1,5 +1,6 @@
 require 'juli/util'
 require 'juli/parser.tab'
+require 'juli/command/recent_update'
 
 module Juli
   # This is a top level module for juli(1) command execution.
@@ -11,15 +12,40 @@ module Juli
     # dispatched to each method.
     def run(command_str, opts = {})
       case command_str
-      when 'init';    init(opts)
-      when 'gen';     gen(opts)
-      when 'sitemap'; sitemap(opts)
+      when 'init';          init(opts)
+      when 'gen';           gen(opts)
+      when 'sitemap';       sitemap(opts)
+      when 'recent_update'; Juli::Command::RecentUpdate.new.run(opts)
       else
         STDERR.print "Unknown juli command: '#{command_str}'\n\n", usage, "\n"
         raise Error
       end
     end
 
+OUTPUT_TOP_COMMENT = <<EOM
+
+# Specify output top directory (default = ../html).
+
+EOM
+TEMPLATE_COMMENT = <<EOM
+
+# Specify html template when generating (default = 'default', which 
+# means that lib/juli/template/default.html is used).
+# You can add your favorite template like
+# lib/juli/template/blue_ocean.html and specify as follows:
+#
+#   template: blue_ocean
+# 
+
+EOM
+EXT_COMMENT = <<EOM
+
+# generating file extention (default = .shtml).
+# The reason why '.shtml' is because to use SSI (server side include)
+# for recent_update.  Of course, it depends on web-server configuration and
+# you may not use SSI.  In such a case, you can change to '.html'.
+
+EOM
     # init does:
     #
     # 1. create juli-repository at the current directory, if not yet.
@@ -29,6 +55,8 @@ module Juli
     #
     # === OPTIONS
     # -o output_top
+    # -t template
+    # -e ext
     def init(opts)
       if !File.directory?(Juli::REPO)
         FileUtils.mkdir(Juli::REPO)
@@ -40,8 +68,12 @@ module Juli
       if !File.exist?(config_file)
         File.open(config_file, 'w') do |f|
           f.print "# put juli-repo config here.\n\n"
+          f.print OUTPUT_TOP_COMMENT
           write_config(f, 'output_top', opts[:o])
+          f.print TEMPLATE_COMMENT
           write_config(f, 'template',   opts[:t])
+          f.print EXT_COMMENT
+          write_config(f, 'ext',        opts[:e])
         end
       else
         STDERR.print "WARN: config file is already created\n"
@@ -75,10 +107,10 @@ module Juli
         FileUtils.mkdir(outdir) if !File.directory?(outdir)
         body = ''
         for textfile in Dir.glob('**/*.txt').sort do
-          html = textfile.gsub(/.txt$/, '.html')
+          html = textfile.gsub(/.txt$/, conf['ext'])
           body += sprintf("<a href='%s'>%s</a><br/>\n",
-                      textfile.gsub(/.txt$/, '.html'),    # url
-                      textfile.gsub(/.txt$/, ''))         # label
+                      textfile.gsub(/.txt$/, conf['ext']),  # url
+                      textfile.gsub(/.txt$/, ''))           # label
         end
 
       title       = 'Sitemap'
@@ -87,8 +119,8 @@ module Juli
       stylesheet  = 'juli.css'
       erb         = ERB.new(File.read(File.join(Juli::TEMPLATE_PATH,
                         'sitemap.html')))
-      out_path    = 'sitemap.html'
-      File.open(File.join(outdir, 'sitemap.html'), 'w') do |f|
+      out_path    = 'sitemap' + conf['ext']
+      File.open(File.join(outdir, out_path), 'w') do |f|
         f.write(erb.result(binding))
       end
       }

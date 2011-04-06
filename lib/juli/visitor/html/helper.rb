@@ -30,7 +30,7 @@ class Juli::Visitor::Html
   # 1. Write WeatherForecast helper class file as
   #    LIB/juli/visitor/html/helper/weather_forecast.rb.
   #    (recent_update.rb could be a reference for this.)
-  # 1. WeatherForecast should inherits
+  # 1. WeatherForecast should inherit
   #    Juli::Visitor::Html::Helper::AbstractHelper.
   # 1. implement each method: initialize, on_root, run.
   # 1. register the class at Juli::Visitor::Html::HELPER in 

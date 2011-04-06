@@ -37,8 +37,9 @@ Version       = Juli::VERSION
   # default option values
   OPTS    = {
     :g=>'html',
-    :o=>'./html/',
-    :t=>'default'
+    :o=>'../html/',
+    :t=>'default',
+    :e=>'.shtml'
   }
   command = 'gen'
 
