@@ -68,7 +68,7 @@ module Juli::Visitor
   
       def visit_wikiname(n)
         decoded = Juli::Wiki.decode(n.str)
-        content_tag(:a, decoded, :class=>'wiki', :href=>decoded + '.html')
+        content_tag(:a, decoded, :class=>'wiki', :href=>decoded + conf['ext'])
       end
   
       def visit_url(n)
@@ -83,10 +83,16 @@ module Juli::Visitor
     #
     # NOTE: this is executed every juli(1) run with -g html option
     # (usually 99% is so), so be careful to avoid multiple initialization.
-    #
-    # FIXME: need to check here if rsync(1) is installed
     def initialize
       super
+
+      # files here will not be deleted even if corresponding *.txt file
+      # doesn't exist.
+      @exception = {
+        'sitemap' + conf['ext']       => 1,
+        'recent_update' + conf['ext'] => 1,
+      }
+
       register_helper
 
       if !File.directory?(conf['output_top'])
@@ -124,7 +130,7 @@ module Juli::Visitor
       prototype   = relative_from(in_file, 'prototype.js')
       javascript  = relative_from(in_file, 'juli.js')
       stylesheet  = relative_from(in_file, 'juli.css')
-      sitemap     = relative_from(in_file, 'sitemap.html')
+      sitemap     = relative_from(in_file, 'sitemap' + conf['ext'])
       body        = root.accept(self)
       erb         = ERB.new(File.read(File.join(Juli::TEMPLATE_PATH,
                         conf['template'] + '.html')))
@@ -274,14 +280,12 @@ module Juli::Visitor
       }
     end
 
-    EXCEPTION = {'sitemap.html'=>1}
-
     # synchronize text file between juli-repo and OUTPUT_TOP:
     #
     # 1. new file exists, generate it.
     # 1. repo's file timestamp is newer than the one under OUTPUT_TOP, regenerate it.
     # 1. correspondent file of OUTPUT_TOP/.../f doesn't exist in repo
-    #    and not in EXCEPTION list above, delete it.
+    #    and not in @exception list above, delete it.
     # 1. if -f option is specified, don't check timestamp and always generates.
     #
     def sync_txt(opts)
@@ -306,10 +310,10 @@ module Juli::Visitor
       end
 
       # When correspondent file of OUTPUT_TOP/.../f doesn't exist in repo,
-      # and not in EXCEPTION list above, delete it.
+      # and not in @exception list above, delete it.
       Dir.chdir(conf['output_top']){
         Dir.glob('**/*' + conf['ext']){|f|
-          next if EXCEPTION[f]
+          next if @exception[f]
           in_file = File.join(juli_repo, in_filename(f))
           if !File.exist?(in_file) && !File.exist?(in_file + '.txt')
             FileUtils.rm(f)

@@ -47,7 +47,7 @@ module Juli::Command
               content_tag(:tr) do
                 content_tag(:td) do
                   content_tag(:a, f.path.gsub(/.txt$/, ''),
-                    :href=>f.path.gsub(/.txt$/, '.html')) + "\n<br/>"
+                    :href=>f.path.gsub(/.txt$/, conf['ext'])) + "\n<br/>"
                 end +
                 content_tag(:td, f.mtime.strftime('%Y/%m/%d'))
               end

@@ -56,5 +56,6 @@ run_juli(){
   if [ $new_file -eq 1 ]; then
     echo 'generate sitemap'
     run_juli sitemap
+    run_juli recent_update
   fi
   
