@@ -75,8 +75,15 @@ Wrong Example:
 -f::  force update.  Even generated HTML file is newer than source text, generate again.
 
 === sitemap
-generates sitemap.html under <i>output_top</i>/.
-je(1) supports when executes this sitemap command semi-automatically.
+generates sitemap.shtml under <i>output_top</i>/.
+je(1) supports this; when edit text by je(1), the sitemap is
+automatically generated.
+
+
+=== recent_update
+generates recent_update.shtml under <i>output_top</i>/.
+je(1) supports this; when edit text by je(1), the recent_update is
+automatically generated.
 
 = FILES
 

@@ -9,6 +9,12 @@ MY_ACCOUNT::  my login account name.
 MY_NOTE::     juli-repo directory. Example: /home/MY_ACCOUNT/juli_repo
 MY_EDITOR::   command of your favarite editor. Example: Notepad, emacs, vi, etc.
 
+Also, it is assumed EDITOR environment variable is set.  Please confirm:
+  $ echo $EDITOR
+  (vi, emacs, or any editor command should be printed)
+
+Otherwise, please set it before using je(1).
+
 = HTML publishing in your local machine
  
 This is the simplest case of juli usage; writing text, generate HTML,
@@ -17,22 +23,29 @@ and read it.
 <center><img src='tutorial/local.png'></center>
 
 1. initialize juli-repo:
-  $ mkdir MY_NOTE
-  $ cd MY_NOTE
-  $ juli init
+    $ mkdir MY_NOTE
+    $ cd MY_NOTE
+    $ juli init
+1. set $JULI_REPO environment variable for je(1):
+    $ export JULI_REPO=MY_NOTE
+   Example:
+    $ export JULI_REPO=~/my_note
+   It is recommended to set JULI_REPO at ~/.bashrc etc. also.
 1. write any memo what you want:
-  $ MY_EDITOR minutes_20110117.txt
-1. generate HTML and browse it:
-  $ juli                                        # generate HTML!
-  bulk mode                                     # brief message is displayed.
-  generated:       html/minutes_20110117.html   #   :
-  $ firefox html/minutes_20110117.html          # run firefox if it is enable
+    $ je minutes_20110117
+   Example of <a href='tutorial/text.png'>editing text</a>.
+1. After exitting your editor, generating HTML, updating sitemap and
+   recent_update list are executed:
+    bulk mode                                     # brief message is displayed.
+    generated:       html/minutes_20110117.html   #   :
+1. browse your document:
+    $ firefox ../html/minutes_20110117.html       # run firefox if it is enable
+   (output directory is '../html' in this example)
+   Generated html of the <a href='tutorial/text.png'>example above</a>
+   is looks like <a href='tutorial/generated_html.png'>this</a>.
 
 As index document explains, each filename under MY_NOTE in a document is
 automatically linked.
-
-After installing git, je(1) command provides easier way to edit &amp;
-generate HTML.  Please see it.
 
 = HTML publishing for www server in your local machine
 
@@ -46,13 +59,13 @@ Only difference is to configure web server.
 There are several ways to configure juli output_top as a web server
 directory.  Here is just one of the ways to do that in Debian/Ubuntu case.
 1. prepare httpd directory for juli output:
-  $ cd /var/www
-  $ sudo mkdir juli
-  $ sudo chown MY_ACCOUNT juli
+    $ cd /var/www
+    $ sudo mkdir juli
+    $ sudo chown MY_ACCOUNT juli
 1. initialize juli-repo:
-  $ mkdir MY_NOTE
-  $ cd MY_NOTE
-  $ juli init -o /var/www/juli
+    $ mkdir MY_NOTE
+    $ cd MY_NOTE
+    $ juli init -o /var/www/juli
 
 The remaining tasks are the same as above.
 

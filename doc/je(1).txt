@@ -13,6 +13,7 @@ je(1) does the followings:
 1. commit to git repository.
 1. run juli(1) to generate/update HTML.
 1. if wikiname is new, generate sitemap.
+1. update 'recent_update' entry.
 
 == Environment
 Following environment variables are required to be set:

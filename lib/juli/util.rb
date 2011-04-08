@@ -42,12 +42,17 @@ general_options:
 COMMAND (default = gen):
   init
   gen  
-  sitemap             generate sitemap to $JULI_REPO/sitemap.html
-  recent_update       generate reent updates to $JULI_REPO/recent_update.html
+  sitemap             generate sitemap to $JULI_REPO/sitemap.shtml
+  recent_update       generate reent updates to $JULI_REPO/recent_update.shtml
+
+                      NOTE: file extention '.shtml' above is the default.
+                      you can change it by 'init' command -e option
+                      (see below), or by modifying $JULI_REPO/.juli/config
+                      'ext' entry later anytime.
 
 command_options for:
   init:
-    -o output_top     default='./html/'
+    -o output_top     default='../html/'
     -t template       template at lib/juli/template/ (default='default')
     -e ext            generating html file extention (default='.shtml')
 
@@ -124,7 +129,7 @@ EOM
     # full path of out filename
     #
     # === EXAMPLE
-    # diary/2010/12/31.txt -> OUTPUT_TOP/diary/2010/12/31.html
+    # diary/2010/12/31.txt -> OUTPUT_TOP/diary/2010/12/31.shtml
     #
     def out_filename(in_filename)
       File.join(conf['output_top'], in_filename.gsub(/\.[^\.]*/,'') + '.shtml')
@@ -138,7 +143,7 @@ EOM
     # relative path of in-filename, but **no extention**.
     #
     # === EXAMPLE
-    # diary/2010/12/31.html -> diary/2010/12/31
+    # diary/2010/12/31.shtml -> diary/2010/12/31
     def in_filename(out_filename)
       File.join(File.dirname(out_filename), File.basename(out_filename).gsub(/\.[^\.]*/,''))
     end
