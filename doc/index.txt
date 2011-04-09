@@ -78,7 +78,7 @@ I looked for such a tool,
 <a href='http://en.wikipedia.org/wiki/Microsoft_OneNote'>OneNote</a>,
 but from keybinding point of view, those are not good...
 
-== Offline wiki + git = best solution?
+== Offline wiki + git = best solution!
 
 I know why almost all of wiki are online is because collaboration.
 However, offline editing and collaboration is already realized.
