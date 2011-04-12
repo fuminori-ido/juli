@@ -457,7 +457,7 @@ private
         yield :ORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
       when /^(\s*)(\*\s+)(.*)$/
         yield :UNORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
-      when /^(\S.*)::\s*(.*)$/
+      when /^(\S.*)::\s+(.*)$/
         yield :DT, $1
         yield :STRING, $2
       when /^(\s*)(.*)$/
