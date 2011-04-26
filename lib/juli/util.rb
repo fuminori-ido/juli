@@ -132,7 +132,8 @@ EOM
     # diary/2010/12/31.txt -> OUTPUT_TOP/diary/2010/12/31.shtml
     #
     def out_filename(in_filename)
-      File.join(conf['output_top'], in_filename.gsub(/\.[^\.]*/,'') + '.shtml')
+      File.join(conf['output_top'],
+                in_filename.gsub(/\.[^\.]*/,'') + conf['ext'])
     end
     module_function :out_filename
 
