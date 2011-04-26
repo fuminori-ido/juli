@@ -74,6 +74,7 @@ both::        t001 and t002 are linked.
 * t019          whiteline
 * t020          nested header and paragraph(2)
 * t021          quote in list (v0.06 feature)
+* t022          nested quote (found bug at v1.00.00)
 
 = SEE ALSO
 

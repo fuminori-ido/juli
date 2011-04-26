@@ -1,0 +1,36 @@
+nested quote (e.g. source program) should be in 1 quote.
+
+  current
+  quote
+
+How about the following?:
+
+  class Hello
+    def world
+      puts "Hello, World\n"
+    end
+    # blank line should be ok
+
+  private
+    def hoge
+      # do nothing
+    end
+  end
+
+1. Does the situation is the same in list?
+    class Hello
+      def world
+        puts "Hello, World\n"
+      end
+      # blank line should be ok
+  
+    private
+      def hoge
+        # do nothing
+      end
+    end
+   OK?
+1. next
+1. third
+
+Done!

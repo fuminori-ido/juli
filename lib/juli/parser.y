@@ -184,28 +184,62 @@ end
 #
 # This is the same search logic as header's.
 #
-# === Baseline
-# Same concept as rdtools.  It is indent or offset from beginnig of a line.
-# When:
-# list level == string level:  continue of list
-# list level <  string level:  quote in the list
-# list level >  string level:  end of list and begin quote
+# === Offset
+# Offset is a start point of text or list.
+#
+# For example, it is 0 in normal text, 2 in 1st level unordered list,
+# 3 in 1st level numbered list, 4 in 2nd level unordered list, ....
+# When there is the following text:
+#
+#   |Hello, World
+#   |
+#   |* Unordered list item A.
+#   |* Unordered list item B.
+#   |  * Nested Unordered list item B-1.
+#   |
+#   |1. Ordred list item A.
+#   |1. Ordred list item B.
+#
+# then, each offset is as follows:
+#
+#    0 offset in normal list:
+#
+#   |Hello, World
+#
+#   <-> 2 offset in 1st level unordred list:
+#   |
+#   |* Unordered list item A.
+#   |* Unordered list item B.
+#
+#   <---> 4 offset in 2nd level unordered list:
+#   |
+#   |  * Nested Unordered list item B-1.
+#
+#   <--> 3 offset in 1st level ordered list:
+#   |
+#   |1. Ordred list item A.
+#   |1. Ordred list item B.
+#
+# === QuoteLevel
+# It indicates quotation's start point.  Combination of Offset and QuoteLevel
+# defines the operation type.  See quote_level.ods file for more detail.
 # 
 class TreeBuilder < Absyn::Visitor
   def initialize
-    @root       = Intermediate::HeaderNode.new(0, '(root)')
+    @root         = Intermediate::HeaderNode.new(0, '(root)')
 
     # following instance vars are to keep 'current' header, list_item, 
-    # array, str_node, and baseline while parsing Absyn tree:
-    @header     = @root
-    @list_item  = nil
-    @array      = @root   # points to header, list, or even list-item
+    # array, str_node, and quote_level while parsing Absyn tree:
+    @header       = @root
+    @list_item    = nil
+    @array        = @root   # points to header, list, or even list-item
 
     # NOTE: str_node is a buffer.  Adding to node tree is differred
     # as possible since there is no actual string right now.
-    @str_node   = Intermediate::StrNode.new
-    @in_quote   = false
-    @baseline   = 0
+    @str_node     = Intermediate::StrNode.new
+    @in_quote     = false
+    @offset       = 0
+    @quote_level  = 0
   end
 
   def root
@@ -219,19 +253,23 @@ class TreeBuilder < Absyn::Visitor
   end
 
   def visit_string(n)
-    vs_debug("start #{@baseline} to #{n.level}", '')
+    vs_debug("start #{@quote_level} to #{n.level}", '')
     vs_debug('array is: ',  @array.class.to_s.split('::').last +
                                 " level-#{@array.level}")
-    if @baseline < n.level
+    if @quote_level==@offset && @quote_level < n.level
+      # blue zone(see quote_level.ods)
       str_node_break
       vs_debug('beginning of quote', n.str)
       @in_quote = true
       @str_node = Intermediate::StrNode.new(n.str, n.level); @array.add(@str_node)
-      @baseline = n.level
-    elsif @baseline == n.level
-      vs_debug('same baseline', n.str)
-      @str_node.concat(n.str)
+      @quote_level = n.level
+    elsif @quote_level == n.level ||
+          @quote_level > @offset &&  @quote_level < n.level
+      # yellow zone
+      vs_debug('same quote_level', n.str)
+      @str_node.concat(' ' * (n.level - @quote_level) + n.str)
     else
+      # red zone
       vs_debug('end of quote', n.str)
 
       # break list(= discard current @array) if n level is upper
@@ -252,7 +290,7 @@ class TreeBuilder < Absyn::Visitor
                                 "level(#{@array.level})")
       # NOTE: add to parent here since n.str exists
       @array.add(@str_node)
-      @baseline = n.level
+      @quote_level = n.level
     end
   end
 
@@ -377,7 +415,7 @@ private
     @array      = @header
     @str_node   = Intermediate::StrNode.new
     @in_quote   = false
-    @baseline   = 0
+    @quote_level   = 0
   end
 
   def visit_list_item(n, list_class, list_item_class)
@@ -406,8 +444,8 @@ private
       parent_list = @list_item.parent.find_list(n.level)
       parent_list.add(list_item)
     end
-    @array    = @list_item  = list_item
-    @baseline = n.level
+    @array  = @list_item    = list_item
+    @offset = @quote_level  = n.level
   end
 
   # if array is Header, add to it.

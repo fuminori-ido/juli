@@ -47,23 +47,15 @@ module Juli::Visitor
       case n.parent
       when Juli::Intermediate::ListItem
         if n.level > n.parent.level
-          # quote
-          printf("quote: %s\n", str_limit(n.str).gsub(/\n/m, '<\n>'))
+          process_str_as_quote(n)
         else
-          # just string
-          @depth += 1
-          process_str(n.str)
-          @depth -= 1
+          process_str_as_str(n)
         end
       else
         if n.level > 0
-          # quote
-          printf("quote: %s\n", str_limit(n.str).gsub(/\n/m, '<\n>'))
+          process_str_as_quote(n)
         else
-          # paragraph
-          @depth += 1
-          process_str(n.str)
-          @depth -= 1
+          process_str_as_str(n)
         end
       end
     end
@@ -141,6 +133,19 @@ module Juli::Visitor
     def process_str(str)
       Juli::LineParser.new.parse(str, Juli::Wiki.wikinames).
           accept(LineTree.new(@depth))
+    end
+
+    def process_str_as_str(n)
+      @depth += 1
+      process_str(n.str)
+      @depth -= 1
+    end
+
+    def process_str_as_quote(n)
+      @depth += 1
+      print_depth
+      printf("quote: %s\n", str_limit(n.str).gsub(/\n/m, '<\n>'))
+      @depth -= 1
     end
   end
 end

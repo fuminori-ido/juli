@@ -156,6 +156,17 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 3,         t.array[0].array[0].array.size
   end
 
+  # nested quote (e.g. source program) should be in 1 quote.
+  def test_quote_with_several_nest_level
+    t = build_tree_on('t022.txt')
+    # 6 elements(text, quote, text, quote, list, text) at top level:
+    assert_equal 6, t.array.size
+
+    # 3rd element is quote and next is list:
+    assert_equal Juli::Intermediate::StrNode,     t.array[3].class
+    assert_equal Juli::Intermediate::OrderedList, t.array[4].class
+  end
+
 private
   # return full path of test data file.
   def data_path(filename)
