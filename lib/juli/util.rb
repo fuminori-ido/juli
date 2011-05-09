@@ -53,7 +53,9 @@ COMMAND (default = gen):
 command_options for:
   init:
     -o output_top     default='../html/'
-    -t template       template at lib/juli/template/ (default='default')
+    -t template       use template at 1) $JULI_REPO/.juli/ or
+                      2) lib/juli/template/ (default='default').
+                      Search priority is 1), and then 2).
     -e ext            generating html file extention (default='.shtml')
 
   gen:

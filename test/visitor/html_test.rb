@@ -35,4 +35,24 @@ require 'test_helper'
       assert '3.1.2',             h.gen(3)
       assert '4',                 h.gen(1)
     end
+
+    def test_find_template
+      h = Juli::Visitor::Html.new
+
+      # default template should be in TEMPLATE_PATH
+      assert_equal File.join(Juli::TEMPLATE_PATH, 'default.html'),
+                   h.find_template('default')
+
+      # when same name is in juli_repo, that should be chosen
+      test_template = File.join(Juli::Util.juli_repo, Juli::REPO, 'default.html')
+      FileUtils.cp(h.find_template('default'), test_template)
+      assert_equal test_template, h.find_template('default')
+      # clean after the test above
+      FileUtils.rm_f(test_template)
+
+      # when no template in both path, error should be raised
+      assert_raise Errno::ENOENT do
+        h.find_template('UNKNOWN_TEMPLATE!')
+      end
+    end
   end

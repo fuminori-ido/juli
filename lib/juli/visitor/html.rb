@@ -132,8 +132,7 @@ module Juli::Visitor
       stylesheet  = relative_from(in_file, 'juli.css')
       sitemap     = relative_from(in_file, 'sitemap' + conf['ext'])
       body        = root.accept(self)
-      erb         = ERB.new(File.read(File.join(Juli::TEMPLATE_PATH,
-                        conf['template'] + '.html')))
+      erb         = ERB.new(File.read(find_template(conf['template'])))
       out_path    = out_filename(in_file)
       mkdir(out_path)
       File.open(out_path, 'w') do |f|
@@ -209,6 +208,18 @@ module Juli::Visitor
         content_tag(:td, str2html(n.term) + ':') +
         content_tag(:td, str2html(n.str))
       end
+    end
+
+    # find erb template in the order:
+    #
+    # 1st) JULI_REPO/.juli/,    and if not found, then
+    # 2nd) lib/juli/template.
+    def find_template(name)
+      for path in [File.join(juli_repo, Juli::REPO), Juli::TEMPLATE_PATH] do
+        template = File.join(path, name + '.html')
+        return template if File.exist?(template)
+      end
+      raise Errno::ENOENT
     end
 
   private

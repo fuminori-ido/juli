@@ -30,9 +30,19 @@ EOM
 TEMPLATE_COMMENT = <<EOM
 
 # Specify html template when generating (default = 'default', which 
-# means that lib/juli/template/default.html is used).
-# You can add your favorite template like
-# lib/juli/template/blue_ocean.html and specify as follows:
+# means that RUBY_LIB/juli/template/default.html is used).
+#
+# Currently available templates are under RUBY_LIB/juli/template/, where
+# RUBY_LIB is installed ruby library site (e.g. /usr/local/lib/ruby/site_ruby/1.8/).
+#
+# (>= v1.01.00) You can put your customized template under JULI_REPO/.juli/
+# rather than ruby standard library directory.  For example,
+# if you want to use your customized template 'blue_ocean.html',
+# create it under JULI_REPO/ and specify it at config as follows:
+#
+#   $ cp RUBY_LIB/juli/template/default.html JULI_REPO/.juli/blue_ocean.html
+#   (edit JULI_REPO/.juli/blue_ocean.html as you like)
+#   (edit JULI_REPO/.juli/config as follows:
 #
 #   template: blue_ocean
 # 
