@@ -64,9 +64,15 @@ EOM
     module_function :usage
 
     def str_limit(str)
-      str.size > 30 ? str[0..30] + '...' : str
+      str.size > 45 ? str[0..45] + '...' : str
     end
     module_function :str_limit
+
+    # trim string just for printing purpose here
+    def str_trim(str)
+      str_limit(str.gsub(/\n/, '\n').gsub(/\r/, '\r'))
+    end
+    module_function :str_trim
 
     # find juli-repository root from the specified path.
     class Repo

@@ -167,6 +167,14 @@ class ParserTest < Test::Unit::TestCase
     assert_equal Juli::Intermediate::OrderedList, t.array[4].class
   end
 
+  # Workaround on test_quote_with_several_nest_level(test case = t022.txt)
+  # was not enough.  With list, quote wasn't handled well;-(
+  def test_quote_after_list
+    t = build_tree_on('t023.txt')
+    # 5 elements(text, list, text, quote, text) at top level:
+    assert_equal 5, t.array.size
+  end
+
 private
   # return full path of test data file.
   def data_path(filename)

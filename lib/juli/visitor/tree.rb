@@ -16,17 +16,17 @@ module Juli::Visitor
 
     def visit_string(n)
       print_depth
-      printf "str:  %s\n", str_limit(n.str.gsub(/\n/, '\n'))
+      printf "str:  %s\n", str_trim(n.str)
     end
 
     def visit_wikiname(n)
       print_depth
-      printf "wiki: %s\n", str_limit(n.str.gsub(/\n/, '\n'))
+      printf "wiki: %s\n", str_trim(n.str)
     end
 
     def visit_url(n)
       print_depth
-      printf "url:  %s\n", str_limit(n.str.gsub(/\n/, '\n'))
+      printf "url:  %s\n", str_trim(n.str)
     end
   end
 
@@ -53,7 +53,7 @@ module Juli::Visitor
         end
       else
         if n.level > 0
-          process_str_as_quote(n)
+            process_str_as_quote(n)
         else
           process_str_as_str(n)
         end
@@ -101,7 +101,7 @@ module Juli::Visitor
 
     def visit_quote(n)
       print_depth
-      printf("QuoteNode(%s)\n", str_limit(n.str).gsub(/\n/m, '<\n>'))
+      printf("QuoteNode(%s)\n", str_trim(n.str))
     end
 
   private
@@ -144,7 +144,7 @@ module Juli::Visitor
     def process_str_as_quote(n)
       @depth += 1
       print_depth
-      printf("quote: %s\n", str_limit(n.str).gsub(/\n/m, '<\n>'))
+      printf("quote: %s\n", str_trim(n.str))
       @depth -= 1
     end
   end

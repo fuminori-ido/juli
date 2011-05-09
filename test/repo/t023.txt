@@ -1,0 +1,11 @@
+A
+
+1. adrs_#_prefecture
+
+B
+
+  &lt;%= draw_adrs(f, 'adrs_0_') %&gt;
+    :
+
+C
+

@@ -411,11 +411,12 @@ private
     vs_debug('', '', 'list_break')
     return if !@list_item
 
-    @list_item  = nil
-    @array      = @header
-    @str_node   = Intermediate::StrNode.new
-    @in_quote   = false
-    @quote_level   = 0
+    @list_item    = nil
+    @array        = @header
+    @str_node     = Intermediate::StrNode.new
+    @in_quote     = false
+    @offset       = 0
+    @quote_level  = 0
   end
 
   def visit_list_item(n, list_class, list_item_class)
