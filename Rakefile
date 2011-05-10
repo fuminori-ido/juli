@@ -44,14 +44,34 @@ task :dist do
   FileUtils.rm_rf work_prefix
 end
 
-Rake::RDocTask.new('doc') do |t|
-  t.rdoc_dir  = 'doc/app'
-  t.title     = 'juli API'
-  t.options  << '--line-numbers'  << '--inline-source' <<
-                '--charset'       << 'utf-8'
-  t.rdoc_files.include('doc/README_FOR_API')
-  t.rdoc_files.include('lib/**/*.rb')
-  t.rdoc_files.include('bin/juli')
+
+namespace :doc do
+  desc 'generate HTML by juli'
+  task :juli do
+    sh <<-EOSH
+      (cd doc; juli; juli sitemap; juli recent_update)
+    EOSH
+  end
+
+  desc 'update project doc to SourceForge site'
+  task :up => :juli do
+    sh <<-EOSH
+      cd doc_html/
+      find . -type f -exec chmod o+r {} \\;
+      find . -type d -exec chmod o+x {} \\;
+      rsync -avP --delete -e ssh . fwells00,jjjuli@web.sourceforge.net:htdocs/
+    EOSH
+  end
+
+  Rake::RDocTask.new('app') do |t|
+    t.rdoc_dir  = 'doc/app'
+    t.title     = 'juli API'
+    t.options  << '--line-numbers'  << '--inline-source' <<
+                  '--charset'       << 'utf-8'
+    t.rdoc_files.include('doc/README_FOR_API')
+    t.rdoc_files.include('lib/**/*.rb')
+    t.rdoc_files.include('bin/juli')
+  end
 end
 
 desc 'clean working files'
