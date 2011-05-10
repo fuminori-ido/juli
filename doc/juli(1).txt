@@ -52,7 +52,21 @@ prepare memo root directory for juli-repo:
 
 ==== options for 'init'
 -o <i>output_top</i>::  Specify output directory, which points to the top directory for generated html files. default = './html/'
--t <i>template</i>::    Specify template under lib/juli/template/ (without .html extention). default = 'default'.
+-t <i>template</i>::    Specify template under 1) JULI_REPO/.juli or 2) RUBY_LIB/juli/template/ (without .html extention). default = 'default'.
+
+Where, JULI_REPO is the directory which you are creating now.
+RUBY_LIB is the directory which juli library is installed
+(e.g. /usr/local/lib/ruby/site_ruby/1.8/).
+
+(v1.01) When you want to customize template, please follow the steps below
+after executing 'juli init':
+
+1. copy template file under lib/juli/template/ to JULI_REPO/.juli/
+   (e.g. template name is 'blue_ocean'):
+    $ cp RUBY_LIB/juli/template/default.html JULI_REPO/.juli/blue_ocean.html
+1. edit JULI_REPO/.juli/blue_ocean.html as you like
+1. edit JULI_REPO/.juli/config as follow as follows:
+    template: blue_ocean
 
 === gen
 When files are specified, each file will be converted by generator (default
