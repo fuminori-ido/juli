@@ -4,7 +4,12 @@ module Juli::Visitor::Html::Helper
     class ContentsDrawer < Juli::Intermediate::Visitor
       include Juli::Visitor::Html::TagHelper
       include Juli::Visitor::Html::Helper
-  
+
+      def initialize
+        super
+        content_tag(:b, 'Contents') + ":\n"
+      end 
+
       def visit_node(n); ''; end
       def visit_str(n); ''; end
       def visit_ordered_list(n); ''; end

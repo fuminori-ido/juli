@@ -1,11 +1,17 @@
-div.title {
-  font-size:        140%;
-  text-align:       center;
-  color:            #000088;
-}
-
 p.default {
   padding-left:     10px;
+}
+
+
+/*----------------------------------------------------------------
+Wiki link
+----------------------------------------------------------------*/
+a.wiki:visited {
+  text-decoration:  none;
+  color:            #000;
+}
+a.wiki:hover {
+  text-decoration:  underline;
 }
 
 
@@ -13,6 +19,11 @@ p.default {
 Headers
 ----------------------------------------------------------------*/
 h1 {
+  font-size:        1.6em;
+  border-bottom:    1px solid #aaa;
+}
+
+h2 {
   font-size:        130%;
   color:            #fff;
   background:       #248;
@@ -23,7 +34,7 @@ h1 {
   border-bottom:    2px  solid #248;
 }
 
-h2 {
+h3 {
   vertical-align:   middle;
   font-size:        120%;
   color:            #000;
@@ -36,7 +47,7 @@ h2 {
   border-bottom:    1px  solid #248;
 }
 
-h3 {
+h4 {
   font-size:        110%;
   color:            #000;
   padding-top:      2px;
@@ -46,7 +57,7 @@ h3 {
   border-bottom:    1px  solid #248;
 }
 
-h4 {
+h5 {
   font-size:        100%;
   color:            #000;
   padding-top:      2px;
@@ -66,10 +77,9 @@ span.juli_toggle:hover {
   background:       #af8;
 }
 
-h1 span.juli_toggle {
+h2 span.juli_toggle {
   color:            #fff;
 }
-h2 span.juli_toggle,
 h3 span.juli_toggle,
 h4 span.juli_toggle,
 h5 span.juli_toggle,
@@ -80,10 +90,9 @@ span.juli_toggle_node {
   font-size:        60%;
   font-family:      monospace;
 }
-h1 span.juli_toggle_node {
+h2 span.juli_toggle_node {
   color:            #ccc;
 }
-h2 span.juli_toggle_node,
 h3 span.juli_toggle_node,
 h4 span.juli_toggle_node,
 h5 span.juli_toggle_node,

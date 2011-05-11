@@ -341,10 +341,13 @@ module Juli::Visitor
       }
     end
 
-    # draw <hi>... link, where i=1..6
+    # draw <hi>... link, where i=2..7
+    #
+    # NOTE: <h1> is reserved for title.  <h2>, <h3>, ... are used for Juli
+    # formatting '=', '==', ...
     def header_link(n)
       id = n.dom_id
-      content_tag("h#{n.level}", :id=>header_id(n)) do
+      content_tag("h#{n.level + 1}", :id=>header_id(n)) do
         content_tag(:span, :class=>'juli_toggle', :onclick=>"Juli.toggle('#{id}');") do
           content_tag(:span, '[+] ', :id=>"#{id}_p", :class=>'juli_toggle_node',  :style=>'display:none;') +
           content_tag(:span, '[-] ', :id=>"#{id}_m", :class=>'juli_toggle_node') +
