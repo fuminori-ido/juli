@@ -483,6 +483,14 @@ Bad Example:
 
 (Where, '|' above is to avoid deleting spaces.  Please ignore it.)
 
+= Feedback
+
+Any feedback is welcome.  Please check the followings:
+
+* <a href='http://sourceforge.net/projects/jjjuli/reviews/'>Love/Hate</a>
+* <a href='http://sourceforge.net/projects/jjjuli/forums'>Help</a>
+* <a href='http://sourceforge.net/tracker/?group_id=390715'>Bug Report, Feature Requests</a>
+
 = TODO
 
 1. Wiki
