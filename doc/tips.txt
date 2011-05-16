@@ -1,0 +1,21 @@
+This page contains several tips.
+
+(Please add your tips here since this is wiki.
+In order to do that, please contact me to grant you to write access
+to this git repository.  Currently, juli code and this document are in the
+same repository because it is very small for now.)
+
+= TODO
+
+Just run:
+
+  $ je TODO
+
+Then, you can:
+
+1. add, modify, delete, re-order your TODOs ;-)
+   I'm serious!!  Using your favorite editor enables you to do this.
+   This is juli's feature.
+1. see your TODOs on browser.
+1. see your TODOs via internet if you publish to webserver (see tutorial).
+1. share your TODOs (e.g. between desktop and note-PC) by git.
