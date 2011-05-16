@@ -1,0 +1,3 @@
+output_top: ../doc_html/
+template:   sourceforge
+ext:        .shtml
