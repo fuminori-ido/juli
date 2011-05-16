@@ -75,7 +75,7 @@ namespace :doc do
 end
 
 desc 'clean working files'
-task :clean => [:clobber_doc, :'test:coverage:clobber_juli'] do
+task :clean => ['doc:clobber_app', :'test:coverage:clobber_juli'] do
   sh "find . -name '*~' -exec rm {} \\;"
   sh 'rm', '-rf', *[parsers, test_conf_outout_top, 
       'InstalledFiles', '.config',    # setup.rb generated
