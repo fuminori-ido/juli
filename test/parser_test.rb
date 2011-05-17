@@ -175,6 +175,16 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 5, t.array.size
   end
 
+  # header, quote, header, and then quote was not parsed correctly at v1.01.01
+  def test_header_quote_without_list
+    t = build_tree_on('t024.txt')
+    assert_equal 2, t.array.size
+    assert_equal 2, t.array[1].array.size
+    assert_equal Juli::Intermediate::StrNode,
+                 t.array[1].array[1].array[0].class
+    assert_equal 2, t.array[1].array[1].array[0].level
+  end
+
 private
   # return full path of test data file.
   def data_path(filename)

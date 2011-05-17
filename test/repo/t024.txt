@@ -1,0 +1,8 @@
+Header + quote without list is not processed correctly.
+
+= A
+== B
+  b
+
+== C
+  c

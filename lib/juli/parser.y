@@ -231,15 +231,8 @@ class TreeBuilder < Absyn::Visitor
     # following instance vars are to keep 'current' header, list_item, 
     # array, str_node, and quote_level while parsing Absyn tree:
     @header       = @root
-    @list_item    = nil
     @array        = @root   # points to header, list, or even list-item
-
-    # NOTE: str_node is a buffer.  Adding to node tree is differred
-    # as possible since there is no actual string right now.
-    @str_node     = Intermediate::StrNode.new
-    @in_quote     = false
-    @offset       = 0
-    @quote_level  = 0
+    reset_contexts
   end
 
   def root
@@ -297,6 +290,7 @@ class TreeBuilder < Absyn::Visitor
   def visit_header(n)
     vs_debug('', n.str, 'visit_header')
     list_break
+    reset_contexts
     new_node = Intermediate::HeaderNode.new(n)
 
     # When @header points to upper (e.g. root) and parse level-1 as
@@ -405,18 +399,28 @@ private
     @list_item.parent.level
   end
 
+  # reset contexts which are used while parsing to keep
+  # 'current' header, list_item, 
+  # array, str_node, and quote_level.
+  #
+  # NOTE: str_node is a buffer.  Adding to node tree is differred
+  # as possible since there is no actual string right now.
+  def reset_contexts
+    @list_item    = nil
+    @str_node     = Intermediate::StrNode.new
+    @in_quote     = false
+    @offset       = 0
+    @quote_level  = 0
+  end
+
   # action on end of list
   def list_break
     str_node_break
     vs_debug('', '', 'list_break')
     return if !@list_item
 
-    @list_item    = nil
     @array        = @header
-    @str_node     = Intermediate::StrNode.new
-    @in_quote     = false
-    @offset       = 0
-    @quote_level  = 0
+    reset_contexts
   end
 
   def visit_list_item(n, list_class, list_item_class)
