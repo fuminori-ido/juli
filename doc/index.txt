@@ -492,13 +492,12 @@ Any feedback is welcome.  Please check the followings:
 * <a href='http://sourceforge.net/projects/jjjuli/forums'>Help</a>
 * <a href='http://sourceforge.net/tracker/?group_id=390715'>Bug Report, Feature Requests</a>
 
-= TODO
+= Competitor
 
-1. Wiki
-  1. support subdirectory
-1. merge je(1) and juli(1)
-1. japanese doc
-1. include, more HTML extention for table support
-1. PDF generator
-1. roff for man generator
-1. fix that quote should be able to use '&lt;', '&gt;', '&amp;', ...
+I had researched several tools before starting juli project.
+I also see similar tools since juli project.
+
+See <a href='compare.ods'>Comparison table</a> for the detail.
+
+= See Also
+* http://en.wikipedia.org/wiki/Comparison_of_documentation_generators
