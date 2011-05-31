@@ -499,5 +499,11 @@ I also see similar tools since juli project.
 
 See <a href='compare.ods'>Comparison table</a> for the detail.
 
+I found following competitor...:
+
+* http://gitit.net/
+* https://github.com/github/gollum
+
+
 = See Also
 * http://en.wikipedia.org/wiki/Comparison_of_documentation_generators
