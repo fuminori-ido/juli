@@ -1,0 +1,42 @@
+# = NAME
+# je-bash-complete    - bash completion for je(1)
+#
+# = SYNOPSIS
+# je [TAB][TAB]
+# 
+# = DESCRIPTION
+# This script is for bash completion of je(1).
+#
+# For example, Saved juli wikiname (filename under $JULI_REPO without
+# '.txt' extention) is automatically completed by typing:
+#
+#   $ je [TAB][TAB]
+#   (Juli wikinames, which already exist, are listed)
+#
+# When typing first character of juli wikiname and hit [TAB],
+# then wikiname which starts with the character are listed:
+#
+#   $ je g[TAB][TAB]
+#   (Juli wikinames, which starts with 'g', are listed)
+#
+# == Setup
+# Let's assume that you locate this file under your home directory
+# and source it from .bachrc, then setup is as follows:
+#
+#   $ cp je-bash-complete $HOME/
+#   $ edit ~/.bachrc                      # any editor can be used
+#       :
+#   . $HOME/je-bash-complete
+#   (quit editor)
+#   (login again)
+#
+
+_je(){
+  local cur files
+  local IFS=$'\n'
+  cur=`_get_cword`;
+  files=`ls --escape $JULI_REPO |
+      awk '/.txt$/ { gsub(/.txt$/, ""); printf("%c%s%c\n", 0x27, $0, 0x27)}'`
+  COMPREPLY=($( compgen -o filenames -W "$files" -- "$cur" ))
+}
+complete -F _je je
