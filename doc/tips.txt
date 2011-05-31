@@ -19,3 +19,10 @@ Then, you can:
 1. see your TODOs on browser.
 1. see your TODOs via internet if you publish to webserver (see tutorial).
 1. share your TODOs (e.g. between desktop and note-PC) by git.
+
+= bash completion for je(1)
+
+I added the utility 'lib/juli/template/je-bash-complete'.
+Actually, this is not a ruby library, but bash script for je(1)
+wikiname completion.  How to setup and use are described in
+this file.  Enjoy!
