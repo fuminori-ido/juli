@@ -52,10 +52,13 @@ run_juli(){
   $EDITOR "$wikiname.txt"
   git add "$wikiname.txt"
   git commit -v "$wikiname.txt"
-  run_juli
+
+  juli_opts=''
   if [ $new_file -eq 1 ]; then
-    echo 'generate sitemap'
-    run_juli sitemap
-    run_juli recent_update
+    echo 're-generate other pages also since new page is added'
+    run_juli gen -f
+  else
+    run_juli
   fi
-  
+  run_juli sitemap
+  run_juli recent_update
