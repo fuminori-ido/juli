@@ -36,4 +36,30 @@ class UtilTest < Test::Unit::TestCase
     assert_not_nil  conf['output_top']
     assert_nil      conf['** NEVER DEFINED KEY! **']
   end
+
+  def test_out_filename
+    tests = [
+      # expected            in-file
+      ['hello.html',        'a/b/hello.txt'],
+      ['Ubuntu 10.html',    'a/b/Ubuntu 10.txt'],
+      ['Ubuntu 10.04.html', 'a/b/Ubuntu 10.04.txt'],
+    ]
+
+    for t in tests do
+      assert_equal t[0], File.basename(out_filename(t[1]))
+    end
+  end
+
+  def test_in_filename
+    tests = [
+      # expected        out-file
+      ['hello',         'a/b/hello.html'],
+      ['Ubuntu 10',     'a/b/Ubuntu 10.html'],
+      ['Ubuntu 10.04',  'a/b/Ubuntu 10.04.html'],
+    ]
+
+    for t in tests do
+      assert_equal t[0], File.basename(in_filename(t[1]))
+    end
+  end
 end

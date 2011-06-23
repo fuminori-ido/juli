@@ -141,7 +141,7 @@ EOM
     #
     def out_filename(in_filename)
       File.join(conf['output_top'],
-                in_filename.gsub(/\.[^\.]*/,'') + conf['ext'])
+                in_filename.gsub(/\.[^\.]*$/,'') + conf['ext'])
     end
     module_function :out_filename
 
@@ -152,9 +152,10 @@ EOM
     # relative path of in-filename, but **no extention**.
     #
     # === EXAMPLE
-    # diary/2010/12/31.shtml -> diary/2010/12/31
+    # diary/2010/12/31.shtml -> 31
     def in_filename(out_filename)
-      File.join(File.dirname(out_filename), File.basename(out_filename).gsub(/\.[^\.]*/,''))
+      File.join(File.dirname(out_filename),
+                File.basename(out_filename).gsub(/\.[^\.]*$/,''))
     end
     module_function :in_filename
   end
