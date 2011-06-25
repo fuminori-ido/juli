@@ -29,10 +29,10 @@ OUTPUT_TOP_COMMENT = <<EOM
 EOM
 TEMPLATE_COMMENT = <<EOM
 
-# Specify html template when generating (default = 'default', which 
+# Specify html template when generating (default = 'default.html', which 
 # means that RUBY_LIB/juli/template/default.html is used).
 #
-# Currently available templates are under RUBY_LIB/juli/template/, where
+# Current available templates are under RUBY_LIB/juli/template/, where
 # RUBY_LIB is is the directory which juli library is installed
 # (e.g. /usr/local/lib/ruby/site_ruby/1.8/).
 #
@@ -45,7 +45,10 @@ TEMPLATE_COMMENT = <<EOM
 #   (edit JULI_REPO/.juli/blue_ocean.html as you like)
 #   (edit JULI_REPO/.juli/config as follows:
 #
-#   template: blue_ocean
+#   template: blue_ocean.html
+#
+# (>= v1.02.00) File extention (e.g. .html) is required in this config.
+# -t option at 'juli gen' command line execution can be also supported.
 # 
 
 EOM
@@ -94,16 +97,18 @@ EOM
     # generate command
     #
     # === OPTIONS
-    # -g generator
+    # -g generator::  specify generator
+    # -f::            force update
+    # -t template::   specify template
     def gen(opts)
       o = opts.dup
       o.delete(:g)
       # executes each generator's init here:
-      v = visitor(opts[:g]).new
+      v = visitor(opts[:g]).new(o)
 
       if ARGV.empty?
         print "bulk mode\n"
-        v.run_bulk(o)
+        v.run_bulk
       else
         for file in ARGV do
           Juli::Parser.new.parse(file, v)

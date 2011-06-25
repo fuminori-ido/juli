@@ -53,6 +53,7 @@ Version       = Juli::VERSION
   s = subparsers['gen'] = OptionParser.new
   s.on('-g generator',  visitor_list) {|v| OPTS[:g]  = v}
   s.on('-f')                          {|v| OPTS[:f]  = true}
+  s.on('-t template_path')            {|v| OPTS[:t]  = v}
 
   s = subparsers['init'] = OptionParser.new
   s.on('-o output_top') {|v| OPTS[:o]  = v}

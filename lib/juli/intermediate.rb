@@ -230,14 +230,13 @@ module Juli::Intermediate
     # Some global initialization can be done here.
     #
     # Take care that this is executed every juli(1) execution.
-    def initialize; end
+    def initialize(opts = {})
+      @opts = opts.dup
+    end
 
     # 'run' bulk-mode (when no files are specified at
     # juli(1) command line).  Derived class should implement this.
-    #
-    # === INPUTS
-    # opts::  option hash
-    def run_bulk(opts={}); end
+    def run_bulk; end
 
     # run for a file and it's node-tree.
     # Here is just sample implementation.

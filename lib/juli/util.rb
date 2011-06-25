@@ -40,27 +40,33 @@ general_options:
   --version
 
 COMMAND (default = gen):
-  init
-  gen  
-  sitemap             generate sitemap to $JULI_REPO/sitemap.shtml
-  recent_update       generate reent updates to $JULI_REPO/recent_update.shtml
+  init                initialize current directory as juli-repo
+  gen                 generate outputs from files under juli-repo
+                      This is the default juli command.
+  sitemap             generate sitemap to JULI_REPO/sitemap.shtml
+  recent_update       generate reent updates to JULI_REPO/recent_update.shtml
 
                       NOTE: file extention '.shtml' above is the default.
                       you can change it by 'init' command -e option
-                      (see below), or by modifying $JULI_REPO/.juli/config
+                      (see below), or by modifying JULI_REPO/.juli/config
                       'ext' entry later anytime.
 
 command_options for:
   init:
     -o output_top     default='../html/'
-    -t template       use template at 1) $JULI_REPO/.juli/ or
-                      2) lib/juli/template/ (default='default').
-                      Search priority is 1), and then 2).
+    -t template       set the template at config (default='default.html').
+                      This template name will be used at 'gen' command
+                      (described below) to search 1) JULI_REPO/.juli/ or
+                      2) lib/juli/template/
     -e ext            generating html file extention (default='.shtml')
 
   gen:
     -g generator      specify generator (#{visitor_list}) default=html
     -f                force generate
+    -t template_path  use the template path rather than juli-config value
+                      set at 'juli init -t ...'
+
+Where, JULI_REPO is the directory which 'juli init' is executed.
 EOM
     end
     module_function :usage

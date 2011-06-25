@@ -8,6 +8,10 @@ module Juli::Visitor
   # This visits Intermediate tree and generates HTML
   #
   # Text files under juli-repository must have '.txt' extention.
+  #
+  # === OPTIONS
+  # -f::            force update
+  # -t template::   specify template
   class Html < Juli::Intermediate::Visitor
     require 'juli/visitor/html/tag_helper'
     require 'juli/visitor/html/helper'
@@ -22,7 +26,7 @@ module Juli::Visitor
     # ContentsDrawer also refers DOM id.  That is the reason why DOM id
     # assignment is isolated from Html visitor.
     class IdAssigner < Juli::Intermediate::Visitor
-      def initialize
+      def initialize(opts={})
         super
         @uniq_id_seed   = 0
       end
@@ -83,7 +87,7 @@ module Juli::Visitor
     #
     # NOTE: this is executed every juli(1) run with -g html option
     # (usually 99% is so), so be careful to avoid multiple initialization.
-    def initialize
+    def initialize(opts={})
       super
 
       # files here will not be deleted even if corresponding *.txt file
@@ -105,11 +109,8 @@ module Juli::Visitor
 
     # run in bulk-mode.  In Html visitor, it sync juli-repository and
     # OUTPUT_TOP.
-    #
-    # === Options
-    # f::          force update
-    def run_bulk(opts={})
-      sync(opts)
+    def run_bulk
+      sync
     end
 
     # visit root to generate:
@@ -132,7 +133,7 @@ module Juli::Visitor
       stylesheet  = relative_from(in_file, 'juli.css')
       sitemap     = relative_from(in_file, 'sitemap' + conf['ext'])
       body        = root.accept(self)
-      erb         = ERB.new(File.read(find_template(conf['template'])))
+      erb         = ERB.new(File.read(find_template))
       out_path    = out_filename(in_file)
       mkdir(out_path)
       File.open(out_path, 'w') do |f|
@@ -210,13 +211,18 @@ module Juli::Visitor
       end
     end
 
-    # find erb template in the order:
+    # find erb template in the following order:
     #
-    # 1st) JULI_REPO/.juli/,    and if not found, then
-    # 2nd) lib/juli/template.
-    def find_template(name)
+    # 1st) -t template_path at juli(1) command line, or
+    # 2nd) {template} in JULI_REPO/.juli/, or
+    # 3rd) {template} in lib/juli/template.
+    #
+    # Where, {template} means conf['template'] + '.html'
+    def find_template
+      return @opts[:t] if @opts[:t] && File.exist?(@opts[:t])
+
       for path in [File.join(juli_repo, Juli::REPO), Juli::TEMPLATE_PATH] do
-        template = File.join(path, name + '.html')
+        template = File.join(path, conf['template'])
         return template if File.exist?(template)
       end
       raise Errno::ENOENT
@@ -274,8 +280,8 @@ module Juli::Visitor
     # * if text file, calls sync_txt()
     # * for others, do rsync(1)
     #
-    def sync(opts)
-      sync_txt(opts)
+    def sync
+      sync_txt
       sync_others
     end
 
@@ -299,7 +305,7 @@ module Juli::Visitor
     #    and not in @exception list above, delete it.
     # 1. if -f option is specified, don't check timestamp and always generates.
     #
-    def sync_txt(opts)
+    def sync_txt
       repo      = {}
       Dir.chdir(juli_repo){
         Dir.glob('**/*.txt'){|f|
@@ -311,7 +317,7 @@ module Juli::Visitor
       # When repo's file timestamp is newer than OUTPUT_TOP, regenerate it.
       for f,v in repo do
         out_file = out_filename(f)
-        if !opts[:f] &&
+        if !@opts[:f] &&
            File.exist?(out_file) &&
            File.stat(out_file).mtime >= File.stat(File.join(juli_repo,f)).mtime
           #printf("already updated: %s\n", out_file)
