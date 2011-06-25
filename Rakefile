@@ -2,7 +2,7 @@ $LOAD_PATH.insert(0, File.join(File.dirname(__FILE__), 'lib'))
 
 require 'rake'
 require 'rake/testtask'
-require 'rake/rdoctask'
+require 'rdoc/task'
 require 'juli'
 
 juli_parser_rb        = 'lib/juli/parser.tab.rb'

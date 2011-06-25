@@ -26,3 +26,8 @@ I added the utility 'lib/juli/template/je-bash-complete'.
 Actually, this is not a ruby library, but bash script for je(1)
 wikiname completion.  How to setup and use are described in
 this file.  Enjoy!
+
+= cron setup at web-server to update contents
+
+sample/update_public_juli.rb is an example implementation to update
+juli contents at web-server.  Please see the description in the source.

@@ -4,11 +4,12 @@
 # update_public_juli.rb   - update juli public site document
 #
 # = SYNOPSIS
-# Following is an example to set up at cron.  Please replace YOUR_ACCOUNT,
-# /PATH/TO/YOUR/RUBY/BIN, and /PATH/TO/THIS to your environment:
+# 1. Copy this file to appropreate location (e.g. /etc), and
+#    modify configuration part in it.
+# 1. Following is an example to set up at cron.  Please replace YOUR_ACCOUNT,
+#    /PATH/TO/YOUR/RUBY/BIN, and /PATH/TO/THIS to your environment:
 #
-#  55 * * * * YOUR_ACCOUNT export PATH=/PATH/TO/YOUR/RUBY/BIN:$PATH; /PATH/TO/THIS/update_public_juli.rb >/var/log/update_public_juli.log 2>&1
-#
+#     55 * * * * YOUR_ACCOUNT export PATH=/PATH/TO/YOUR/RUBY/BIN:$PATH; /PATH/TO/THIS/update_public_juli.rb >/var/log/update_public_juli.log 2>&1
 #
 # = DESCRIPTION
 # This script does the followings:
@@ -28,8 +29,7 @@
 
 # Juli repository directory at web server for staging to
 # generate HTML from juli text files:
-#JULI_STAGE_DIR          = '/home/wells/nogit/juli_doc/html_stage'
-JULI_STAGE_DIR          = '/home/wells/nogit/juli/public_doc'
+JULI_STAGE_DIR          = '/home/wells/nogit/juli_doc/html_stage'
 
 # Command path to set commit-timestamp to each juli text file.
 # git(1) doesn't keep file timestamp, but it is important for
