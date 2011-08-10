@@ -36,7 +36,7 @@ _je(){
   local IFS=$'\n'
   cur=`_get_cword`;
   files=`ls --escape $JULI_REPO |
-      awk '/.txt$/ { gsub(/.txt$/, ""); printf("%c%s%c\n", 0x27, $0, 0x27)}'`
+      awk '/.txt$/ { gsub(/.txt$/, ""); printf("%c%s%c\n", 39, $0, 39)}'`
   COMPREPLY=($( compgen -o filenames -W "$files" -- "$cur" ))
 }
 complete -F _je je
