@@ -3,6 +3,8 @@ require 'test_helper'
 class LineParserTest < Test::Unit::TestCase
   def test_parse
     tests = [
+# expected                  text          wikinames
+#--------------------------------------------------
 # simplest
 [['abc', 'W:test', 'def'], 'abctestdef', ['test']],
 # empty wikinames
@@ -26,7 +28,7 @@ class LineParserTest < Test::Unit::TestCase
 # URL git:... is NOT recognized :-(
 [['abc git:def ghi'],             'abc git:def ghi',      %w(test)],
 # URL is high priority than wikiname
-[['abc ','U:http://def',' ghi'],'abc http://def ghi', %w(def)],
+[['abc ','U:http://def',' ghi'],  'abc http://def ghi', %w(def)],
 # not isolated URL token is not recognized as URL
 [['abchttp://def ghi'],           'abchttp://def ghi', %w(test)],
 [['abchttp://', 'W:def', ' ghi'], 'abchttp://def ghi', %w(def)],
@@ -34,7 +36,9 @@ class LineParserTest < Test::Unit::TestCase
 [['abc', '<a href="#x">test</a>', 'def'],
     'abc<a href="#x">test</a>def', ['test']],
 # explicit escape
-[%w(abc test def),       'abc\{test}def', %w(test)],
+[%w(abc test def),                'abc\{test}def', %w(test)],
+# beggining with URL
+[['','U:http://abc', ' def'],     'http://abc def', %w(X)],
 ]
 
     for t in tests do
