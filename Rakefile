@@ -4,6 +4,7 @@ require 'rake'
 require 'rake/testtask'
 require 'rdoc/task'
 require 'juli'
+require 'racc'
 
 juli_parser_rb        = 'lib/juli/parser.tab.rb'
 juli_line_parser_rb   = 'lib/juli/line_parser.tab.rb'
