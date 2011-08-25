@@ -42,7 +42,7 @@ and read it.
     $ firefox ../html/minutes_20110117.html       # run firefox if it is enable
    (output directory is '../html' in this example)
    Generated html of the <a href='tutorial/text.png'>example above</a>
-   is looks like <a href='tutorial/generated_html.png'>this</a>.
+   looks like <a href='tutorial/generated_html.png'>this</a>.
 
 As index document explains, each filename under MY_NOTE in a document is
 automatically linked.
