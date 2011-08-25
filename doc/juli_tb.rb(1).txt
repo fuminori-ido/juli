@@ -1,0 +1,27 @@
+= NAME
+juil_tb.rb    - track back to external site
+
+= SYNOPSIS
+juli_tb.rb trackback-url juli-url [title [exerpt [blog_name]]]
+
+= DESCRIPTION
+(This is just experimental utility to do trackback.)
+
+juil_tb.rb is a commandline trackback tool which
+sends 'trackback ping' to the requesting trackback-url for the juli-url.
+
+Response XML body replied from the target trackback-url site
+is printed to stdout.  If the value in <error>...</error>
+is 0 then it means successful.
+
+= MISC
+== Author
+Fumisky Wells, https://sourceforge.net/users/fwells00
+
+== License
+
+You can use/re-distribute/change juli under GPL.
+This distribution include files that are copyrighted by
+somebody else, and these files can be re-distributed under those own
+license.
+These files include the condition of those licenses in themselves.
