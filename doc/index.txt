@@ -24,7 +24,7 @@ tips::          several Howto-s
 
 = Introduction
 
-Do you want to memo anytime anyplace(like <b>offline</b> environment)?
+Do you want to make a memo anytime anyplace(like <b>offline</b> environment)?
 Do you want to use your <b>favorite editor</b> for wiki and/or any documentation?
 Do you want to organize your idea by <b>outline-processor</b> and/or <b>wiki</b>?
 In wiki, Did you think it's much better to <b>link</b> page <b>automatically</b>?
@@ -51,14 +51,15 @@ Current browser (Firefox, IE[789], etc.) has enough capability to do that.
 
 I didn't want to have any other fancy GUI since browser+HTML is enough for me.
 
-GUI tool like Word-processor or GUI outline-processor is slow to invoke to memo.
+GUI tool like Word-processor or GUI outline-processor is slow to invoke
+the app.
 Key-bindings for such tools don't fit me.  Editor (vi, emacs, or wahtever
 you are now using) is the most suitable for me to input.
 
 == Offline
 
 When I'm getting in a train and working/thinking on my Note-PC,
-sometimes an idea comes up in my mind so I want to memo it
+sometimes an idea comes up in my mind so I want to make the memo
 as quick and easy as possible anyplace anytime.
 In such a situation, using favorite editor is good for me to write.
 
@@ -66,7 +67,7 @@ In such a situation, using favorite editor is good for me to write.
 
 Wiki is good, but it requires online.
 It is ok for me only to link on browsing time.
-I would like to memo offline as well.
+I would like to make a memo offline as well.
 
 I don't want to think about "link it by WikiName, or, well,
 What is the notation to link in this wiki tool?" when I'm

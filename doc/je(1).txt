@@ -32,7 +32,8 @@ JULI::      for debug (only for developer)
 1. It is recommended to set JULI_REPO at ~/.bashrc etc. also.
 1. create juli repository also
     $ juli init
-1. From any directory without worry about current working directory, just run followings to memo your idea:
+1. From any directory without worry about current working directory,
+   just run followings to make a memo for your idea:
     $ je Eureka!
 1. After saving the file by your editor, git asks to enter commit message as follows:
     # Please enter the commit message for your changes. Lines starting
