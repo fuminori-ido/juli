@@ -1,4 +1,4 @@
-<h1>Juli, an offline wiki &amp; outliner by your favorite editor</h1>
+<h1>Juli, an offline wiki &amp; outliner with your favorite editor</h1>
 
 This is top document for juli.  Introduction, installation and
 juli formatting are described here.
