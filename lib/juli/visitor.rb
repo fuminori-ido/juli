@@ -3,8 +3,9 @@
 module Juli
   # Namespace for visitors.
   module Visitor
-    Dir.glob(File.join(File.dirname(__FILE__), 'visitor/*.rb')){|v|
-      require File.join('juli/visitor', File.basename(v))
-    }
+    # since slidy depends on html, order of 'require' is important
+    require 'juli/visitor/html'
+    require 'juli/visitor/slidy'
+    require 'juli/visitor/tree'
   end
 end

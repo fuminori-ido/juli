@@ -238,7 +238,7 @@ module Juli::Intermediate
     # juli(1) command line).  Derived class should implement this.
     def run_bulk; end
 
-    # run for a file and it's node-tree.
+    # run for a file and its node-tree.
     # Here is just sample implementation.
     # Derived class can re-implement this.
     #
@@ -249,7 +249,8 @@ module Juli::Intermediate
       root.accept(self)
     end
 
-    # Method for each Intermediate node. Derived class should implement this.
+    # Methods for each Intermediate node. Derived class should implement
+    # these.
     #
     # === INPUTS
     # n:: Intermediate node
