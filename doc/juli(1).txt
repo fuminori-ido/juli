@@ -52,7 +52,7 @@ prepare memo root directory for juli-repo:
 
 ==== options for 'init'
 -o <i>output_top</i>::  Specify output directory, which points to the top directory for generated html files. default = './html/'
--t <i>template</i>::    Specify template under 1) JULI_REPO/.juli or 2) RUBY_LIB/juli/template/ (without .html extention). default = 'default'.
+-t <i>template</i>::    Specify template under 1) JULI_REPO/.juli or 2) RUBY_LIB/juli/template/. default = 'default.html'.
 
 Where, JULI_REPO is the directory which you are creating now.
 RUBY_LIB is the directory which juli library is installed
@@ -87,6 +87,19 @@ Wrong Example:
 ==== options for 'gen'
 -g <i>generator</i>:: specify generator.  Supported generators are in lib/juli/visitor/ directory.  Default is html.
 -f::  force update.  Even generated HTML file is newer than source text, generate again.
+-t <i>template</i>::  Specify template; it may be fullpath, relative path from current directory, under JULI_REPO/.juli, or under RUBY_LIB/juli/template/
+
+Template search priority is as follows:
+
+1. If -t option is specified
+  1. check if it is fullpath or relative path from current directory, or
+  1. check it under JULI_REPO/.juli, or
+  1. check it under RUBY_LIB/juli/template/
+1. Otherwise
+  1. check configured template under JULI_REPO/.juli, or
+  1. check configured template under RUBY_LIB/juli/template/
+
+Where, configured template means the template specified at .juli/config.
 
 === sitemap
 generates sitemap.shtml under <i>output_top</i>/.
