@@ -499,12 +499,13 @@ Any feedback is welcome.  Please check the followings:
 = Competitor
 
 I had researched several tools before starting juli project.
-I also see similar tools since juli project.
+I also see similar tools since juli project started.
 
 See <a href='compare.ods'>Comparison table</a> for the detail.
 
 I found following competitor...:
 
+* http://ikiwiki.info/
 * http://gitit.net/
 * https://github.com/github/gollum
 
