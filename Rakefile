@@ -51,6 +51,7 @@ namespace :doc do
   task :juli do
     sh <<-EOSH
       (cd doc; juli; juli sitemap; juli recent_update)
+      (cd doc; ../bin/juli gen -g slidy -t slidy.html slidy.txt)
     EOSH
   end
 
