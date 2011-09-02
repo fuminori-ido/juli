@@ -206,26 +206,35 @@ module Juli::Visitor
 
     def visit_dictionary_list_item(n)
       content_tag(:tr) do
-        content_tag(:td, str2html(n.term) + ':') +
+        content_tag(:td, str2html(n.term) + ':', :nowrap=>true) +
         content_tag(:td, str2html(n.str))
       end
     end
 
     # find erb template in the following order:
     #
-    # 1st) -t template_path at juli(1) command line, or
-    # 2nd) {template} in JULI_REPO/.juli/, or
-    # 3rd) {template} in lib/juli/template.
+    # if -t options is specified:
+    #   1st) template_path in absolute or relative from current dir, or
+    #   2nd) -t template_path in JULI_REPO/.juli/, or
+    #   3rd) -t template_path in lib/juli/template/
+    #   otherwise, error
+    # else:
+    #   4th) {template} in JULI_REPO/.juli/, or
+    #   5th) {template} in lib/juli/template.
+    #   otherwise, error
     #
-    # Where, {template} means conf['template'] + '.html'
+    # Where, {template} means conf['template']
     def find_template
-      return @opts[:t] if @opts[:t] && File.exist?(@opts[:t])
-
-      for path in [File.join(juli_repo, Juli::REPO), Juli::TEMPLATE_PATH] do
-        template = File.join(path, conf['template'])
-        return template if File.exist?(template)
+      dirs = [File.join(juli_repo, Juli::REPO), Juli::TEMPLATE_PATH]
+      if @opts[:t]
+        if File.exist?(@opts[:t])
+          @opts[:t]
+        else
+          find_template_sub(@opts[:t])
+        end
+      else
+        find_template_sub(conf['template'])
       end
-      raise Errno::ENOENT
     end
 
   private
@@ -374,6 +383,15 @@ module Juli::Visitor
     # 1. visit the tree by HtmlLine and generate HTML
     def str2html(str)
       Juli::LineParser.new.parse(str, Juli::Wiki.wikinames).accept(HtmlLine.new)
+    end
+
+    # find template 't' in dirs
+    def find_template_sub(t)
+      for path in [File.join(juli_repo, Juli::REPO), Juli::TEMPLATE_PATH] do
+        template = File.join(path, t)
+        return template if File.exist?(template)
+      end
+      raise Errno::ENOENT, "no #{t} found"
     end
   end
 
