@@ -1,6 +1,6 @@
 = Overview
 
-Compete Powerpoint!(^_^)
+Compete PowerPoint!(^_^)
 
 Slidy is an another way for presentation by Juli.
 
@@ -52,6 +52,11 @@ alt="stock image " width="125" height="125" border="0" />
 <tr><th></th><th>A</th><th>B</th></tr>
 <tr><th>C</th><td>D</td><td>E</td></tr>
 </table>
+
+= Advantage
+
+* Small file size (this slidy document is &lt; 2k bytes!)
+* Fast and easy input
 
 = Restriction
 
