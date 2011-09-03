@@ -34,13 +34,6 @@ Version       = Juli::VERSION
   include Juli::Util
   include Juli::Command
 
-  # default option values
-  OPTS    = {
-    :g=>'html',
-    :o=>'../html/',
-   #:t                -- must be nil here
-    :e=>'.shtml'
-  }
   command = 'gen'
 
   # parse common & default options
@@ -51,21 +44,33 @@ Version       = Juli::VERSION
     exit 1
   }
   s = subparsers['gen'] = OptionParser.new
-  s.on('-g generator',  visitor_list) {|v| OPTS[:g]  = v}
-  s.on('-f')                          {|v| OPTS[:f]  = true}
-  s.on('-t template')                 {|v| OPTS[:t]  = v}
+  GEN_OPTS = {           # default option values for 'gen'
+    :g=>'html',
+  }
+  s.on('-g generator',  visitor_list) {|v| GEN_OPTS[:g]  = v}
+  s.on('-f')                          {|v| GEN_OPTS[:f]  = true}
+  s.on('-t template')                 {|v| GEN_OPTS[:t]  = v}
+  opts = GEN_OPTS
 
   s = subparsers['init'] = OptionParser.new
-  OPTS[:t] = 'default.html' # set default template only for init subcommand
-  s.on('-o output_top') {|v| OPTS[:o]  = v}
-  s.on('-t template')   {|v| OPTS[:t]  = v}
+  INIT_OPTS = {           # default option values for 'init'
+    :o=>'../html/',
+    :t=>'default.html',
+    :e=>'.shtml'
+  }
+  s.on('-o output_top') {|v| INIT_OPTS[:o]  = v}
+  s.on('-t template')   {|v| INIT_OPTS[:t]  = v}
+  s.on('-e extention')  {|v| INIT_OPTS[:e]  = v}
 
   parser.order!(ARGV)
 
   # check command
   command = ARGV.shift if !ARGV.empty?
 
+  # switch opts
+  opts = INIT_OPTS if command == 'init'
+
   # parse command options
   subparsers[command].parse!(ARGV) if !ARGV.empty?
 
-  Juli::Command::run(command, OPTS)
+  Juli::Command::run(command, opts)
