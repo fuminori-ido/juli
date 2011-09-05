@@ -97,9 +97,10 @@ EOM
     # generate command
     #
     # === OPTIONS
-    # -g generator::  specify generator
-    # -f::            force update
-    # -t template::   specify template
+    # -g generator::    specify generator
+    # -f::              force update
+    # -t template::     specify template
+    # -o output_path::  specify output file path (only non-bulk-mode)
     def gen(opts)
       o = opts.dup
       o.delete(:g)
@@ -108,7 +109,11 @@ EOM
 
       if ARGV.empty?
         print "bulk mode\n"
-        v.run_bulk
+        if opts[:o]
+          STDERR.print "ERROR: -o #{opts[:o]} is specified in bulk-mode\n"
+        else
+          v.run_bulk
+        end
       else
         for file in ARGV do
           Juli::Parser.new.parse(file, v)

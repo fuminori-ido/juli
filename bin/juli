@@ -43,15 +43,19 @@ Version       = Juli::VERSION
     $stderr.puts "no such juli command: #{k}"
     exit 1
   }
+
+  # set 'gen' options
   s = subparsers['gen'] = OptionParser.new
   GEN_OPTS = {           # default option values for 'gen'
     :g=>'html',
   }
-  s.on('-g generator',  visitor_list) {|v| GEN_OPTS[:g]  = v}
-  s.on('-f')                          {|v| GEN_OPTS[:f]  = true}
-  s.on('-t template')                 {|v| GEN_OPTS[:t]  = v}
+  s.on('-g generator',  visitor_list.join(',')) {|v| GEN_OPTS[:g]  = v}
+  s.on('-f')              {|v| GEN_OPTS[:f]  = true}
+  s.on('-t template')     {|v| GEN_OPTS[:t]  = v}
+  s.on('-o output_path')  {|v| GEN_OPTS[:o]  = v}
   opts = GEN_OPTS
 
+  # set 'init' options
   s = subparsers['init'] = OptionParser.new
   INIT_OPTS = {           # default option values for 'init'
     :o=>'../html/',

@@ -61,10 +61,15 @@ command_options for:
     -e ext            generating html file extention (default='.shtml')
 
   gen:
-    -g generator      specify generator (#{visitor_list}) default=html
+    -g generator      specify generator as follows(default=html):
+                         #{visitor_list.join("\n" + " "*25)}
     -f                force generate
     -t template_path  use the template path rather than juli-config value
                       set at 'juli init -t ...'
+    -o output_path    specify output file path.  It cannot be set at bulk-mode.
+                      default is under the directory defined at .juli/config
+                      'output_top' entry.
+    config[
 
 Where, JULI_REPO is the directory which 'juli init' is executed.
 EOM
@@ -140,14 +145,16 @@ EOM
     # in_filename:: relative path under repository
     #
     # === RETURN
-    # full path of out filename
+    # full path of out filename.  if -o option is specified,
+    # it is used.
     #
     # === EXAMPLE
     # diary/2010/12/31.txt -> OUTPUT_TOP/diary/2010/12/31.shtml
     #
     def out_filename(in_filename)
-      File.join(conf['output_top'],
-                in_filename.gsub(/\.[^\.]*$/,'') + conf['ext'])
+      @opts[:o] ||
+          File.join(conf['output_top'],
+                    in_filename.gsub(/\.[^\.]*$/,'') + conf['ext'])
     end
     module_function :out_filename
 
