@@ -50,8 +50,9 @@ namespace :doc do
   desc 'generate HTML by juli'
   task :juli do
     sh <<-EOSH
-      (cd doc; juli; juli sitemap; juli recent_update)
-      (cd doc; juli gen -g slidy -t slidy.html slidy.txt)
+      (cd doc; ../bin/juli; ../bin/juli sitemap; ../bin/juli recent_update)
+      (cd doc; ../bin/juli gen -g slidy -t slidy.html slidy.txt)
+      (cd doc; ../bin/juli gen -g takahashi_method -t takahashi_method.html -o ../doc_html/slidy_takahashi_method_version.shtml slidy.txt)
     EOSH
   end
 
