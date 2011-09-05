@@ -1,9 +1,11 @@
 require 'test_helper'
 
-include Juli::Util
 
 class UtilTest < Test::Unit::TestCase
+  include Juli::Util
+
   def setup
+    @opts = {}
     @saved_cwd = Dir.pwd
     Dir.chdir(repo4test)
   end
@@ -48,6 +50,10 @@ class UtilTest < Test::Unit::TestCase
     for t in tests do
       assert_equal t[0], File.basename(out_filename(t[1]))
     end
+
+    # if -o is specified, it should be used rather than wikiname
+    @opts[:o] = 'special.html'
+    assert_equal 'special.html', File.basename(out_filename('a/b/hello.txt'))
   end
 
   def test_in_filename

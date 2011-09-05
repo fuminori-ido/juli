@@ -6,6 +6,7 @@ module Juli
     # since slidy depends on html, order of 'require' is important
     require 'juli/visitor/html'
     require 'juli/visitor/slidy'
+    require 'juli/visitor/takahashi_method'
     require 'juli/visitor/tree'
   end
 end

@@ -146,19 +146,17 @@ module Juli::Visitor
       case n.parent
       when Juli::Intermediate::ListItem
         if n.level > n.parent.level
-          # quote; trim last white spaces at generating phase
-          content_tag(:blockquote, content_tag(:pre, n.str.gsub(/\s+\z/m, '')))
+          blockquote(n.str)
         else
           # just string (no quote, no paragraph)
           str2html(n.str)
         end
       else
         if n.level > 0
-          # quote; trim last white spaces at generating phase
-          content_tag(:blockquote, content_tag(:pre, n.str.gsub(/\s+\z/m, '')))
+          blockquote(n.str)
         else
           # paragraph
-          content_tag(:p, :class=>'default') do
+          content_tag(:p, paragraph_css) do
             str2html(n.str)
           end
         end
@@ -181,11 +179,7 @@ module Juli::Visitor
     end
 
     def visit_ordered_list_item(n)
-      content_tag(:li) do
-        n.array.inject('') do |result, str_or_quote|
-          result += str_or_quote.accept(self)
-        end
-      end
+      visit_list_item(n)
     end
 
     def visit_unordered_list(n)
@@ -193,11 +187,7 @@ module Juli::Visitor
     end
 
     def visit_unordered_list_item(n)
-      content_tag(:li) do
-        n.array.inject('') do |result, str_or_quote|
-          result += str_or_quote.accept(self)
-        end
-      end
+      visit_list_item(n)
     end
 
     def visit_dictionary_list(n)
@@ -392,6 +382,34 @@ module Juli::Visitor
         return template if File.exist?(template)
       end
       raise Errno::ENOENT, "no #{t} found"
+    end
+
+    # quote; trim last white spaces at generating phase
+    def blockquote(str)
+      content_tag(:blockquote,
+          content_tag(:pre, str.gsub(/\s+\z/m, '')),
+          blockquote_css)
+    end
+
+    # both ordered and unordered list item
+    def visit_list_item(n)
+      content_tag(:li, list_item_css) do
+        n.array.inject('') do |result, str_or_quote|
+          result += str_or_quote.accept(self)
+        end
+      end
+    end
+
+    def paragraph_css
+      {:class=>'default'}
+    end
+
+    def blockquote_css
+      {}
+    end
+
+    def list_item_css
+      {}
     end
   end
 

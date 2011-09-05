@@ -27,7 +27,7 @@ module Juli
         next if f =~ /^\./
         result << File.basename(f).gsub(/\.rb$/, '')
       end
-      result.join(',')
+      result
     end
     module_function :visitor_list
 

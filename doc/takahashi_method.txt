@@ -1,0 +1,56 @@
+= Overview
+
+'Takahashi method' is a presentation way to use huge size of text.
+It is quite impressive so that I write the generator for Juli.
+
+If you are not familiar with Takahashi method, please read the followings:
+
+* <a href='http://www.rubycolor.org/takahashi/'>Original Site</a>
+  (in Japanese)
+* <a href='http://en.wikipedia.org/wiki/Takahashi_method'>Wikipedia</a>
+* http://presentationzen.blogs.com/presentationzen/2005/09/living_large_ta.html
+
+== Feature
+Juli implementation of Takahashi method has the following features:
+
+* fast &amp; easy input by your favorite editor.
+* Juli wiki formatting (RD like).
+* resonable disk consumption (because it's just text file).
+* style and color of any element (e.g. header, list, text) can be changed
+  by template CSS.
+
+= How to generate
+
+Commandline is as follows:
+
+  $ juli gen -g takahashi_method -t takahashi_method.html -o <i>output_path</i> <i>wikiname</i>.txt
+
+-o option is not required.
+
+= Navigation
+
+* Mouse click or Right(→) key to go to the next page.
+* Left(←) key to go to the previous page.
+
+= How Juli Markup is treated in takahashi_method
+
+One page in Takahashi method slideshow is:
+
+* header (=, ==, ..., in text)
+* paragraph (text separated by blank line)
+* list item
+* blockquote
+
+== Example
+I'll show two documents generated from the same slidy.txt as follows:
+
+* slidy
+* <a href='slidy_takahashi_method_version.shtml'>slidy (Takahashi method version)</a>
+
+Both are generated as follows.
+You can see them in Rakefile of Juli source package:
+
+  $ (cd doc; juli gen -g slidy -t slidy.html slidy.txt)
+  $ (cd doc; juli gen -g takahashi_method -t takahashi_method.html \
+    -o ../doc_html/slidy_takahashi_method_version.shtml slidy.txt)
+

@@ -17,10 +17,8 @@ Commandline is as follows:
 
   $ juli gen -g slidy -t slidy.html <i>wikiname</i>.txt
 
-<div style='font-size:10pt;'>
 ※ slidy generator doesn't support bulk-mode since it doesn't make sense.
 As you can see source (lib/juli/visitor/slidy.rb), it is very small.
-</div>
 
 = Navigation
 
