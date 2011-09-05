@@ -69,7 +69,6 @@ command_options for:
     -o output_path    specify output file path.  It cannot be set at bulk-mode.
                       default is under the directory defined at .juli/config
                       'output_top' entry.
-    config[
 
 Where, JULI_REPO is the directory which 'juli init' is executed.
 EOM
