@@ -22,6 +22,7 @@ rule
     : H STRING                  { Absyn::HeaderNode.new(val[0], val[1]) }
     | ORDERED_LIST_ITEM         { Absyn::OrderedListItem.new(*val[0]) }
     | UNORDERED_LIST_ITEM       { Absyn::UnorderedListItem.new(*val[0]) }
+    | LONG_DT                   { Absyn::LongDictionaryListItem.new(val[0]) }
     | DT STRING                 { Absyn::DictionaryListItem.new(val[0], val[1]) }
     | WHITELINE                 { Absyn::WhiteLine.new }
     | LEVEL STRING              { Absyn::StringNode.new(val[0], val[1]) }
@@ -121,6 +122,7 @@ module Juli::Absyn
     end
   end
 
+  # term:: desciption,
   class DictionaryListItem < Node
     attr_accessor :term, :str
   
@@ -131,6 +133,23 @@ module Juli::Absyn
   
     def accept(visitor)
       visitor.visit_dictionary_list_item(self)
+    end
+  end
+
+  #   term::
+  #       desciption...
+  #       desciption(cont'd)...
+  #   <-->
+  #   level
+  class LongDictionaryListItem < Node
+    attr_accessor :term
+  
+    def initialize(term)
+      @term = term
+    end
+  
+    def accept(visitor)
+      visitor.visit_long_dictionary_list_item(self)
     end
   end
 
@@ -148,6 +167,7 @@ module Juli::Absyn
     def visit_ordered_list_item(n); end
     def visit_unordered_list_item(n); end
     def visit_dictionary_list_item(n); end
+    def visit_long_dictionary_list_item(n); end
     def visit_white_line(n); end
     def visit_end(n); end
   end
@@ -347,6 +367,29 @@ class TreeBuilder < Absyn::Visitor
     list.add(@list_item)
   end
 
+  LONG_DICT_LEVEL = 2
+
+  # long dictionary is more like ordered/unordered list than
+  # (compact)dictionary list.
+  def visit_long_dictionary_list_item(n)
+    vs_debug('start parse', n.term, 'visit_long_dict')
+    str_node_break
+    list_item = Intermediate::LongDictionaryListItem.new(n.term, LONG_DICT_LEVEL)
+    
+    # when list_item exists, add to curr_list
+    if @list_item
+      vs_debug('same level', n.term, 'visit_long_dict')
+      @list_item.parent.add(list_item)
+    else
+      vs_debug("new dict", n.term, 'visit_long_dict')
+      new_list  = Intermediate::LongDictionaryList.new(LONG_DICT_LEVEL)
+      add_list_to_array(new_list)
+      new_list.add(list_item)
+    end
+    @array = @list_item = list_item
+    @offset = @quote_level  = LONG_DICT_LEVEL
+  end
+
   def visit_white_line(n)
     vs_debug('', '', 'visit_white_line')
     if in_quote?
@@ -500,6 +543,8 @@ private
         yield :ORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
       when /^(\s*)(\*\s+)(.*)$/
         yield :UNORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
+      when /^(\S.*)::\s*$/
+        yield :LONG_DT, $1
       when /^(\S.*)::\s+(.*)$/
         yield :DT, $1
         yield :STRING, $2

@@ -1,0 +1,14 @@
+long dictionary list
+
+-o output_top::
+  default='../html/'
+
+-t template::
+  set the template at config (default='default.html').
+  This template name will be used at 'gen' command
+  (described below) to search 1) JULI_REPO/.juli/ or
+  2) lib/juli/template/
+
+-e ext::
+  generating html file extention (default='.shtml')
+

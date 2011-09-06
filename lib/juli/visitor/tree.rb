@@ -99,6 +99,21 @@ module Juli::Visitor
       @depth -= 1
     end
 
+    def visit_long_dictionary_list(n)
+      visit_list("LongDictionaryList\n", n)
+    end
+
+    def visit_long_dictionary_list_item(n)
+      print_depth
+      printf("LongDictionaryListItem\n")
+      @depth += 1
+      process_str(n.term)
+      for str_or_quote in n.array do
+        str_or_quote.accept(self)
+      end
+      @depth -= 1
+    end
+
     def visit_quote(n)
       print_depth
       printf("QuoteNode(%s)\n", str_trim(n.str))

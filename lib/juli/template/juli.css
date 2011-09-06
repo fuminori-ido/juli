@@ -108,6 +108,15 @@ ol, ul {
 table.juli_dictionary {
   padding-left:     10px;
 }
+dl.juli_long_dictionary dt {
+  font-weight:      bold;
+  color:            navy;
+  padding-left:     10px;
+}
+dl.juli_long_dictionary dd p.default {
+  margin:           1px;
+  padding:          1px;
+}
 
 /* block quote */
 blockquote {
