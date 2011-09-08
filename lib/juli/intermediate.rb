@@ -1,6 +1,8 @@
 require 'juli/wiki'
 
 # intermediate tree nodes
+#
+# FIXME: level may be able to delete?
 module Juli::Intermediate
   class Node
     attr_accessor :parent
@@ -36,6 +38,10 @@ module Juli::Intermediate
     def initialize(level)
       @array  = Array.new
       @level  = level
+    end
+
+    def accept(visitor)
+      visitor.visit_array(self)
     end
 
     def add(child)
@@ -75,16 +81,21 @@ module Juli::Intermediate
     # 1. absyn_header
     # 2. level & str
     def initialize(*absyn_header_or_values)
+      super(0)
+=begin
       super(absyn_header_or_values[0].class == Juli::Absyn::HeaderNode ?
           absyn_header_or_values[0].level :
           absyn_header_or_values[0])
+=end
 
+=begin
       case absyn_header_or_values[0]
       when Juli::Absyn::HeaderNode
         @str    = absyn_header_or_values[0].str
       else
+=end
         @str    = absyn_header_or_values[1]
-      end
+#     end
     end
   
     def accept(visitor)
@@ -155,8 +166,9 @@ module Juli::Intermediate
   #
   # ListItem has also level to track depth of child string.
   class ListItem < ArrayNode
-    def initialize(level)
+    def initialize(level, str)
       super(level)
+      self.add(StrNode.new(str))
     end
 
     def find_list(level)
@@ -252,6 +264,12 @@ module Juli::Intermediate
     end
   end
 
+  class WhiteLine < Node
+    def accept(visitor)
+      visitor.visit_white_line(self)
+    end
+  end
+
   # Abstract VISITOR-pattern around Intermediate tree.
   #
   # === How to add new generator
@@ -299,6 +317,11 @@ module Juli::Intermediate
     # n:: Intermediate node
     def visit_node(n); end
     def visit_str(n); end
+    def visit_array(n)
+      for node in n.array do
+        node.accept(self)
+      end
+    end
     def visit_header(n); end
     def visit_ordered_list(n); end
     def visit_ordered_list_item(n); end
@@ -308,5 +331,6 @@ module Juli::Intermediate
     def visit_dictionary_list_item(n); end
     def visit_long_dictionary_list(n); end
     def visit_long_dictionary_list_item(n); end
+    def visit_white_line(n); end
   end
 end

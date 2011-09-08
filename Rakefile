@@ -14,7 +14,7 @@ test_conf_outout_top  = 'test/html'
 task :default => parsers
 
 file juli_parser_rb => 'lib/juli/parser.y' do |t|
-  sh "racc #{t.prerequisites[0]}"
+  sh "racc -v -g #{t.prerequisites[0]}"
 end
 
 file juli_line_parser_rb => 'lib/juli/line_parser.y' do |t|

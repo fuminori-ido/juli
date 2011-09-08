@@ -1,526 +1,123 @@
 # Text parser for Juli format.
-#
-# = FIXME
-# Two pass (1. build Absyn tree, 2. build Intermediate tree) may be
-# merged into one pass, but I couldn't do that.
 class Juli::Parser
   options no_result_var
 
 rule
-  # Since Juli text is line-oriented syntax like wiki, 
-  # Abstract syntax tree is fixed 6-level depth header.
-  #
   # Racc action returns absyn node to build absyn-tree, while
-  # @curr is current node to store current node
   text
-    : elements                  { @root = val[0]; @root.add(Absyn::End.new) }
-  elements
-    : /* none */                { Absyn::ArrayNode.new }
-    | elements element          { val[0].add(val[1]) }
+    : blocks                    { @root = val[0] }
 
-  element
-    : H STRING                  { Absyn::HeaderNode.new(val[0], val[1]) }
-    | ORDERED_LIST_ITEM         { Absyn::OrderedListItem.new(*val[0]) }
-    | UNORDERED_LIST_ITEM       { Absyn::UnorderedListItem.new(*val[0]) }
-    | LONG_DT                   { Absyn::LongDictionaryListItem.new(val[0]) }
-    | DT STRING                 { Absyn::DictionaryListItem.new(val[0], val[1]) }
-    | WHITELINE                 { Absyn::WhiteLine.new }
-    | LEVEL STRING              { Absyn::StringNode.new(val[0], val[1]) }
+  blocks
+    : /* none */                { Intermediate::ArrayNode.new(0) }
+    | blocks block              { val[0].add(val[1]) }
+
+  block
+    : textblock                 { Intermediate::StrNode.new(val[0], 0) }
+    | verbatim                  { Intermediate::StrNode.new(val[0], 2) }
+    | '(' headlines ')'         { val[1] }
+    | '(' unordered_list ')'    { val[1] }
+    | WHITELINE                 { Intermediate::WhiteLine.new }
+
+  textblock
+    : STRING
+    | textblock STRING          { val[0] + val[1] }
+
+  verbatim
+    : '(' textblock ')'         { val[1] }
+
+  # '(' ... ')' at headlines syntax above 'block' definition is to let
+  # racc parse headlines with *level* correctly.
+  # It's the same as 'if ... elsif ... elsif ... end' in Ada, Eiffel, and Ruby.
+  headlines
+    : headline                  {
+                h = Intermediate::ArrayNode.new(0)
+                h.add(val[0])
+              }
+    | headlines headline        { val[0].add(val[1]) }
+
+  headline
+    : H STRING blocks {
+                h = Intermediate::HeaderNode.new(val[0], val[1])
+                h.add(val[2])
+              }
+
+  unordered_list
+    : list_item {
+                l = Intermediate::UnorderedList.new(0)
+                l.add(val[0])
+              }
+    | unordered_list list_item { val[0].add(val[1]) }
+
+  list_item
+    : UNORDERED_LIST_ITEM   { Intermediate::UnorderedListItem.new(*val[0]) }
+    | '(' blocks ')'        { val[1] }
 end
 
 ---- header
 require 'juli/wiki'
 
-module Juli::Absyn
-  class Node
-    include Juli::Wiki
-
-    def accept(visitor)
-      visitor.visit_node(self)
-    end
-  end
-
-  # let Visitor know end of visiting
-  class End < Node
-    def accept(visitor)
-      visitor.visit_end(self)
-    end
-  end
-
-  class StringNode < Node
-    attr_accessor :level, :str
-  
-    def initialize(level, str)
-      @level  = level
-      @str    = str
-    end
-  
-    def accept(visitor)
-      visitor.visit_string(self)
-    end
-  end
-  
-  class ArrayNode < Node
-    attr_accessor :array
-  
-    def initialize
-      @array  = Array.new
-    end
-  
-    def add(child)
-      @array << child
-      self
-    end
-  
-    def accept(visitor)
-      visitor.visit_array(self)
-    end
-  end
-  
-  class HeaderNode < Node
-    attr_accessor :level, :str
-  
-    def initialize(level, str)
-      @level  = level
-      @str    = str
-    end
-  
-    def accept(visitor)
-      visitor.visit_header(self)
-    end
-  end
-
-  #   |   1. HelloWorld
-  #    <----><-----------
-  #    level    str
-  class OrderedListItem < Node
-    attr_accessor :level, :str
-  
-    def initialize(level, str)
-      @level  = level
-      @str    = str
-    end
-  
-    def accept(visitor)
-      visitor.visit_ordered_list_item(self)
-    end
-  end
-
-  #   |   *  HelloWorld
-  #    <----><-----------
-  #    level    str
-  class UnorderedListItem < Node
-    attr_accessor :level, :str
-  
-    def initialize(level, str)
-      @level  = level
-      @str    = str
-    end
-  
-    def accept(visitor)
-      visitor.visit_unordered_list_item(self)
-    end
-  end
-
-  # term:: desciption,
-  class DictionaryListItem < Node
-    attr_accessor :term, :str
-  
-    def initialize(term, str)
-      @term = term
-      @str  = str
-    end
-  
-    def accept(visitor)
-      visitor.visit_dictionary_list_item(self)
-    end
-  end
-
-  #   term::
-  #       desciption...
-  #       desciption(cont'd)...
-  #   <-->
-  #   level
-  class LongDictionaryListItem < Node
-    attr_accessor :term
-  
-    def initialize(term)
-      @term = term
-    end
-  
-    def accept(visitor)
-      visitor.visit_long_dictionary_list_item(self)
-    end
-  end
-
-  class WhiteLine < Node
-    def accept(visitor)
-      visitor.visit_white_line(self)
-    end
-  end
-
-  class Visitor
-    def visit_node(n); end
-    def visit_array(n); end
-    def visit_string(n); end
-    def visit_header(n); end
-    def visit_ordered_list_item(n); end
-    def visit_unordered_list_item(n); end
-    def visit_dictionary_list_item(n); end
-    def visit_long_dictionary_list_item(n); end
-    def visit_white_line(n); end
-    def visit_end(n); end
-  end
-end
-
 ---- inner
-
-# build Intermediate tree from Absyn tree.
-#
-# Before:
-#   h1
-#   Orange
-#   h2
-#   Apple
-#   h1
-# ↓
-#
-# After:
-#   h1
-#   | +- Orange
-#   | +- h2
-#   |   +- Apple
-#   h1
-#
-# === Header
-# As seen Before & After above, flat header (where i=1..6) is 
-# organized in tree by finding its level.
-#
-# === List
-# When:
-# level keeps the same:           each type list item is in the same list.
-# deeper level list item comes:   create new list.
-# shallow level list item comes:  ends the list until the same level.
-#
-# This is the same search logic as header's.
-#
-# === Offset
-# Offset is a start point of text or list.
-#
-# For example, it is 0 in normal text, 2 in 1st level unordered list,
-# 3 in 1st level numbered list, 4 in 2nd level unordered list, ....
-# When there is the following text:
-#
-#   |Hello, World
-#   |
-#   |* Unordered list item A.
-#   |* Unordered list item B.
-#   |  * Nested Unordered list item B-1.
-#   |
-#   |1. Ordred list item A.
-#   |1. Ordred list item B.
-#
-# then, each offset is as follows:
-#
-#    0 offset in normal list:
-#
-#   |Hello, World
-#
-#   <-> 2 offset in 1st level unordred list:
-#   |
-#   |* Unordered list item A.
-#   |* Unordered list item B.
-#
-#   <---> 4 offset in 2nd level unordered list:
-#   |
-#   |  * Nested Unordered list item B-1.
-#
-#   <--> 3 offset in 1st level ordered list:
-#   |
-#   |1. Ordred list item A.
-#   |1. Ordred list item B.
-#
-# === QuoteLevel
-# It indicates quotation's start point.  Combination of Offset and QuoteLevel
-# defines the operation type.  See quote_level.ods file for more detail.
-# 
-class TreeBuilder < Absyn::Visitor
-  def initialize
-    @root         = Intermediate::HeaderNode.new(0, '(root)')
-
-    # following instance vars are to keep 'current' header, list_item, 
-    # array, str_node, and quote_level while parsing Absyn tree:
-    @header       = @root
-    @array        = @root   # points to header, list, or even list-item
-    reset_contexts
-  end
-
-  def root
-    @root
-  end
-
-  def visit_array(n)
-    for child in n.array do
-      child.accept(self)
-    end
-  end
-
-  def visit_string(n)
-    vs_debug("start #{@quote_level} to #{n.level}", '')
-    vs_debug('array is: ',  @array.class.to_s.split('::').last +
-                                " level-#{@array.level}")
-    if @quote_level==@offset && @quote_level < n.level
-      # blue zone(see quote_level.ods)
-      str_node_break
-      vs_debug('beginning of quote', n.str)
-      @in_quote = true
-      @str_node = Intermediate::StrNode.new(n.str, n.level); @array.add(@str_node)
-      @quote_level = n.level
-    elsif @quote_level == n.level ||
-          @quote_level > @offset &&  @quote_level < n.level
-      # yellow zone
-      vs_debug('same quote_level', n.str)
-      @str_node.concat(' ' * (n.level - @quote_level) + n.str)
-    else
-      # red zone
-      vs_debug('end of quote', n.str)
-
-      # break list(= discard current @array) if n level is upper
-      # than @array.level.
-      list_break if n.level < @array.level
-
-      @in_quote = case @array
-                  when Intermediate::ListItem
-                    n.level > @array.level
-                  when  Intermediate::HeaderNode
-                    n.level > 0
-                  else
-                    false
-                  end
-      @str_node = Intermediate::StrNode.new(n.str, n.level)
-
-      vs_debug('add to array',  @array.class.to_s.split('::').last +
-                                "level(#{@array.level})")
-      # NOTE: add to parent here since n.str exists
-      @array.add(@str_node)
-      @quote_level = n.level
-    end
-  end
-
-  def visit_header(n)
-    vs_debug('', n.str, 'visit_header')
-    list_break
-    reset_contexts
-    new_node = Intermediate::HeaderNode.new(n)
-
-    # When @header points to upper (e.g. root) and parse level-1 as
-    # follows, build new node under the upper and shift @header to it:
-    #
-    #   (root)          - @header
-    #     test
-    #     = NAME        - we are here!
-    #     ...
-    #
-    if @header.level < n.level
-      @header.add(new_node)
-
-    # When @header points to lower level (e.g. 'Option' below)
-    # and parses 'SEE ALSO' (level=1) as follows, find parent, 
-    # build new node under it, and shift @header to the new node:
-    #
-    #   ...
-    #   === Option      - @header
-    #   ...
-    #   = SEE ALSO      - we are here!
-    else
-      @header.find_upper(n.level).add(new_node)
-    end
-    @array = @header = new_node
-
-    # NOTE: Adding to node tree is differred
-    # as possible since there is no actual string right now.
-    @str_node = Intermediate::StrNode.new
-    @in_quote = false
-  end
-
-  def visit_ordered_list_item(n)
-    visit_list_item(n, 
-        Intermediate::OrderedList,
-        Intermediate::OrderedListItem)
-  end
-
-  def visit_unordered_list_item(n)
-    visit_list_item(n,
-        Intermediate::UnorderedList,
-        Intermediate::UnorderedListItem)
-  end
-
-  def visit_dictionary_list_item(n)
-    list = if !@list_item
-              l = Intermediate::DictionaryList.new
-              @header.add(l)
-              l
-           else
-             @list_item.parent
-           end
-    @list_item = Intermediate::DictionaryListItem.new(n)
-    list.add(@list_item)
-  end
-
-  LONG_DICT_LEVEL = 2
-
-  # long dictionary is more like ordered/unordered list than
-  # (compact)dictionary list.
-  def visit_long_dictionary_list_item(n)
-    vs_debug('start parse', n.term, 'visit_long_dict')
-    str_node_break
-    list_item = Intermediate::LongDictionaryListItem.new(n.term, LONG_DICT_LEVEL)
-    
-    # when list_item exists, add to curr_list
-    if @list_item
-      vs_debug('same level', n.term, 'visit_long_dict')
-      @list_item.parent.add(list_item)
-    else
-      vs_debug("new dict", n.term, 'visit_long_dict')
-      new_list  = Intermediate::LongDictionaryList.new(LONG_DICT_LEVEL)
-      add_list_to_array(new_list)
-      new_list.add(list_item)
-    end
-    @array = @list_item = list_item
-    @offset = @quote_level  = LONG_DICT_LEVEL
-  end
-
-  def visit_white_line(n)
-    vs_debug('', '', 'visit_white_line')
-    if in_quote?
-      @str_node.concat("\n")
-    else
-      list_break
-    end
-  end
-
-  # flush every buffer
-  def visit_end(n)
-    str_node_break
-  end
-
-private
-  def in_quote?
-    @in_quote
-  end
-
-  # print debug info when DEBUG environment is set.
-  def vs_debug(tag, str, method='visit_string')
-    return if !ENV['DEBUG']
-
-    printf("%-20.20s %-20.20s '%s'\n",
-        method,
-        tag,
-        str_limit(str).gsub(/\n/, '\n'))
-  end
-
-  # str_node_break is called when:
-  # 1. beginning of quote
-  # 1. list break
-  # 1. end of input file
-  #
-  # to do:
-  # 1. if parent is not set, add to @array.
-  #    This happens for example at the beginning of text.
-  # 1. create new str_node
-  def str_node_break
-    if @str_node.str !~ /\A\s*\z/m && !@str_node.parent
-      @array.add(@str_node)
-      vs_debug('add to parent:', @str_node.str, 'str_node_break')
-    end
-
-    @str_node = Intermediate::StrNode.new
-    @in_quote = false
-  end
-
-  def list_level
-    @list_item.parent.level
-  end
-
-  # reset contexts which are used while parsing to keep
-  # 'current' header, list_item, 
-  # array, str_node, and quote_level.
-  #
-  # NOTE: str_node is a buffer.  Adding to node tree is differred
-  # as possible since there is no actual string right now.
-  def reset_contexts
-    @list_item    = nil
-    @str_node     = Intermediate::StrNode.new
-    @in_quote     = false
-    @offset       = 0
-    @quote_level  = 0
-  end
-
-  # action on end of list
-  def list_break
-    str_node_break
-    vs_debug('', '', 'list_break')
-    return if !@list_item
-
-    @array        = @header
-    reset_contexts
-  end
-
-  def visit_list_item(n, list_class, list_item_class)
-    str_node_break
-    @str_node = Intermediate::StrNode.new(n.str)
-    list_item = list_item_class.new(n.level)
-    list_item.add(@str_node)
-
-    # when same level, add to curr_list
-    if @list_item && list_level == n.level
-      vs_debug('same level', n.str, 'visit_list_item')
-      @list_item.parent.add(list_item)
-
-    # when list points to upper or nil and parses lower(=nested) list,
-    # build new list node under the upper and shift list to it:
-    elsif !@list_item || list_level < n.level
-      vs_debug('deeper level', n.str, 'visit_list_item')
-      new_list  = list_class.new(n.level)
-      add_list_to_array(new_list)
-      new_list.add(list_item)
-
-    # when list points to lower and parses upper, find parent,
-    # build new node under it, and shift list to it:
-    else
-      vs_debug('shallow level', n.str, 'visit_list_item')
-      parent_list = @list_item.parent.find_list(n.level)
-      parent_list.add(list_item)
-    end
-    @array  = @list_item    = list_item
-    @offset = @quote_level  = n.level
-  end
-
-  # if array is Header, add to it.
-  # if array is ListItem, add to the parent.
-  def add_list_to_array(list)
-    if @array.is_a?(Juli::Intermediate::HeaderNode)
-      @array.add(list)
-    elsif @array.is_a?(Juli::Intermediate::ListItem)
-      @array.parent.add(list)
-    else
-      raise "unknown array class"
-    end
-  end
-end
-
   require 'erb'
   require 'juli/visitor'
 
+  # keep nest level; will be used to yield ')'
+  #
+  # This is used for both headline level and list nesting.
+  class NestStack
+    class InvalidIndentOrder < StandardError; end
+
+    def initialize
+      @stack  = []
+      @curr   = 0
+    end
+
+    # action on '('
+    def push(length)
+      if @stack.last && length <= @stack.last
+        raise InvalidIndentOrder, "length(#{length}) <= top(#{@stack.last})"
+      end
+      @stack << length
+      @curr = length
+    end
+
+    # current level of nest
+    def curr
+      @curr
+    end
+
+    # action on ')'
+    #
+    # go up nest until length meets.  Block (mainly for ')') is called
+    # on each pop
+    def pop(length, &block)
+      if @stack.last && length < @stack.last
+        @stack.pop
+        if block_given?
+          yield
+        end
+        self.pop(length, &block)
+      else
+        @curr = length
+      end
+    end
+
+    def flush(&block)
+      pop(0, &block)
+    end
+  end
+
   # parse one file, build Intermediate tree, then generate HTML
   def parse(in_file, visitor)
+@yydebug = true
+
+    @indent_stack = NestStack.new
+    @header_stack = NestStack.new
+    @in_file      = in_file
     File.open(in_file) do |io|
       @in_io = io
       yyparse self, :scan
     end
-    @tree = TreeBuilder.new
-    @root.accept(@tree)
-    visitor.run_file(in_file, @tree.root)
+    visitor.run_file(in_file, @root)
   end
 
   # return intermediate tree
@@ -532,29 +129,82 @@ private
   class ScanError < Exception; end
 
   def scan(&block)
+    @src_line = 0
     while line = @in_io.gets do
+      @src_line += 1
       case line
       when /^\s*$/
+        indent_or_dedent(0, &block)
         yield :WHITELINE, nil
       when /^(={1,6})\s+(.*)$/
+        header_nest($1.length, &block)
         yield :H,       $1.length
         yield :STRING,  $2
+=begin
       when /^(\s*)(\d+\.\s+)(.*)$/
         yield :ORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
+=end
       when /^(\s*)(\*\s+)(.*)$/
+        indent_or_dedent($1.length, &block)
         yield :UNORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
+=begin
       when /^(\S.*)::\s*$/
         yield :LONG_DT, $1
       when /^(\S.*)::\s+(.*)$/
         yield :DT, $1
         yield :STRING, $2
+=end
       when /^(\s*)(.*)$/
-        yield :LEVEL,   $1.length
+        indent_or_dedent($1.length, &block)
+       #yield :LEVEL,   $1.length
         yield :STRING,  $2 + "\n"
       else
         raise ScanError
       end
     end
+    indent_or_dedent(0, &block)
+    header_nest(0, &block)
     yield false, nil
+  end
+
+  def on_error(et, ev, values)
+    File.open(@in_file) do |io|
+      line = 0
+      while line_str = io.gets do
+        if @src_line == line
+          raise ParseError,
+                sprintf("Juli syntax error\n%04d: %s\n", @src_line+1, line_str)
+        end
+        line += 1
+      end
+    end
+    raise ParseError, sprintf("Juli syntax error at line %d\n", @src_line + 1)
+  end
+
+  # calculate indent level and yield '(' or ')' correctly
+  def indent_or_dedent(length, &block)
+    if @indent_stack.curr < length
+      @indent_stack.push(length)
+      yield '(', nil
+    elsif @indent_stack.curr > length
+      @indent_stack.pop(length) do
+        yield ')', nil
+      end
+    end
+  end
+
+  # calculate header level and yield '(' or ')' correctly
+  def header_nest(length, &block)
+    # at header level change, flush indent_stack
+    @indent_stack.flush{yield ')', nil}
+
+    if @header_stack.curr < length
+      @header_stack.push(length)
+      yield '(', nil
+    elsif @header_stack.curr > length
+      @header_stack.pop(length) do
+        yield ')', nil
+      end
+    end
   end
 ---- footer

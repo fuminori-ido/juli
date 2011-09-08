@@ -185,6 +185,19 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 2, t.array[1].array[1].array[0].level
   end
 
+  def test_indent_stack
+    is = Juli::Parser::IndentStack.new
+    is.push(2);   assert_equal 2, is.curr
+    is.push(4);   assert_equal 4, is.curr
+    is.push(6);   assert_equal 6, is.curr
+    is.pop(4);    assert_equal 4, is.curr
+    is.push(6);   assert_equal 6, is.curr
+    is.pop(2);    assert_equal 2, is.curr
+    assert_raise(Juli::Parser::IndentStack::InvalidIndentOrder) do
+      is.push(2)
+    end
+  end
+
 private
   # return full path of test data file.
   def data_path(filename)
