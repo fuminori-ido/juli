@@ -127,7 +127,7 @@ require 'juli/wiki'
 
   # return intermediate tree
   def tree
-    @tree.root
+    @root
   end
 
 private
