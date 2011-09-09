@@ -186,16 +186,22 @@ class ParserTest < Test::Unit::TestCase
   end
 
   def test_indent_stack
-    is = Juli::Parser::IndentStack.new
-    is.push(2);   assert_equal 2, is.curr
-    is.push(4);   assert_equal 4, is.curr
-    is.push(6);   assert_equal 6, is.curr
-    is.pop(4);    assert_equal 4, is.curr
-    is.push(6);   assert_equal 6, is.curr
-    is.pop(2);    assert_equal 2, is.curr
-    assert_raise(Juli::Parser::IndentStack::InvalidIndentOrder) do
+    is = Juli::Parser::NestStack.new
+    is.push(2);   assert_equal 2, is.baseline
+    is.push(4);   assert_equal 4, is.baseline
+    is.push(6);   assert_equal 6, is.baseline
+    is.pop(4);    assert_equal 4, is.baseline
+    is.push(6);   assert_equal 6, is.baseline
+    is.pop(2);    assert_equal 2, is.baseline
+    assert_raise(Juli::Parser::NestStack::InvalidOrder) do
       is.push(2)
     end
+
+    # test flush
+    is.push(4); is.push(6)
+    count = 0
+    is.flush{ count += 1 }
+    assert_equal 3, count       # flushed stack depth
   end
 
 private

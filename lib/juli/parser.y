@@ -3,7 +3,7 @@ class Juli::Parser
   options no_result_var
 
 rule
-  # Racc action returns absyn node to build absyn-tree, while
+  # Racc action returns absyn node to build absyn-tree
   text
     : blocks                    { @root = val[0] }
 
@@ -14,8 +14,8 @@ rule
   block
     : textblock                 { Intermediate::StrNode.new(val[0], 0) }
     | verbatim                  { Intermediate::StrNode.new(val[0], 2) }
-    | '(' headlines ')'         { val[1] }
-    | '(' unordered_list ')'    { val[1] }
+    | headline_block
+    | unordered_list_block
     | WHITELINE                 { Intermediate::WhiteLine.new }
 
   textblock
@@ -25,32 +25,35 @@ rule
   verbatim
     : '(' textblock ')'         { val[1] }
 
-  # '(' ... ')' at headlines syntax above 'block' definition is to let
+  # '{' ... '}' at headline_block syntax is to let
   # racc parse headlines with *level* correctly.
   # It's the same as 'if ... elsif ... elsif ... end' in Ada, Eiffel, and Ruby.
+  headline_block
+    : '{' headlines '}'         { val[1] }
   headlines
     : headline                  {
                 h = Intermediate::ArrayNode.new(0)
                 h.add(val[0])
               }
     | headlines headline        { val[0].add(val[1]) }
-
   headline
     : H STRING blocks {
                 h = Intermediate::HeaderNode.new(val[0], val[1])
                 h.add(val[2])
               }
 
+  unordered_list_block
+    : '(' unordered_list ')'    { val[1] }
   unordered_list
     : list_item {
                 l = Intermediate::UnorderedList.new(0)
                 l.add(val[0])
               }
-    | unordered_list list_item { val[0].add(val[1]) }
+    | unordered_list list_item  { val[0].add(val[1]) }
+    | unordered_list block      { val[0].add(val[1]) }
 
   list_item
     : UNORDERED_LIST_ITEM   { Intermediate::UnorderedListItem.new(*val[0]) }
-    | '(' blocks ')'        { val[1] }
 end
 
 ---- header
@@ -64,25 +67,25 @@ require 'juli/wiki'
   #
   # This is used for both headline level and list nesting.
   class NestStack
-    class InvalidIndentOrder < StandardError; end
+    class InvalidOrder < StandardError; end
 
     def initialize
-      @stack  = []
-      @curr   = 0
+      @stack    = []
+      @baseline = 0
     end
 
     # action on '('
     def push(length)
       if @stack.last && length <= @stack.last
-        raise InvalidIndentOrder, "length(#{length}) <= top(#{@stack.last})"
+        raise InvalidOrder, "length(#{length}) <= top(#{@stack.last})"
       end
       @stack << length
-      @curr = length
+      @baseline = length
     end
 
-    # current level of nest
-    def curr
-      @curr
+    # current baseline
+    def baseline
+      @baseline
     end
 
     # action on ')'
@@ -92,17 +95,19 @@ require 'juli/wiki'
     def pop(length, &block)
       if @stack.last && length < @stack.last
         @stack.pop
-        if block_given?
-          yield
-        end
+        yield if block_given?
         self.pop(length, &block)
       else
-        @curr = length
+        @baseline = length
       end
     end
 
     def flush(&block)
-      pop(0, &block)
+      while @stack.last do
+        yield if block_given?
+        @stack.pop
+      end
+      @baseline = 0
     end
   end
 
@@ -134,7 +139,6 @@ private
       @src_line += 1
       case line
       when /^\s*$/
-        indent_or_dedent(0, &block)
         yield :WHITELINE, nil
       when /^(={1,6})\s+(.*)$/
         header_nest($1.length, &block)
@@ -145,7 +149,7 @@ private
         yield :ORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
 =end
       when /^(\s*)(\*\s+)(.*)$/
-        indent_or_dedent($1.length, &block)
+        indent_or_dedent($1.length + $2.length, &block)
         yield :UNORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
 =begin
       when /^(\S.*)::\s*$/
@@ -162,8 +166,8 @@ private
         raise ScanError
       end
     end
-    indent_or_dedent(0, &block)
-    header_nest(0, &block)
+    @indent_stack.flush{ yield ')', nil }
+    @header_stack.flush{ yield '}', nil }
     yield false, nil
   end
 
@@ -171,22 +175,22 @@ private
     File.open(@in_file) do |io|
       line = 0
       while line_str = io.gets do
+        line += 1
         if @src_line == line
           raise ParseError,
-                sprintf("Juli syntax error\n%04d: %s\n", @src_line+1, line_str)
+                sprintf("Juli syntax error\n%04d: %s\n", @src_line, line_str)
         end
-        line += 1
       end
     end
-    raise ParseError, sprintf("Juli syntax error at line %d\n", @src_line + 1)
+    raise ParseError, sprintf("Juli syntax error at line %d\n", @src_line)
   end
 
   # calculate indent level and yield '(' or ')' correctly
   def indent_or_dedent(length, &block)
-    if @indent_stack.curr < length
+    if @indent_stack.baseline < length
       @indent_stack.push(length)
       yield '(', nil
-    elsif @indent_stack.curr > length
+    elsif @indent_stack.baseline > length
       @indent_stack.pop(length) do
         yield ')', nil
       end
@@ -196,14 +200,14 @@ private
   # calculate header level and yield '(' or ')' correctly
   def header_nest(length, &block)
     # at header level change, flush indent_stack
-    @indent_stack.flush{yield ')', nil}
+    @indent_stack.flush{ yield ')', nil }
 
-    if @header_stack.curr < length
+    if @header_stack.baseline < length
       @header_stack.push(length)
-      yield '(', nil
-    elsif @header_stack.curr > length
+      yield '{', nil
+    elsif @header_stack.baseline > length
       @header_stack.pop(length) do
-        yield ')', nil
+        yield '}', nil
       end
     end
   end

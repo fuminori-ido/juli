@@ -163,6 +163,12 @@ module Juli::Visitor
       end
     end
   
+    def visit_array(n)
+      n.array.inject(''){|result, child|
+        result += child.accept(self)
+      }
+    end
+
     def visit_header(n)
       if n.level == 0
         header_content(n)
@@ -212,6 +218,10 @@ module Juli::Visitor
           result += str_or_quote.accept(self)
         end
       end
+    end
+
+    def visit_white_line(n)
+      ''
     end
 
     # find erb template in the following order:

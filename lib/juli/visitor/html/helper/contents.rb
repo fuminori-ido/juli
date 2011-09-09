@@ -20,7 +20,14 @@ module Juli::Visitor::Html::Helper
       def visit_dictionary_list_item(n); ''; end
       def visit_long_dictionary_list(n); ''; end
       def visit_long_dictionary_list_item(n); ''; end
+      def visit_white_line(n); ''; end
   
+      def visit_array(n)
+        n.array.inject(''){|result, child|
+          result += child.accept(self)
+        }
+      end
+
       def visit_header(n)
         if n.level > 0
           content_tag(:li) do
