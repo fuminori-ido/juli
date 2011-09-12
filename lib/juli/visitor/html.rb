@@ -143,24 +143,16 @@ module Juli::Visitor
     end
   
     def visit_str(n)
-      case n.parent
-      when Juli::Intermediate::ListItem
-       #if n.level > n.parent.level
-       #  blockquote(n.str)
-       #else
-          # just string (no quote, no paragraph)
-          str2html(n.str)
-       #end
-      else
-       #if n.level > 0
-       #  blockquote(n.str)
-       #else
-          # paragraph
-          content_tag(:p, paragraph_css) do
-            str2html(n.str)
-          end
-       #end
+      content_tag(:p, paragraph_css) do
+        str2html(n.str)
       end
+    end
+
+    def visit_verbatim(n)
+      # quote; trim last white spaces at generating phase
+      content_tag(:blockquote,
+          content_tag(:pre, n.str.gsub(/\s+\z/m, '')),
+          blockquote_css)
     end
   
     def visit_array(n)
@@ -218,10 +210,6 @@ module Juli::Visitor
           result += str_or_quote.accept(self)
         end
       end
-    end
-
-    def visit_white_line(n)
-      ''
     end
 
     # find erb template in the following order:
@@ -407,12 +395,6 @@ module Juli::Visitor
       raise Errno::ENOENT, "no #{t} found"
     end
 
-    # quote; trim last white spaces at generating phase
-    def blockquote(str)
-      content_tag(:blockquote,
-          content_tag(:pre, str.gsub(/\s+\z/m, '')),
-          blockquote_css)
-    end
 
     # both ordered and unordered list item
     def visit_list_item(n)

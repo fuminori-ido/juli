@@ -60,9 +60,9 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 3, t.array[0].array.size
   end
 
-  def test_chapter
-    t = build_tree_on('t008.txt')
-    assert_equal 9, t.array.size
+  def test_verbatim
+    t = build_tree_on('t010.txt')
+    assert_equal 4, t.array.size
   end
 
 =begin

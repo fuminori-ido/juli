@@ -30,6 +30,18 @@ module Juli::Intermediate
     end
   end
 
+  class Verbatim < Node
+    attr_accessor :str
+
+    def initialize(str)
+      @str    = str
+    end
+
+    def accept(visitor)
+      visitor.visit_verbatim(self)
+    end
+  end
+
   class ArrayNode < Node
     attr_accessor :array
 
@@ -168,12 +180,6 @@ module Juli::Intermediate
     end
   end
 
-  class WhiteLine < Node
-    def accept(visitor)
-      visitor.visit_white_line(self)
-    end
-  end
-
   # Abstract VISITOR-pattern around Intermediate tree.
   #
   # === How to add new generator
@@ -221,6 +227,7 @@ module Juli::Intermediate
     # n:: Intermediate node
     def visit_node(n); end
     def visit_str(n); end
+    def visit_verbatim(n); end
     def visit_array(n)
       for node in n.array do
         node.accept(self)
@@ -235,6 +242,5 @@ module Juli::Intermediate
     def visit_dictionary_list_item(n); end
     def visit_long_dictionary_list(n); end
     def visit_long_dictionary_list_item(n); end
-    def visit_white_line(n); end
   end
 end

@@ -12,8 +12,8 @@ rule
     | blocks block              { val[0].add(val[1]) if val[1]; val[0] }
 
   block
-    : textblock                 { Intermediate::StrNode.new(val[0], 0) }
-    | verbatim                  { Intermediate::StrNode.new(val[0], 2) }
+    : textblock                 { Intermediate::StrNode.new(val[0]) }
+    | verbatim                  { Intermediate::Verbatim.new(val[0]) }
     | '{' chapters '}'          { val[1] }
     | '(' ulist ')'             { val[1] }
     | '(' olist ')'             { val[1] }
@@ -174,7 +174,6 @@ private
 =end
       when /^(\s*)(.*)$/
         indent_or_dedent($1.length, &block)
-       #yield :LEVEL,   $1.length
         yield :STRING,  $2 + "\n"
       else
         raise ScanError

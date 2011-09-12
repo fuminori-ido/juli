@@ -44,12 +44,12 @@ module Juli::Visitor
     def visit_str(n)
       print_depth
       printf("StrNode(%d)\n", -1)
-      case n.parent
-      when Juli::Intermediate::ListItem
-        process_str_as_quote(n)
-      else
-        process_str_as_quote(n)
-      end
+      process_str(n.str)
+    end
+
+    def visit_verbatim(n)
+      print_depth
+      printf("verbatim: %s\n", str_trim(n.str))
     end
 
     def visit_header(n)
@@ -140,19 +140,6 @@ module Juli::Visitor
     def process_str(str)
       Juli::LineParser.new.parse(str, Juli::Wiki.wikinames).
           accept(LineTree.new(@depth))
-    end
-
-    def process_str_as_str(n)
-      @depth += 1
-      process_str(n.str)
-      @depth -= 1
-    end
-
-    def process_str_as_quote(n)
-      @depth += 1
-      print_depth
-      printf("quote: %s\n", str_trim(n.str))
-      @depth -= 1
     end
   end
 end
