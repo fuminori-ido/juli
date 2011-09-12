@@ -31,16 +31,38 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 3, count       # flushed stack depth
   end
 
+  def test_string_blocks_only
+    t = build_tree_on('t002.txt')
+    assert_equal 5, t.array.size
+  end
+
   def test_simple_headline
     t = build_tree_on('t003.txt')
     assert_equal 1, t.array.size
     assert_equal 1, t.array[0].array.size
   end
 
+  def test_simple_ordered_list
+    t = build_tree_on('t004.txt')
+    assert_equal 1, t.array.size
+    assert_equal 3, t.array[0].array.size
+  end
+
   def test_simple_unordered_list
     t = build_tree_on('t006.txt')
     assert_equal 1, t.array.size
     assert_equal 3, t.array[0].array.size
+  end
+
+  def test_ordered_n_unordered_list
+    t = build_tree_on('t007.txt')
+    assert_equal 3, t.array.size
+    assert_equal 3, t.array[0].array.size
+  end
+
+  def test_chapter
+    t = build_tree_on('t008.txt')
+    assert_equal 9, t.array.size
   end
 
 =begin

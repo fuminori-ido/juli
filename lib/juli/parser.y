@@ -8,15 +8,16 @@ rule
     : blocks                    { @root = val[0] }
 
   blocks
-    : /* none */                { Intermediate::ArrayNode.new(0) }
-    | blocks block              { val[0].add(val[1]) }
+    : /* none */                { Intermediate::ArrayNode.new }
+    | blocks block              { val[0].add(val[1]) if val[1]; val[0] }
 
   block
     : textblock                 { Intermediate::StrNode.new(val[0], 0) }
     | verbatim                  { Intermediate::StrNode.new(val[0], 2) }
-    | headline_block
-    | unordered_list_block
-    | WHITELINE                 { Intermediate::WhiteLine.new }
+    | '{' chapters '}'          { val[1] }
+    | '(' ulist ')'             { val[1] }
+    | '(' olist ')'             { val[1] }
+    | WHITELINE                 { nil }
 
   textblock
     : STRING
@@ -25,35 +26,48 @@ rule
   verbatim
     : '(' textblock ')'         { val[1] }
 
-  # '{' ... '}' at headline_block syntax is to let
+  # chapters are list of chapter at the same level,
+  # and chapter is header + blocks.
+  #
+  # Where, chapter here refers both chapter and/or section in
+  # usual meanings since (again) it contains header + blocks.
+  # 
+  # '{' ... '}' at chapters syntax is to let
   # racc parse headlines with *level* correctly.
   # It's the same as 'if ... elsif ... elsif ... end' in Ada, Eiffel, and Ruby.
-  headline_block
-    : '{' headlines '}'         { val[1] }
-  headlines
-    : headline                  {
-                h = Intermediate::ArrayNode.new(0)
+  chapters
+    : chapter {
+                h = Intermediate::ArrayNode.new
                 h.add(val[0])
               }
-    | headlines headline        { val[0].add(val[1]) }
-  headline
+    | chapters chapter { val[0].add(val[1]) }
+  chapter
     : H STRING blocks {
                 h = Intermediate::HeaderNode.new(val[0], val[1])
                 h.add(val[2])
               }
 
-  unordered_list_block
-    : '(' unordered_list ')'    { val[1] }
-  unordered_list
-    : list_item {
-                l = Intermediate::UnorderedList.new(0)
+  # unordered list
+  ulist
+    : ulist_item {
+                l = Intermediate::UnorderedList.new
                 l.add(val[0])
               }
-    | unordered_list list_item  { val[0].add(val[1]) }
-    | unordered_list block      { val[0].add(val[1]) }
+    | ulist ulist_item  { val[0].add(val[1]) }
+    | ulist block       { val[0].add(val[1]) }
+  ulist_item
+    : UNORDERED_LIST_ITEM   { Intermediate::UnorderedListItem.new(val[0][1]) }
 
-  list_item
-    : UNORDERED_LIST_ITEM   { Intermediate::UnorderedListItem.new(*val[0]) }
+  # ordered list
+  olist
+    : olist_item {
+                l = Intermediate::OrderedList.new
+                l.add(val[0])
+              }
+    | olist olist_item  { val[0].add(val[1]) }
+    | olist block       { val[0].add(val[1]) }
+  olist_item
+    : ORDERED_LIST_ITEM   { Intermediate::OrderedListItem.new(val[0][1]) }
 end
 
 ---- header
@@ -139,15 +153,15 @@ private
       @src_line += 1
       case line
       when /^\s*$/
+        indent_or_dedent(0, &block)
         yield :WHITELINE, nil
       when /^(={1,6})\s+(.*)$/
         header_nest($1.length, &block)
         yield :H,       $1.length
         yield :STRING,  $2
-=begin
       when /^(\s*)(\d+\.\s+)(.*)$/
+        indent_or_dedent($1.length + $2.length, &block)
         yield :ORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
-=end
       when /^(\s*)(\*\s+)(.*)$/
         indent_or_dedent($1.length + $2.length, &block)
         yield :UNORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]

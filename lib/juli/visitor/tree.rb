@@ -43,20 +43,12 @@ module Juli::Visitor
   
     def visit_str(n)
       print_depth
-      printf("StrNode(%d)\n", n.level)
+      printf("StrNode(%d)\n", -1)
       case n.parent
       when Juli::Intermediate::ListItem
-        if n.level > n.parent.level
-          process_str_as_quote(n)
-        else
-          process_str_as_str(n)
-        end
+        process_str_as_quote(n)
       else
-        if n.level > 0
-            process_str_as_quote(n)
-        else
-          process_str_as_str(n)
-        end
+        process_str_as_quote(n)
       end
     end
 

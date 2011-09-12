@@ -145,21 +145,21 @@ module Juli::Visitor
     def visit_str(n)
       case n.parent
       when Juli::Intermediate::ListItem
-        if n.level > n.parent.level
-          blockquote(n.str)
-        else
+       #if n.level > n.parent.level
+       #  blockquote(n.str)
+       #else
           # just string (no quote, no paragraph)
           str2html(n.str)
-        end
+       #end
       else
-        if n.level > 0
-          blockquote(n.str)
-        else
+       #if n.level > 0
+       #  blockquote(n.str)
+       #else
           # paragraph
           content_tag(:p, paragraph_css) do
             str2html(n.str)
           end
-        end
+       #end
       end
     end
   

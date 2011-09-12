@@ -1,8 +1,6 @@
 require 'juli/wiki'
 
 # intermediate tree nodes
-#
-# FIXME: level may be able to delete?
 module Juli::Intermediate
   class Node
     attr_accessor :parent
@@ -33,11 +31,10 @@ module Juli::Intermediate
   end
 
   class ArrayNode < Node
-    attr_accessor :array, :level
+    attr_accessor :array
 
-    def initialize(level)
+    def initialize
       @array  = Array.new
-      @level  = level
     end
 
     def accept(visitor)
@@ -49,53 +46,16 @@ module Juli::Intermediate
       child.parent = self
       self
     end
-
-    # find upper node than the 'level'
-    def find_upper(level)
-      if self.level < level
-        self
-      else
-        if parent
-          parent.find_upper(level)
-        else
-          raise "No parent node"
-        end
-      end
-    end
-
-    # fallback when no list parent on list.find_list
-    def find_list(level)
-      self
-    end
   end
 
-  # level==0 is top level array node.
-  #
   # NOTE: @dom_id will be used for only Html visitor and contents helper.
   class HeaderNode < ArrayNode
-    attr_accessor :str, :dom_id
+    attr_accessor :level, :str, :dom_id
 
-    # === INPUTS
-    # two patterns are considered:
-    #
-    # 1. absyn_header
-    # 2. level & str
-    def initialize(*absyn_header_or_values)
-      super(0)
-=begin
-      super(absyn_header_or_values[0].class == Juli::Absyn::HeaderNode ?
-          absyn_header_or_values[0].level :
-          absyn_header_or_values[0])
-=end
-
-=begin
-      case absyn_header_or_values[0]
-      when Juli::Absyn::HeaderNode
-        @str    = absyn_header_or_values[0].str
-      else
-=end
-        @str    = absyn_header_or_values[1]
-#     end
+    def initialize(level, str)
+      super()
+      @level  = level
+      @str    = str
     end
   
     def accept(visitor)
@@ -104,58 +64,10 @@ module Juli::Intermediate
   end
 
   # abstract List.
-  #
-  # find_list() is Array method because to find parent
-  # even if string is the following level:
-  #
-  #   |1. list item
-  #   |Hello World
-  #
-  # On the other side, above 'Hello World' level is zero so
-  # it must be added to header, not list.  In order to do that,
-  # list level is calculated as depth + offset.
   class List < ArrayNode
-    def initialize(level)
-      super(level)
-    end
-    # find upper or equal *list* node than the 'level'
-    #
-    # NOTE: use find_upper() to find parent header while use
-    # find_upper_list() to find parent *list* but implement here because:
-    #
-    # 1. header is added under parent while list item is added at the same
-    #    level of list as follows:
-    #
-    #
-    # Header:
-    #   = a             H(a)
-    #   == b        ->    | H(b)
-    #   = c             H(c)
-    #
-    # List:
-    #                   List
-    #   1. a              | item(a)
-    #     1. b      ->    | List
-    #   1. c              | | item(b)
-    #                     | item(c)
-    def find_list(level)
-      if self.level <= level
-        self
-      else
-        if parent
-          parent.find_list(level)
-        else
-          raise "No parent node"
-        end
-      end
-    end
   end
 
   class OrderedList < List
-    def initialize(level)
-      super
-    end
-
     def accept(visitor)
       visitor.visit_ordered_list(self)
     end
@@ -166,13 +78,9 @@ module Juli::Intermediate
   #
   # ListItem has also level to track depth of child string.
   class ListItem < ArrayNode
-    def initialize(level, str)
-      super(level)
+    def initialize(str)
+      super()
       self.add(StrNode.new(str))
-    end
-
-    def find_list(level)
-      parent.find_list(level)
     end
   end
 
@@ -183,10 +91,6 @@ module Juli::Intermediate
   end
 
   class UnorderedList < List
-    def initialize(level)
-      super
-    end
-
     def accept(visitor)
       visitor.visit_unordered_list(self)
     end
