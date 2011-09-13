@@ -76,16 +76,8 @@ module Juli::Visitor
       visit_list("OrderedList\n", n)
     end
 
-    def visit_ordered_list_item(n)
-      visit_list_item("OrderedListItem\n", n)
-    end
-
     def visit_unordered_list(n)
       visit_list("UnorderedList\n", n)
-    end
-
-    def visit_unordered_list_item(n)
-      visit_list_item("UnorderedListItem\n", n)
     end
 
     def visit_dictionary_list(n)
@@ -132,16 +124,6 @@ module Juli::Visitor
       @depth += 1
       for child in n.array do
         child.accept(self)
-      end
-      @depth -= 1
-    end
-
-    def visit_list_item(class_str, n)
-      print_depth
-      printf(class_str)
-      @depth += 1
-      for str_or_quote in n.array do
-        str_or_quote.accept(self)
       end
       @depth -= 1
     end

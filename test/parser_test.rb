@@ -46,19 +46,19 @@ class ParserTest < Test::Unit::TestCase
   def test_simple_ordered_list
     t = build_tree_on('t004.txt')
     assert_equal 1, t.array.size
-    assert_equal 3, t.array[0].array.size
+    assert_equal 2, t.array[0].array.size
   end
 
   def test_simple_unordered_list
     t = build_tree_on('t006.txt')
     assert_equal 1, t.array.size
-    assert_equal 3, t.array[0].array.size
+    assert_equal 2, t.array[0].array.size
   end
 
   def test_ordered_n_unordered_list
     t = build_tree_on('t007.txt')
     assert_equal 3, t.array.size
-    assert_equal 3, t.array[0].array.size
+    assert_equal 2, t.array[0].array.size
   end
 
   def test_verbatim
@@ -76,7 +76,7 @@ class ParserTest < Test::Unit::TestCase
   def test_list_n_verbatim
     t = build_tree_on('t012.txt')
     assert_equal 10, t.array.size
-    assert_equal  6, t.array[3].array.size
+    assert_equal  4, t.array[3].array.size
   end
 
   def test_str_after_list
@@ -94,7 +94,7 @@ class ParserTest < Test::Unit::TestCase
   def test_str_after_list_with_quote
     t = build_tree_on('t016.txt')
     assert_equal 3, t.array.size
-    assert_equal 3, t.array[1].array.size
+    assert_equal 2, t.array[1].array.size
   end
 
   def test_nested_chapter
@@ -108,6 +108,22 @@ class ParserTest < Test::Unit::TestCase
   def test_whiteline
     t = build_tree_on('t019.txt')
     assert_equal 2, t.array.size              # number of blocks
+  end
+
+  def test_nested_header_and_paragraph
+    t = build_tree_on('t020.txt')
+    assert_equal 1, t.array.size              # number of top blocks
+    assert_equal 1, t.array[0].array.size     # number of chapters
+                                              # number of blocks in chapter1
+    assert_equal 5, t.array[0].array[0].blocks.array.size
+  end
+
+  def test_quote_in_list
+    t = build_tree_on('t021.txt')
+    assert_equal 1, t.array.size              # number of blocks
+    assert_equal 2, t.array[0].array.size     # number of list items
+                                              # number of elements@1st list item
+    assert_equal 3, t.array[0].array[0].array.size
   end
 
 =begin

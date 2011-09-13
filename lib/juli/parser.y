@@ -51,9 +51,8 @@ rule
                 l.add(val[0])
               }
     | ulist ulist_item  { val[0].add(val[1]) }
-    | ulist block       { val[0].add(val[1]) }
   ulist_item
-    : '*' textblock     { Intermediate::UnorderedListItem.new(val[1]) }
+    : '*' blocks        { val[1] }
 
   # ordered list
   olist
@@ -62,9 +61,9 @@ rule
                 l.add(val[0])
               }
     | olist olist_item  { val[0].add(val[1]) }
-    | olist block       { val[0].add(val[1]) }
+#   | olist block       { val[0].add(val[1]) }
   olist_item
-    : '#' textblock     { Intermediate::OrderedListItem.new(val[1]) }
+    : '#' blocks        { val[1] }
 end
 
 ---- header

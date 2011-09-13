@@ -168,16 +168,8 @@ module Juli::Visitor
       visit_list(:ol, n)
     end
 
-    def visit_ordered_list_item(n)
-      visit_list_item(n)
-    end
-
     def visit_unordered_list(n)
       visit_list(:ul, n)
-    end
-
-    def visit_unordered_list_item(n)
-      visit_list_item(n)
     end
 
     def visit_dictionary_list(n)
@@ -360,7 +352,9 @@ module Juli::Visitor
     def visit_list(tag, n, options={})
       content_tag(tag, options) do
         n.array.inject('') do |result, child|
-          result += child.accept(self)
+          result += content_tag(:li, list_item_css) do
+            child.accept(self)
+          end
         end
       end
     end
@@ -378,16 +372,6 @@ module Juli::Visitor
         return template if File.exist?(template)
       end
       raise Errno::ENOENT, "no #{t} found"
-    end
-
-
-    # both ordered and unordered list item
-    def visit_list_item(n)
-      content_tag(:li, list_item_css) do
-        n.array.inject('') do |result, str_or_quote|
-          result += str_or_quote.accept(self)
-        end
-      end
     end
 
     def paragraph_css

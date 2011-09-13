@@ -86,32 +86,9 @@ module Juli::Intermediate
     end
   end
 
-  # ListItem is also an array-node, but it consists from only
-  # StrNode and QuoteNode.
-  #
-  # ListItem has also level to track depth of child string.
-  class ListItem < ArrayNode
-    def initialize(str)
-      super()
-      self.add(StrNode.new(str))
-    end
-  end
-
-  class OrderedListItem < ListItem
-    def accept(visitor)
-      visitor.visit_ordered_list_item(self)
-    end
-  end
-
    class UnorderedList < List
     def accept(visitor)
       visitor.visit_unordered_list(self)
-    end
-  end
-
-  class UnorderedListItem < ListItem
-    def accept(visitor)
-      visitor.visit_unordered_list_item(self)
     end
   end
 
@@ -236,9 +213,7 @@ module Juli::Intermediate
     end
     def visit_chapter(n); end
     def visit_ordered_list(n); end
-    def visit_ordered_list_item(n); end
     def visit_unordered_list(n); end
-    def visit_unordered_list_item(n); end
     def visit_dictionary_list(n); end
     def visit_dictionary_list_item(n); end
     def visit_long_dictionary_list(n); end
