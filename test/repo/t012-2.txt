@@ -1,0 +1,3 @@
+See test_list_n_verbatim2 in test/parser_test.rb for comment.
+ b
+* c

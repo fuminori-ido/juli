@@ -61,7 +61,6 @@ rule
                 l.add(val[0])
               }
     | olist olist_item  { val[0].add(val[1]) }
-#   | olist block       { val[0].add(val[1]) }
   olist_item
     : '#' blocks        { val[1] }
 end
@@ -109,6 +108,7 @@ require 'juli/wiki'
         self.pop(length, &block)
       else
         @baseline = length
+       #@baseline = @stack.last ? length : 0
       end
     end
 
@@ -119,14 +119,19 @@ require 'juli/wiki'
       end
       @baseline = 0
     end
+
+    # for debug
+    def status
+      @stack.inspect
+    end
   end
 
   # parse one file, build Intermediate tree, then generate HTML
   def parse(in_file, visitor)
-@yydebug = true
-
+    @yydebug      = true          if ENV['YYDEBUG']
     @indent_stack = NestStack.new
     @header_stack = NestStack.new
+    @indent_level = nil
     @in_file      = in_file
     File.open(in_file) do |io|
       @in_io = io
@@ -146,6 +151,7 @@ private
   def scan(&block)
     @src_line = 0
     while line = @in_io.gets do
+      debug("@indent_level = #{@indent_level.inspect}")
       @src_line += 1
       case line
       when /^\s*$/
@@ -156,13 +162,23 @@ private
         yield [:H,       $1.length]
         yield [:STRING,  $2]
       when /^(\s*)(\d+\.\s+)(.*)$/
-        indent_or_dedent($1.length + $2.length, &block)
-        yield ['#', nil]
-        yield [:STRING, $3 + "\n"]
+        length = $1.length + $2.length
+        if in_verbatim && @indent_stack.baseline <= length
+          yield [:STRING,  line]
+        else
+          indent_or_dedent(length, &block)
+          yield ['#', nil]
+          yield [:STRING, $3 + "\n"]
+        end
       when /^(\s*)(\*\s+)(.*)$/
-        indent_or_dedent($1.length + $2.length, &block)
-        yield ['*', nil]
-        yield [:STRING, $3 + "\n"]
+        length = $1.length + $2.length
+        if in_verbatim && @indent_stack.baseline <= length
+          yield [:STRING,  line]
+        else
+          indent_or_dedent(length, &block)
+          yield ['*', nil]
+          yield [:STRING, $3 + "\n"]
+        end
 =begin
       when /^(\S.*)::\s*$/
         yield [:LONG_DT, $1]
@@ -171,7 +187,14 @@ private
         yield [:STRING, $2]
 =end
       when /^(\s*)(.*)$/
-        indent_or_dedent($1.length, &block)
+        indent_length = $1.length
+        if !in_verbatim && @indent_stack.baseline < indent_length
+          indent_or_dedent(indent_length, &block)
+          @indent_level = indent_length
+        else
+          indent_or_dedent(indent_length, &block)
+        end
+        indent_or_dedent(indent_length, &block)
         yield [:STRING,  $2 + "\n"]
       else
         raise ScanError
@@ -196,14 +219,29 @@ private
     raise ParseError, sprintf("Juli syntax error at line %d\n", @src_line)
   end
 
+  def in_verbatim
+    @indent_level != nil
+  end
+
   # calculate indent level and yield '(' or ')' correctly
   def indent_or_dedent(length, &block)
-    if @indent_stack.baseline < length
-      @indent_stack.push(length)
-      yield ['(', nil]
-    elsif @indent_stack.baseline > length
-      @indent_stack.pop(length) do
-        yield [')', nil]
+    if in_verbatim
+      debug_indent('in_verbatim', length)
+      if @indent_stack.baseline > length    # end of verbatim
+        @indent_level = nil
+        @indent_stack.pop(length) do
+          yield [')', nil]
+        end
+      end
+    else
+      debug_indent('NOTverbatim', length)
+      if @indent_stack.baseline < length    # begin verbatim
+        @indent_stack.push(length)
+        yield ['(', nil]
+      elsif @indent_stack.baseline > length
+        @indent_stack.pop(length) do
+          yield [')', nil]
+        end
       end
     end
   end
@@ -221,5 +259,18 @@ private
         yield ['}', nil]
       end
     end
+  end
+
+  def debug_indent(key, length)
+    debug(sprintf(
+        "indent_or_dedent() %s: @indent_stack(%s,%d), length=%d",
+        key,
+        @indent_stack.status,
+        @indent_stack.baseline,
+        length))
+  end
+
+  def debug(str)
+    @racc_debug_out.print(str, "\n") if @yydebug
   end
 ---- footer

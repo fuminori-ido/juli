@@ -79,6 +79,14 @@ class ParserTest < Test::Unit::TestCase
     assert_equal  4, t.array[3].array.size
   end
 
+  # t012-2.txt resulted in 'syntax error' at the git version
+  # 0bc176893f57a6fdbecd0340101bd84a5eb724e0 (In other words, t012-2.txt was
+  # the minimum input text to detect the parser bug of the version).
+  def test_list_n_verbatim2
+    t = build_tree_on('t012-2.txt')
+    assert_equal  2, t.array.size
+  end
+
   def test_str_after_list
     t = build_tree_on('t014.txt')
     assert_equal 3, t.array.size
@@ -124,6 +132,10 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 2, t.array[0].array.size     # number of list items
                                               # number of elements@1st list item
     assert_equal 3, t.array[0].array[0].array.size
+  end
+
+  def test_nested_quote
+    t = build_tree_on('t022.txt')
   end
 
 =begin
