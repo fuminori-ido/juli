@@ -42,10 +42,7 @@ rule
               }
     | chapters chapter { val[0].add(val[1]) }
   chapter
-    : H STRING blocks {
-                h = Intermediate::HeaderNode.new(val[0], val[1])
-                h.add(val[2])
-              }
+    : H STRING blocks { Intermediate::Chapter.new(val[0], val[1], val[2]) }
 
   # unordered list
   ulist

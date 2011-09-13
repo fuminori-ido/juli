@@ -17,18 +17,14 @@ module Juli::Visitor
     # overwrite to:
     # * add 'slide' stylesheet-class at level==1
     # * include all contents in 'slide' stylesheet-class even title
-    def visit_header(n)
-      if n.level == 0
-        header_content(n)
-      else
-        attr = {:id=>n.dom_id}
-        if n.level==1
-          attr.merge!(:class=>'slide')
-        end
-        content_tag(:div, attr) do
-          header_link(n) + header_content(n)
-        end + "\n"
+    def visit_chapter(n)
+      attr = {:id=>n.dom_id}
+      if n.level==1
+        attr.merge!(:class=>'slide')
       end
+      content_tag(:div, attr) do
+        header_link(n) + header_content(n)
+      end + "\n"
     end
 
   private

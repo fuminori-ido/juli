@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'pp'
 
 class ParserTest < Test::Unit::TestCase
   def setup
@@ -70,6 +71,38 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 3, t.array.size
     assert_equal 2, t.array[1].array.size
     assert_equal 2, t.array[2].array.size
+  end
+
+  def test_list_n_verbatim
+    t = build_tree_on('t012.txt')
+    assert_equal 10, t.array.size
+    assert_equal  6, t.array[3].array.size
+  end
+
+  def test_str_after_list
+    t = build_tree_on('t014.txt')
+    assert_equal 3, t.array.size
+    assert_equal 2, t.array[1].array.size
+  end
+
+  def test_str_after_list2
+    t = build_tree_on('t015.txt')
+    assert_equal 2, t.array.size
+    assert_equal 2, t.array[0].array.size
+  end
+
+  def test_str_after_list_with_quote
+    t = build_tree_on('t016.txt')
+    assert_equal 3, t.array.size
+    assert_equal 3, t.array[1].array.size
+  end
+
+  def test_nested_chapter
+    t = build_tree_on('t018.txt')
+    assert_equal 1, t.array.size              # number of blocks
+    assert_equal 1, t.array[0].array.size     # number of chapters
+                                              # number of blocks in chapter1
+    assert_equal 2, t.array[0].array[0].blocks.array.size
   end
 
 =begin

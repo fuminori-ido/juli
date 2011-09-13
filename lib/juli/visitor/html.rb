@@ -31,13 +31,9 @@ module Juli::Visitor
         @uniq_id_seed   = 0
       end
     
-      def visit_header(n)
-        if n.level > 0
-          n.dom_id = uniq_id(n.level)
-        end
-        for child in n.array do
-          child.accept(self)
-        end
+      def visit_chapter(n)
+        n.dom_id = uniq_id(n.level)
+        n.blocks.accept(self)
       end
   
       def run(in_file, root)
@@ -161,15 +157,11 @@ module Juli::Visitor
       }
     end
 
-    def visit_header(n)
-      if n.level == 0
-        header_content(n)
-      else
-        header_link(n) +
-        content_tag(:div, :id=>n.dom_id) do
-          header_content(n)
-        end + "\n"
-      end
+    def visit_chapter(n)
+      header_link(n) +
+      content_tag(:div, :id=>n.dom_id) do
+        n.blocks.accept(self)
+      end + "\n"
     end
 
     def visit_ordered_list(n)
@@ -347,13 +339,6 @@ module Juli::Visitor
             printf("%s is deleted since no correspondent source text.\n", f)
           end
         }
-      }
-    end
-
-    # common for all h0, h1, ..., h6
-    def header_content(n)
-      n.array.inject(''){|result, child|
-        result += child.accept(self)
       }
     end
 

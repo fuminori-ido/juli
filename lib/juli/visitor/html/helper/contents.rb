@@ -28,20 +28,14 @@ module Juli::Visitor::Html::Helper
         }
       end
 
-      def visit_header(n)
-        if n.level > 0
+      def visit_chapter(n)
+        content_tag(:ol) do
           content_tag(:li) do
             content_tag(:a, :href=>'#' + header_id(n)) do
               n.str
             end
-          end
-        else
-          ''
-        end +
-        content_tag(:ol) do
-          n.array.inject(''){|result, child|
-            result += child.accept(self)
-          }
+          end +
+          n.blocks.accept(self)
         end
       end
     end

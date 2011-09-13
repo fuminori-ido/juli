@@ -61,17 +61,18 @@ module Juli::Intermediate
   end
 
   # NOTE: @dom_id will be used for only Html visitor and contents helper.
-  class HeaderNode < ArrayNode
-    attr_accessor :level, :str, :dom_id
+  class Chapter < Node
+    attr_accessor :level, :str, :blocks, :dom_id
 
-    def initialize(level, str)
+    def initialize(level, str, blocks)
       super()
       @level  = level
       @str    = str
+      @blocks = blocks
     end
   
     def accept(visitor)
-      visitor.visit_header(self)
+      visitor.visit_chapter(self)
     end
   end
 
@@ -102,7 +103,7 @@ module Juli::Intermediate
     end
   end
 
-  class UnorderedList < List
+   class UnorderedList < List
     def accept(visitor)
       visitor.visit_unordered_list(self)
     end
@@ -233,7 +234,7 @@ module Juli::Intermediate
         node.accept(self)
       end
     end
-    def visit_header(n); end
+    def visit_chapter(n); end
     def visit_ordered_list(n); end
     def visit_ordered_list_item(n); end
     def visit_unordered_list(n); end

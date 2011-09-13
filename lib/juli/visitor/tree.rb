@@ -54,13 +54,21 @@ module Juli::Visitor
       printf("verbatim: %s\n", str_trim(n.str))
     end
 
-    def visit_header(n)
+    def visit_array(n)
       print_depth
-      printf("HeaderNode(%d %s)\n", n.level, n.str)
+      printf("Array\n")
       @depth += 1
       for child in n.array do
         child.accept(self)
       end
+      @depth -= 1
+    end
+
+    def visit_chapter(n)
+      print_depth
+      printf("Chapter(%d %s)\n", n.level, n.str)
+      @depth += 1
+      n.blocks.accept(self)
       @depth -= 1
     end
 
