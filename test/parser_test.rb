@@ -105,6 +105,11 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 2, t.array[0].array[0].blocks.array.size
   end
 
+  def test_whiteline
+    t = build_tree_on('t019.txt')
+    assert_equal 2, t.array.size              # number of blocks
+  end
+
 =begin
   def test_parse
     stdout_to_dev_null do
