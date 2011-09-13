@@ -44,7 +44,9 @@ module Juli::Visitor
     def visit_str(n)
       print_depth
       printf("StrNode(%d)\n", -1)
-      process_str(n.str)
+      @depth += 1
+        process_str(n.str)
+      @depth -= 1
     end
 
     def visit_verbatim(n)

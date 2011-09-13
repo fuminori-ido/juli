@@ -56,7 +56,7 @@ rule
     | ulist ulist_item  { val[0].add(val[1]) }
     | ulist block       { val[0].add(val[1]) }
   ulist_item
-    : UNORDERED_LIST_ITEM   { Intermediate::UnorderedListItem.new(val[0][1]) }
+    : '*' textblock     { Intermediate::UnorderedListItem.new(val[1]) }
 
   # ordered list
   olist
@@ -67,7 +67,7 @@ rule
     | olist olist_item  { val[0].add(val[1]) }
     | olist block       { val[0].add(val[1]) }
   olist_item
-    : ORDERED_LIST_ITEM   { Intermediate::OrderedListItem.new(val[0][1]) }
+    : '#' textblock     { Intermediate::OrderedListItem.new(val[1]) }
 end
 
 ---- header
@@ -154,34 +154,36 @@ private
       case line
       when /^\s*$/
         indent_or_dedent(0, &block)
-        yield :WHITELINE, nil
+        yield [:WHITELINE, nil]
       when /^(={1,6})\s+(.*)$/
         header_nest($1.length, &block)
-        yield :H,       $1.length
-        yield :STRING,  $2
+        yield [:H,       $1.length]
+        yield [:STRING,  $2]
       when /^(\s*)(\d+\.\s+)(.*)$/
         indent_or_dedent($1.length + $2.length, &block)
-        yield :ORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
+        yield ['#', nil]
+        yield [:STRING, $3 + "\n"]
       when /^(\s*)(\*\s+)(.*)$/
         indent_or_dedent($1.length + $2.length, &block)
-        yield :UNORDERED_LIST_ITEM, [$1.length + $2.length, $3 + "\n"]
+        yield ['*', nil]
+        yield [:STRING, $3 + "\n"]
 =begin
       when /^(\S.*)::\s*$/
-        yield :LONG_DT, $1
+        yield [:LONG_DT, $1]
       when /^(\S.*)::\s+(.*)$/
-        yield :DT, $1
-        yield :STRING, $2
+        yield [:DT, $1]
+        yield [:STRING, $2]
 =end
       when /^(\s*)(.*)$/
         indent_or_dedent($1.length, &block)
-        yield :STRING,  $2 + "\n"
+        yield [:STRING,  $2 + "\n"]
       else
         raise ScanError
       end
     end
-    @indent_stack.flush{ yield ')', nil }
-    @header_stack.flush{ yield '}', nil }
-    yield false, nil
+    @indent_stack.flush{ yield [')', nil] }
+    @header_stack.flush{ yield ['}', nil] }
+    yield [false, nil]
   end
 
   def on_error(et, ev, values)
@@ -202,10 +204,10 @@ private
   def indent_or_dedent(length, &block)
     if @indent_stack.baseline < length
       @indent_stack.push(length)
-      yield '(', nil
+      yield ['(', nil]
     elsif @indent_stack.baseline > length
       @indent_stack.pop(length) do
-        yield ')', nil
+        yield [')', nil]
       end
     end
   end
@@ -213,14 +215,14 @@ private
   # calculate header level and yield '(' or ')' correctly
   def header_nest(length, &block)
     # at header level change, flush indent_stack
-    @indent_stack.flush{ yield ')', nil }
+    @indent_stack.flush{ yield [')', nil] }
 
     if @header_stack.baseline < length
       @header_stack.push(length)
-      yield '{', nil
+      yield ['{', nil]
     elsif @header_stack.baseline > length
       @header_stack.pop(length) do
-        yield '}', nil
+        yield ['}', nil]
       end
     end
   end

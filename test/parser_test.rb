@@ -65,6 +65,13 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 4, t.array.size
   end
 
+  def test_continued_list
+    t = build_tree_on('t011.txt')
+    assert_equal 3, t.array.size
+    assert_equal 2, t.array[1].array.size
+    assert_equal 2, t.array[2].array.size
+  end
+
 =begin
   def test_parse
     stdout_to_dev_null do
