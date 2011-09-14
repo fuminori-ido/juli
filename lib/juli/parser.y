@@ -102,7 +102,7 @@ require 'juli/wiki'
     # go up nest until length meets.  Block (mainly for ')') is called
     # on each pop
     def pop(length, &block)
-      if @stack.last && length < @stack.last
+      if @stack.last && @stack.last > length
         @stack.pop
         yield if block_given?
         self.pop(length, &block)
@@ -261,6 +261,7 @@ private
     end
   end
 
+  # print indent info on debug
   def debug_indent(key, length)
     debug(sprintf(
         "indent_or_dedent() %s: @indent_stack(%s,%d), length=%d",
@@ -270,6 +271,7 @@ private
         length))
   end
 
+  # general debug method
   def debug(str)
     @racc_debug_out.print(str, "\n") if @yydebug
   end
