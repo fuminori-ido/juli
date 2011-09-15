@@ -134,6 +134,16 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 3, t.array[0].array[0].array.size
   end
 
+  def test_nested_quote2
+    t = build_tree_on('t022-2.txt')
+    assert_equal 3, t.array.size
+    assert_equal 1, t.array[2].array.size
+  end
+
+  def test_nested_quote3
+    t = build_tree_on('t022-3.txt')
+  end
+
   def test_nested_quote
     t = build_tree_on('t022.txt')
   end

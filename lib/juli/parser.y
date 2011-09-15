@@ -85,8 +85,8 @@ require 'juli/wiki'
 
     # action on '('
     def push(length)
-      if @stack.last && length <= @stack.last
-        raise InvalidOrder, "length(#{length}) <= top(#{@stack.last})"
+      if @stack.last && @stack.last >= length
+        raise InvalidOrder, "top(#{@stack.last}) >= length(#{length})"
       end
       @stack << length
       @baseline = length
@@ -107,8 +107,7 @@ require 'juli/wiki'
         yield if block_given?
         self.pop(length, &block)
       else
-        @baseline = length
-       #@baseline = @stack.last ? length : 0
+        @baseline = @stack.last ? length : 0
       end
     end
 
@@ -131,6 +130,8 @@ require 'juli/wiki'
     @yydebug      = true          if ENV['YYDEBUG']
     @indent_stack = NestStack.new
     @header_stack = NestStack.new
+
+    # indicator whether if current status is in verbatim
     @indent_level = nil
     @in_file      = in_file
     File.open(in_file) do |io|
@@ -187,14 +188,29 @@ private
         yield [:STRING, $2]
 =end
       when /^(\s*)(.*)$/
-        indent_length = $1.length
-        if !in_verbatim && @indent_stack.baseline < indent_length
-          indent_or_dedent(indent_length, &block)
-          @indent_level = indent_length
+        length = $1.length
+        if in_verbatim
+          debug_indent('in_verbatim', length)
+          if @indent_stack.baseline > length     # end of verbatim
+            @indent_stack.pop(length) do
+              yield [')', nil]
+            end
+            end_of_verbatim(length, &block)
+          else
+            # do nothing (continue of verbatim)
+          end
         else
-          indent_or_dedent(indent_length, &block)
+          debug_indent('NOTverbatim', length)
+          if @indent_stack.baseline < length        # begin verbatim
+            @indent_stack.push(length)
+            yield ['(', nil]
+            @indent_level = length
+          elsif @indent_stack.baseline > length     # end of nest ')'
+            @indent_stack.pop(length) do
+              yield [')', nil]
+            end
+          end
         end
-        indent_or_dedent(indent_length, &block)
         yield [:STRING,  $2 + "\n"]
       else
         raise ScanError
@@ -228,10 +244,10 @@ private
     if in_verbatim
       debug_indent('in_verbatim', length)
       if @indent_stack.baseline > length    # end of verbatim
-        @indent_level = nil
         @indent_stack.pop(length) do
           yield [')', nil]
         end
+        @indent_level = nil
       end
     else
       debug_indent('NOTverbatim', length)
@@ -243,6 +259,27 @@ private
           yield [')', nil]
         end
       end
+    end
+  end
+
+  # Special case: 'continued string line just after verbatim, but its
+  # offset length is less than baseline'.  For example, this happens
+  # at test/repo/t022-2.txt 2nd line.
+  #
+  # Treat as:
+  #
+  # 1. end of verbatim
+  # 2. begin new verbatim if baseline < length, else
+  #    begin simple string
+  # 
+  def end_of_verbatim(length, &block)
+    debug_indent('end_of_verbatim', length)
+    if @indent_stack.baseline < length            # begin verbatim
+      @indent_stack.push(length)
+      yield ['(', nil]
+      @indent_level = length
+    else
+      @indent_level = nil
     end
   end
 
@@ -264,7 +301,7 @@ private
   # print indent info on debug
   def debug_indent(key, length)
     debug(sprintf(
-        "indent_or_dedent() %s: @indent_stack(%s,%d), length=%d",
+        "indent(%s): @indent_stack(%s,%d), length=%d",
         key,
         @indent_stack.status,
         @indent_stack.baseline,
