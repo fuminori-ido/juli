@@ -190,30 +190,19 @@ private
             # after verbatim, dedent just 1-level because there is no
             # deeper nest in verbatim
             @indent_stack.pop do
-debug_indent('unordered list item 1.1', length)
               yield [')', nil]
             end
             @in_verbatim = false
 
-debug_indent('unordered list item 2', length)
             # same as 'NOTverbatim' part of indent_or_dedent() 
             if @indent_stack.baseline < length    # begin verbatim
-p 'unordered list item a'
-debug_indent('unordered list item 3', length)
               @indent_stack.push(length)
               yield ['(', nil]
             elsif @indent_stack.baseline > length
-p 'unordered list item b'
-debug_indent('unordered list item 4', length)
               @indent_stack.pop(length) do
                 yield [')', nil]
               end
             end
-
-=begin
-            @indent_stack.push(length)
-            yield ['(', nil]
-=end
             yield ['*', nil]
             yield [:STRING, $3 + "\n"]
           end
@@ -253,7 +242,10 @@ debug_indent('unordered list item 4', length)
             end
           end
         end
-        yield [:STRING,  $2 + "\n"]
+        yield [:STRING,
+               (@in_verbatim ?
+                   ' ' * (length - @indent_stack.baseline) :
+                   '') + $2 + "\n"]
       else
         raise ScanError
       end
