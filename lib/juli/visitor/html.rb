@@ -137,10 +137,16 @@ module Juli::Visitor
       end
       printf("generated:       %s\n", out_filename(in_file))
     end
-  
+
+    # if str is in list, don't enclose by <p>
     def visit_str(n)
-      content_tag(:p, paragraph_css) do
+      if n.parent && n.parent.parent &&
+          n.parent.parent.is_a?(Juli::Intermediate::List)
         str2html(n.str)
+      else
+        content_tag(:p, paragraph_css) do
+          str2html(n.str)
+        end
       end
     end
 
