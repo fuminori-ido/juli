@@ -229,7 +229,10 @@ private
         line += 1
         if @src_line == line
           raise ParseError,
-                sprintf("Juli syntax error\n%04d: %s\n", @src_line, line_str)
+                sprintf("%s: Juli syntax error\n%04d: %s\n",
+                    @in_file,
+                    @src_line,
+                    line_str)
         end
       end
     end
