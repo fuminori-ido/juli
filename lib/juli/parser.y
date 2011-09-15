@@ -175,46 +175,9 @@ private
         yield [:H,       $1.length]
         yield [:STRING,  $2]
       when /^(\s*)(\d+\.\s+)(.*)$/
-        length = $1.length + $2.length
-        if @in_verbatim && @indent_stack.baseline <= length
-          yield [:STRING,  line]
-        else
-          indent_or_dedent(length, &block)
-          yield ['#', nil]
-          yield [:STRING, $3 + "\n"]
-        end
+        on_list_item(line, '#', $1.length, $2.length, $3, &block)
       when /^(\s*)(\*\s+)(.*)$/
-        mark_length = $2.length
-        length      = $1.length + mark_length
-        debug_indent('unordered list item', length)
-        if @in_verbatim
-          if @indent_stack.baseline <= length - mark_length
-            yield [:STRING,  line]
-          else
-            # after verbatim, dedent just 1-level because there is no
-            # deeper nest in verbatim
-            @indent_stack.pop do
-              yield [')', nil]
-            end
-            @in_verbatim = false
-
-            # same as 'NOTverbatim' part of indent_or_dedent() 
-            if @indent_stack.baseline < length    # begin verbatim
-              @indent_stack.push(length)
-              yield ['(', nil]
-            elsif @indent_stack.baseline > length
-              @indent_stack.pop(length) do
-                yield [')', nil]
-              end
-            end
-            yield ['*', nil]
-            yield [:STRING, $3 + "\n"]
-          end
-        else
-          indent_or_dedent(length, &block)
-          yield ['*', nil]
-          yield [:STRING, $3 + "\n"]
-        end
+        on_list_item(line, '*', $1.length, $2.length, $3, &block)
 =begin
       when /^(\S.*)::\s*$/
         yield [:LONG_DT, $1]
@@ -271,6 +234,39 @@ private
       end
     end
     raise ParseError, sprintf("Juli syntax error at line %d\n", @src_line)
+  end
+
+  def on_list_item(line, token, length1, length2, str, &block)
+        length  = length1 + length2
+        debug_indent("list item('#{token}')", length)
+        if @in_verbatim
+          if @indent_stack.baseline <= length1
+            yield [:STRING,  line]
+          else
+            # after verbatim, dedent just 1-level because there is no
+            # deeper nest in verbatim
+            @indent_stack.pop do
+              yield [')', nil]
+            end
+            @in_verbatim = false
+
+            # same as 'NOTverbatim' part of indent_or_dedent() 
+            if @indent_stack.baseline < length    # begin verbatim
+              @indent_stack.push(length)
+              yield ['(', nil]
+            elsif @indent_stack.baseline > length
+              @indent_stack.pop(length) do
+                yield [')', nil]
+              end
+            end
+            yield [token, nil]
+            yield [:STRING, str + "\n"]
+          end
+        else
+          indent_or_dedent(length, &block)
+          yield [token, nil]
+          yield [:STRING, str + "\n"]
+        end
   end
 
   # calculate indent level and yield '(' or ')' correctly
