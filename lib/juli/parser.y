@@ -13,7 +13,7 @@ rule
 
   block
     : textblock                 { Intermediate::StrNode.new(val[0]) }
-    | verbatim                  { Intermediate::Verbatim.new(val[0]) }
+    | '(' textblock ')'         { Intermediate::Verbatim.new(val[1]) }
     | '{' chapters '}'          { val[1] }
     | '(' ulist ')'             { val[1] }
     | '(' olist ')'             { val[1] }
@@ -22,9 +22,6 @@ rule
   textblock
     : STRING
     | textblock STRING          { val[0] + val[1] }
-
-  verbatim
-    : '(' textblock ')'         { val[1] }
 
   # chapters are list of chapter at the same level,
   # and chapter is header + blocks.
