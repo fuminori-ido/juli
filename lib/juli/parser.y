@@ -164,8 +164,12 @@ private
       @src_line += 1
       case line
       when /^\s*$/
-        indent_or_dedent(0, &block)
-        yield [:WHITELINE, nil]
+        if @in_verbatim
+          yield [:STRING, "\n"]
+        else
+          indent_or_dedent(0, &block)
+          yield [:WHITELINE, nil]
+        end
       when /^(={1,6})\s+(.*)$/
         header_nest($1.length, &block)
         yield [:H,       $1.length]
