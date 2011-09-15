@@ -84,7 +84,13 @@ class ParserTest < Test::Unit::TestCase
   # the minimum input text to detect the parser bug of the version).
   def test_list_n_verbatim2
     t = build_tree_on('t012-2.txt')
+    assert_equal  3, t.array.size
+  end
+
+  def test_list_n_verbatim3
+    t = build_tree_on('t012-3.txt')
     assert_equal  2, t.array.size
+    assert_equal  2, t.array[0].array.size
   end
 
   def test_str_after_list

@@ -101,13 +101,22 @@ require 'juli/wiki'
     #
     # go up nest until length meets.  Block (mainly for ')') is called
     # on each pop
-    def pop(length, &block)
-      if @stack.last && @stack.last > length
-        @stack.pop
-        yield if block_given?
-        self.pop(length, &block)
+    # If length==nil, pop just 1 level up
+    def pop(length = nil, &block)
+      if length
+        if @stack.last && @stack.last > length
+          @stack.pop
+          yield if block_given?
+          self.pop(length, &block)
+        else
+          @baseline = @stack.last ? length : 0
+        end
       else
-        @baseline = @stack.last ? length : 0
+        if @stack.last
+          @stack.pop
+          yield if block_given?
+          @baseline = @stack.last || 0
+        end
       end
     end
 
@@ -172,9 +181,43 @@ private
           yield [:STRING, $3 + "\n"]
         end
       when /^(\s*)(\*\s+)(.*)$/
-        length = $1.length + $2.length
-        if in_verbatim && @indent_stack.baseline <= length
-          yield [:STRING,  line]
+        mark_length = $2.length
+        length      = $1.length + mark_length
+        debug_indent('unordered list item', length)
+        if in_verbatim
+          if @indent_stack.baseline <= length - mark_length
+            yield [:STRING,  line]
+          else
+            # after verbatim, dedent just 1-level because there is no
+            # deeper nest in verbatim
+            @indent_stack.pop do
+debug_indent('unordered list item 1.1', length)
+              yield [')', nil]
+            end
+            @indent_level = length
+
+debug_indent('unordered list item 2', length)
+            # same as 'NOTverbatim' part of indent_or_dedent() 
+            if @indent_stack.baseline < length    # begin verbatim
+p 'unordered list item a'
+debug_indent('unordered list item 3', length)
+              @indent_stack.push(length)
+              yield ['(', nil]
+            elsif @indent_stack.baseline > length
+p 'unordered list item b'
+debug_indent('unordered list item 4', length)
+              @indent_stack.pop(length) do
+                yield [')', nil]
+              end
+            end
+
+=begin
+            @indent_stack.push(length)
+            yield ['(', nil]
+=end
+            yield ['*', nil]
+            yield [:STRING, $3 + "\n"]
+          end
         else
           indent_or_dedent(length, &block)
           yield ['*', nil]
