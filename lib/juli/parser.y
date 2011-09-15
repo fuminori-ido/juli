@@ -140,8 +140,7 @@ require 'juli/wiki'
     @indent_stack = NestStack.new
     @header_stack = NestStack.new
 
-    # indicator whether if current status is in verbatim
-    @indent_level = nil
+    @in_verbatim  = false
     @in_file      = in_file
     File.open(in_file) do |io|
       @in_io = io
@@ -161,7 +160,7 @@ private
   def scan(&block)
     @src_line = 0
     while line = @in_io.gets do
-      debug("@indent_level = #{@indent_level.inspect}")
+      debug("@in_verbatim = #{@in_verbatim.inspect}")
       @src_line += 1
       case line
       when /^\s*$/
@@ -173,7 +172,7 @@ private
         yield [:STRING,  $2]
       when /^(\s*)(\d+\.\s+)(.*)$/
         length = $1.length + $2.length
-        if in_verbatim && @indent_stack.baseline <= length
+        if @in_verbatim && @indent_stack.baseline <= length
           yield [:STRING,  line]
         else
           indent_or_dedent(length, &block)
@@ -184,7 +183,7 @@ private
         mark_length = $2.length
         length      = $1.length + mark_length
         debug_indent('unordered list item', length)
-        if in_verbatim
+        if @in_verbatim
           if @indent_stack.baseline <= length - mark_length
             yield [:STRING,  line]
           else
@@ -194,7 +193,7 @@ private
 debug_indent('unordered list item 1.1', length)
               yield [')', nil]
             end
-            @indent_level = length
+            @in_verbatim = false
 
 debug_indent('unordered list item 2', length)
             # same as 'NOTverbatim' part of indent_or_dedent() 
@@ -232,7 +231,7 @@ debug_indent('unordered list item 4', length)
 =end
       when /^(\s*)(.*)$/
         length = $1.length
-        if in_verbatim
+        if @in_verbatim
           debug_indent('in_verbatim', length)
           if @indent_stack.baseline > length     # end of verbatim
             @indent_stack.pop(length) do
@@ -247,7 +246,7 @@ debug_indent('unordered list item 4', length)
           if @indent_stack.baseline < length        # begin verbatim
             @indent_stack.push(length)
             yield ['(', nil]
-            @indent_level = length
+            @in_verbatim = true
           elsif @indent_stack.baseline > length     # end of nest ')'
             @indent_stack.pop(length) do
               yield [')', nil]
@@ -278,19 +277,15 @@ debug_indent('unordered list item 4', length)
     raise ParseError, sprintf("Juli syntax error at line %d\n", @src_line)
   end
 
-  def in_verbatim
-    @indent_level != nil
-  end
-
   # calculate indent level and yield '(' or ')' correctly
   def indent_or_dedent(length, &block)
-    if in_verbatim
+    if @in_verbatim
       debug_indent('in_verbatim', length)
       if @indent_stack.baseline > length    # end of verbatim
         @indent_stack.pop(length) do
           yield [')', nil]
         end
-        @indent_level = nil
+        @in_verbatim = false
       end
     else
       debug_indent('NOTverbatim', length)
@@ -320,9 +315,9 @@ debug_indent('unordered list item 4', length)
     if @indent_stack.baseline < length            # begin verbatim
       @indent_stack.push(length)
       yield ['(', nil]
-      @indent_level = length
+      @in_verbatim = true
     else
-      @indent_level = nil
+      @in_verbatim = false
     end
   end
 

@@ -93,6 +93,11 @@ class ParserTest < Test::Unit::TestCase
     assert_equal  2, t.array[0].array.size
   end
 
+  def test_continued_list3
+    t = build_tree_on('t013.txt')
+    assert_equal 2, t.array.size
+  end
+
   def test_str_after_list
     t = build_tree_on('t014.txt')
     assert_equal 3, t.array.size
@@ -109,6 +114,11 @@ class ParserTest < Test::Unit::TestCase
     t = build_tree_on('t016.txt')
     assert_equal 3, t.array.size
     assert_equal 2, t.array[1].array.size
+  end
+
+  def test_continued_list5
+    t = build_tree_on('t017.txt')
+    assert_equal 6, t.array.size
   end
 
   def test_nested_chapter
@@ -140,39 +150,39 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 3, t.array[0].array[0].array.size
   end
 
+  def test_nested_quote
+    t = build_tree_on('t022.txt')
+  end
+
   def test_nested_quote2
     t = build_tree_on('t022-2.txt')
     assert_equal 3, t.array.size
     assert_equal 1, t.array[2].array.size
   end
 
+  # This is a kind of irregular case, but Juli must parse as much as
+  # possible.  So far, it should be 2 verbatims and one list.
   def test_nested_quote3
     t = build_tree_on('t022-3.txt')
+    assert_equal 3, t.array.size
+    assert_equal 1, t.array[2].array.size
   end
 
-  def test_nested_quote
-    t = build_tree_on('t022.txt')
+  def test_quote_after_list
+    t = build_tree_on('t023.txt')
+    # 5 elements(text, list, text, quote, text) at top level:
+    assert_equal 5, t.array.size
+  end
+
+  def test_header_quote_without_list
+    t = build_tree_on('t024.txt')
+    assert_equal 2, t.array.size
+    assert_equal 1, t.array[1].array.size
+    assert_equal Juli::Intermediate::Verbatim,
+        t.array[1].array[0].blocks.array[0].array[0].blocks.array[0].class
   end
 
 =begin
-  def test_parse
-    stdout_to_dev_null do
-      for file in ['t001.txt', 't002.txt'] do
-        assert_nothing_raised do
-          Juli::Parser.new.parse(data_path(file), Juli::Visitor::Tree.new)
-        end
-      end
-    end
-  end
-
-  def test_nested_ordered_list
-    t = build_tree_on('t004.txt')
-    assert_equal 1, t.array.size
-    assert_equal Juli::Intermediate::OrderedList,     t.array[0].class
-    assert_equal Juli::Intermediate::OrderedListItem, t.array[0].array[0].class
-    assert_equal Juli::Intermediate::OrderedList,     t.array[0].array[1].class
-  end
-
   # even if list order is incorrect, parser shouldn't failed and
   # it is recognized as top-level.
   def test_nested_ordered_list_incorrect
@@ -180,29 +190,6 @@ class ParserTest < Test::Unit::TestCase
       parser = Juli::Parser.new
       parser.parse(data_path('t005.txt'), Juli::Visitor::Tree.new)
     end
-  end
-
-  def test_nested_unordered_list
-    t = build_tree_on('t006.txt')
-    assert_equal 1, t.array.size
-    assert_equal Juli::Intermediate::UnorderedList,     t.array[0].class
-    assert_equal Juli::Intermediate::UnorderedListItem, t.array[0].array[0].class
-    assert_equal Juli::Intermediate::UnorderedList,     t.array[0].array[1].class
-  end
-
-  def test_nested_mixed_list
-    t = build_tree_on('t007.txt')
-
-    # [order-list, default, unorder-list]
-    assert_equal 3, t.array.size
-    assert_equal Juli::Intermediate::OrderedList,   t.array[0].class
-    assert_equal Juli::Intermediate::UnorderedList, t.array[2].class
-
-    # [order-item, unorder-list, order-item]
-    assert_equal 3, t.array[0].array.size
-
-    # [unorder-item, order-list, unorder-item]
-    assert_equal 3, t.array[2].array.size
   end
 
   def test_line_break
@@ -222,83 +209,6 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 2, t.array[1].array.size
   end
 
-  def test_quote_in_list
-    t = build_tree_on('t016.txt')
-    assert_equal 3, t.array.size
-    assert_match /a.*b.*c/m, t.array[1].array[0].array[1].str
-  end
-
-  def test_quote_and_normal
-    t = build_tree_on('t010.txt')
-    assert_equal 4, t.array.size
-    assert_equal Juli::Intermediate::StrNode, t.array[2].class
-    assert_equal Juli::Intermediate::StrNode,   t.array[3].class
-  end
-
-  def test_continued_list
-    t = build_tree_on('t011.txt')
-    assert_equal 3, t.array.size
-    assert_equal 2, t.array[1].array.size
-    assert_match /hello/, t.array[1].array[0].array[0].str
-    assert_match /world/, t.array[1].array[0].array[0].str
-    assert_equal 2, t.array[2].array.size
-    assert_equal Juli::Intermediate::UnorderedList,     t.array[1].class
-    assert_equal Juli::Intermediate::UnorderedListItem, t.array[1].array[1].class
-  end
-
-  def test_continued_list2
-    t = build_tree_on('t012.txt')
-    assert_match /b/, t.array[3].array[0].array[0].str
-    assert_match /B/, t.array[3].array[0].array[0].str
-  end
-
-  def test_continued_list3
-    t = build_tree_on('t013.txt')
-    assert_equal Juli::Intermediate::UnorderedList, t.array[1].array[1].class
-    assert_equal Juli::Intermediate::UnorderedListItem, t.array[1].array[2].class
-  end
-
-  def test_continued_list4
-    t = build_tree_on('t014.txt')
-    assert_equal 3, t.array.size
-    assert_equal 2, t.array[1].array.size
-  end
-
-  def test_line_break_with_same_baseline
-    t = build_tree_on('t015.txt')
-    assert_equal 2,         t.array.size
-    assert_equal 2,         t.array[0].array.size
-    assert_match /^c\s*$/,  t.array[1].str
-  end
-
-  def test_str_node_break_on_sub_header
-    t = build_tree_on('t018.txt')
-    assert_equal 1,         t.array.size
-    assert_match /^hi\s*$/, t.array[0].array[0].str
-    assert_match /^ho\s*$/, t.array[0].array[1].array[0].str
-  end
-
-  def test_paragraph_break_on_whiteline
-    t = build_tree_on('t019.txt')
-    assert_equal 2,         t.array.size
-    assert_match /^a\s*$/,  t.array[0].str
-    assert_match /^b\s*$/,  t.array[1].str
-  end
-
-  def test_nested_header
-    t = build_tree_on('t020.txt')
-    assert_equal 1,         t.array.size
-    assert_match /will be/, t.array[0].array[2].str
-  end
-
-  # v0.06.00 feature
-  def test_quote_in_list
-    t = build_tree_on('t021.txt')
-    assert_equal 1,         t.array.size
-    assert_equal 2,         t.array[0].array.size
-    assert_equal 3,         t.array[0].array[0].array.size
-  end
-
   # nested quote (e.g. source program) should be in 1 quote.
   def test_quote_with_several_nest_level
     t = build_tree_on('t022.txt')
@@ -308,24 +218,6 @@ class ParserTest < Test::Unit::TestCase
     # 3rd element is quote and next is list:
     assert_equal Juli::Intermediate::StrNode,     t.array[3].class
     assert_equal Juli::Intermediate::OrderedList, t.array[4].class
-  end
-
-  # Workaround on test_quote_with_several_nest_level(test case = t022.txt)
-  # was not enough.  With list, quote wasn't handled well;-(
-  def test_quote_after_list
-    t = build_tree_on('t023.txt')
-    # 5 elements(text, list, text, quote, text) at top level:
-    assert_equal 5, t.array.size
-  end
-
-  # header, quote, header, and then quote was not parsed correctly at v1.01.01
-  def test_header_quote_without_list
-    t = build_tree_on('t024.txt')
-    assert_equal 2, t.array.size
-    assert_equal 2, t.array[1].array.size
-    assert_equal Juli::Intermediate::StrNode,
-                 t.array[1].array[1].array[0].class
-    assert_equal 2, t.array[1].array[1].array[0].level
   end
 =end
 
