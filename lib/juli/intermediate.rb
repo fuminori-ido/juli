@@ -98,7 +98,7 @@ module Juli::Intermediate
   #   ...
   #
   # === SEE ALSO
-  # LongDictionaryList
+  # DictionaryList
   class CompactDictionaryList < ArrayNode
     def accept(visitor)
       visitor.visit_compact_dictionary_list(self)
@@ -118,7 +118,7 @@ module Juli::Intermediate
     end
   end
 
-  # (Long) Dictionary list as follows:
+  # Dictionary list as follows:
   #   term1::
   #     description1
   #     description1(cont'd)
@@ -126,31 +126,19 @@ module Juli::Intermediate
   #     description2
   #   ...
   #
-  # Description can be a paragraph.
+  # Description can be in multilines.
   #
   # === SEE ALSO
-  # DictionaryList
-  class LongDictionaryList < List
-    def initialize(level)
-      super(level)
-    end
-  
+  # CompactDictionaryList
+  class DictionaryList < List
     def accept(visitor)
-      visitor.visit_long_dictionary_list(self)
+      visitor.visit_dictionary_list(self)
     end
   end
 
-  # LongDictionaryListItem consists from term and array-node
-  class LongDictionaryListItem < ArrayNode
-    attr_accessor :term
-
-    def initialize(term, level)
-      @term = term
-      super(level)
-    end
-  
+  class DictionaryListItem < CompactDictionaryListItem
     def accept(visitor)
-      visitor.visit_long_dictionary_list_item(self)
+      visitor.visit_dictionary_list_item(self)
     end
   end
 

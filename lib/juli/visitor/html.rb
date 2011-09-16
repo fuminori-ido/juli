@@ -194,16 +194,16 @@ module Juli::Visitor
     end
 
     def visit_dictionary_list(n)
-      visit_list(:dl, n, :class=>'juli_dictionary')
+      content_tag(:dl, :class=>'juli_dictionary') do
+        n.array.inject('') do |result, child|
+          result += child.accept(self)
+        end
+      end
     end
 
     def visit_dictionary_list_item(n)
       content_tag(:dt, str2html(n.term), dt_css) +
-      content_tag(:dd, dd_css) do
-        n.array.inject('') do |result, str_or_quote|
-          result += str_or_quote.accept(self)
-        end
-      end
+      content_tag(:dd, str2html(n.str),  dd_css)
     end
 
     # find erb template in the following order:
@@ -396,12 +396,12 @@ module Juli::Visitor
       {}
     end
 
-    # default long dictionary list item term part CSS
+    # default dictionary list item term part CSS
     def dt_css
       {}
     end
 
-    # default long dictionary list item description part CSS
+    # default dictionary list item description part CSS
     def dd_css
       {}
     end

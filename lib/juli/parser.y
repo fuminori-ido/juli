@@ -18,6 +18,7 @@ rule
     | '(' ulist ')'             { val[1] }
     | '(' olist ')'             { val[1] }
     | cdlist
+    | dlist
     | WHITELINE                 { nil }
 
   textblock
@@ -69,8 +70,15 @@ rule
                           }
     | cdlist cdlist_item  { val[0].add(val[1]) }
   cdlist_item
-    : DT STRING           { Intermediate::CompactDictionaryListItem.new(
+    : CDT STRING          { Intermediate::CompactDictionaryListItem.new(
                                 val[0], val[1]) }
+
+  # dictionary list
+  dlist
+    : dlist_item        { l = Intermediate::DictionaryList.new; l.add(val[0]) }
+    | dlist dlist_item  { val[0].add(val[1]) }
+  dlist_item
+    : DT '(' textblock ')'  { Intermediate::DictionaryListItem.new(val[0], val[2]) }
 end
 
 ---- header
@@ -186,14 +194,13 @@ private
         on_list_item(line, '#', $1.length, $2.length, $3, &block)
       when /^(\s*)(\*\s+)(.*)$/
         on_list_item(line, '*', $1.length, $2.length, $3, &block)
-=begin
       when /^(\S.*)::\s*$/
-        yield [:LONG_DT, $1]
-=end
+        indent_or_dedent(0, &block)
+        yield [:DT, $1]
       when /^(\S.*)::\s+(.*)$/
         # since compact dictionary list is not nested, indent control is
         # not necessary.
-        yield [:DT, $1]
+        yield [:CDT, $1]
         yield [:STRING, $2]
       when /^(\s*)(.*)$/
         length = $1.length
@@ -330,6 +337,7 @@ private
   def header_nest(length, &block)
     # at header level change, flush indent_stack
     @indent_stack.flush{ yield [')', nil] }
+    @in_verbatim = false
 
     if @header_stack.baseline < length
       @header_stack.push(length)

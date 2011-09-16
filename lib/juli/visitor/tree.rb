@@ -98,14 +98,7 @@ module Juli::Visitor
     end
 
     def visit_dictionary_list_item(n)
-      print_depth
-      printf("DictionaryListItem\n")
-      @depth += 1
-      process_str(n.term)
-      for str_or_quote in n.array do
-        str_or_quote.accept(self)
-      end
-      @depth -= 1
+      visit_compact_dictionary_list_item(n)
     end
 
     def visit_quote(n)
