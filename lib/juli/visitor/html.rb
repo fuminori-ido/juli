@@ -178,22 +178,26 @@ module Juli::Visitor
       visit_list(:ul, n)
     end
 
-    def visit_dictionary_list(n)
-      visit_list(:table, n, :class=>'juli_dictionary')
+    def visit_compact_dictionary_list(n)
+      content_tag(:table, :class=>'juli_compact_dictionary') do
+        n.array.inject('') do |result, child|
+          result += child.accept(self)
+        end
+      end
     end
 
-    def visit_dictionary_list_item(n)
+    def visit_compact_dictionary_list_item(n)
       content_tag(:tr) do
         content_tag(:td, str2html(n.term) + ':', :nowrap=>true) +
         content_tag(:td, str2html(n.str))
       end
     end
 
-    def visit_long_dictionary_list(n)
-      visit_list(:dl, n, :class=>'juli_long_dictionary')
+    def visit_dictionary_list(n)
+      visit_list(:dl, n, :class=>'juli_dictionary')
     end
 
-    def visit_long_dictionary_list_item(n)
+    def visit_dictionary_list_item(n)
       content_tag(:dt, str2html(n.term), dt_css) +
       content_tag(:dd, dd_css) do
         n.array.inject('') do |result, str_or_quote|

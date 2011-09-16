@@ -92,33 +92,29 @@ module Juli::Intermediate
     end
   end
 
-  # (Compact) Dictionary list as follows:
+  # CompactDictionary list as follows:
   #   term1:: description1
   #   term2:: description2
   #   ...
   #
   # === SEE ALSO
   # LongDictionaryList
-  class DictionaryList < ArrayNode
-    def initialize
-      super(0)
-    end
-  
+  class CompactDictionaryList < ArrayNode
     def accept(visitor)
-      visitor.visit_dictionary_list(self)
+      visitor.visit_compact_dictionary_list(self)
     end
   end
 
-  class DictionaryListItem < Node
+  class CompactDictionaryListItem < Node
     attr_accessor :term, :str
 
-    def initialize(absyn_dictionary_list_item)
-      @term = absyn_dictionary_list_item.term
-      @str  = absyn_dictionary_list_item.str
+    def initialize(term, str)
+      @term = term
+      @str  = str
     end
   
     def accept(visitor)
-      visitor.visit_dictionary_list_item(self)
+      visitor.visit_compact_dictionary_list_item(self)
     end
   end
 
@@ -214,9 +210,9 @@ module Juli::Intermediate
     def visit_chapter(n); end
     def visit_ordered_list(n); end
     def visit_unordered_list(n); end
+    def visit_compact_dictionary_list(n); end
+    def visit_compact_dictionary_list_item(n); end
     def visit_dictionary_list(n); end
     def visit_dictionary_list_item(n); end
-    def visit_long_dictionary_list(n); end
-    def visit_long_dictionary_list_item(n); end
   end
 end

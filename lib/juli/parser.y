@@ -17,6 +17,7 @@ rule
     | '{' chapters '}'          { val[1] }
     | '(' ulist ')'             { val[1] }
     | '(' olist ')'             { val[1] }
+    | cdlist
     | WHITELINE                 { nil }
 
   textblock
@@ -60,6 +61,16 @@ rule
     | olist olist_item  { val[0].add(val[1]) }
   olist_item
     : '#' blocks        { val[1] }
+
+  # compact dictionary list
+  cdlist
+    : cdlist_item         { l = Intermediate::CompactDictionaryList.new
+                            l.add(val[0])
+                          }
+    | cdlist cdlist_item  { val[0].add(val[1]) }
+  cdlist_item
+    : DT STRING           { Intermediate::CompactDictionaryListItem.new(
+                                val[0], val[1]) }
 end
 
 ---- header
@@ -178,10 +189,12 @@ private
 =begin
       when /^(\S.*)::\s*$/
         yield [:LONG_DT, $1]
+=end
       when /^(\S.*)::\s+(.*)$/
+        # since compact dictionary list is not nested, indent control is
+        # not necessary.
         yield [:DT, $1]
         yield [:STRING, $2]
-=end
       when /^(\s*)(.*)$/
         length = $1.length
         if @in_verbatim

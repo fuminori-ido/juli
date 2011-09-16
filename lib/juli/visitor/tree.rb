@@ -80,6 +80,19 @@ module Juli::Visitor
       visit_list("UnorderedList\n", n)
     end
 
+    def visit_compact_dictionary_list(n)
+      visit_list("CompactDictionaryList\n", n)
+    end
+
+    def visit_compact_dictionary_list_item(n)
+      print_depth
+      printf("CompactDictionaryListItem\n")
+      @depth += 1
+      process_str(n.term)
+      process_str(n.str)
+      @depth -= 1
+    end
+
     def visit_dictionary_list(n)
       visit_list("DictionaryList\n", n)
     end
@@ -87,19 +100,6 @@ module Juli::Visitor
     def visit_dictionary_list_item(n)
       print_depth
       printf("DictionaryListItem\n")
-      @depth += 1
-      process_str(n.term)
-      process_str(n.str)
-      @depth -= 1
-    end
-
-    def visit_long_dictionary_list(n)
-      visit_list("LongDictionaryList\n", n)
-    end
-
-    def visit_long_dictionary_list_item(n)
-      print_depth
-      printf("LongDictionaryListItem\n")
       @depth += 1
       process_str(n.term)
       for str_or_quote in n.array do

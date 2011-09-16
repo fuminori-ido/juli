@@ -182,6 +182,14 @@ class ParserTest < Test::Unit::TestCase
         t.array[1].array[0].blocks.array[0].array[0].blocks.array[0].class
   end
 
+  def test_compact_dictionary_list
+    t = build_tree_on('t027.txt')
+    assert_equal 2, t.array.size
+    assert_equal Juli::Intermediate::CompactDictionaryList,
+                 t.array[0].class
+    assert_equal 2, t.array[0].array.size
+  end
+
 =begin
   # even if list order is incorrect, parser shouldn't failed and
   # it is recognized as top-level.
