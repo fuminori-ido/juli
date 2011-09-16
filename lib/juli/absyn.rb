@@ -1,7 +1,7 @@
 require 'juli/wiki'
 
-# intermediate tree nodes
-module Juli::Intermediate
+# Abstract tree nodes
+module Juli::Absyn
   class Node
     attr_accessor :parent
 
@@ -142,7 +142,7 @@ module Juli::Intermediate
     end
   end
 
-  # Abstract VISITOR-pattern around Intermediate tree.
+  # Abstract VISITOR-pattern around Absyn tree.
   #
   # === How to add new generator
   # Document generator, which juli(1) command says, points to 'visitor'
@@ -177,16 +177,16 @@ module Juli::Intermediate
     #
     # === INPUTS
     # in_file::   input filename
-    # root::      Intermediate tree root
+    # root::      Absyn tree root
     def run_file(in_file, root)
       root.accept(self)
     end
 
-    # Methods for each Intermediate node. Derived class should implement
+    # Methods for each Absyn node. Derived class should implement
     # these.
     #
     # === INPUTS
-    # n:: Intermediate node
+    # n:: Absyn node
     def visit_node(n); end
     def visit_str(n); end
     def visit_verbatim(n); end

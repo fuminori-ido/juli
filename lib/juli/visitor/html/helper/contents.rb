@@ -1,7 +1,7 @@
 module Juli::Visitor::Html::Helper
   # Helper-class for 'contents' helper
   class Contents < AbstractHelper
-    class ContentsDrawer < Juli::Intermediate::Visitor
+    class ContentsDrawer < Juli::Absyn::Visitor
       include Juli::Visitor::Html::TagHelper
       include Juli::Visitor::Html::Helper
 

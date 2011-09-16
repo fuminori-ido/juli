@@ -178,14 +178,14 @@ class ParserTest < Test::Unit::TestCase
     t = build_tree_on('t024.txt')
     assert_equal 2, t.array.size
     assert_equal 1, t.array[1].array.size
-    assert_equal Juli::Intermediate::Verbatim,
+    assert_equal Juli::Absyn::Verbatim,
         t.array[1].array[0].blocks.array[0].array[0].blocks.array[0].class
   end
 
   def test_compact_dictionary_list
     t = build_tree_on('t027.txt')
     assert_equal 2, t.array.size
-    assert_equal Juli::Intermediate::CompactDictionaryList,
+    assert_equal Juli::Absyn::CompactDictionaryList,
                  t.array[0].class
     assert_equal 2, t.array[0].array.size
   end
@@ -193,7 +193,7 @@ class ParserTest < Test::Unit::TestCase
   def test_dictionary_list
     t = build_tree_on('t028.txt')
     assert_equal 2, t.array.size
-    assert_equal Juli::Intermediate::DictionaryList,
+    assert_equal Juli::Absyn::DictionaryList,
                  t.array[0].class
     assert_equal 3, t.array[0].array.size
   end
@@ -215,8 +215,8 @@ class ParserTest < Test::Unit::TestCase
     #
     # Where, s = str, o = ordered list, q = quote, h = header
     assert_equal 8, t.array.size
-    assert_equal Juli::Intermediate::StrNode,     t.array[6].class
-    assert_equal Juli::Intermediate::HeaderNode,  t.array[7].class
+    assert_equal Juli::Absyn::StrNode,     t.array[6].class
+    assert_equal Juli::Absyn::HeaderNode,  t.array[7].class
   end
 
   def test_quote_or_nested_list
@@ -232,8 +232,8 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 6, t.array.size
 
     # 3rd element is quote and next is list:
-    assert_equal Juli::Intermediate::StrNode,     t.array[3].class
-    assert_equal Juli::Intermediate::OrderedList, t.array[4].class
+    assert_equal Juli::Absyn::StrNode,     t.array[3].class
+    assert_equal Juli::Absyn::OrderedList, t.array[4].class
   end
 =end
 

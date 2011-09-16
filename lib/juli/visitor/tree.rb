@@ -1,4 +1,4 @@
-require 'juli/intermediate'
+require 'juli/absyn'
 require 'juli/util'
 require 'juli/line_parser.tab'
 
@@ -30,12 +30,12 @@ module Juli::Visitor
     end
   end
 
-  # Another VISITOR-pattern for Intermediate tree to print tree
+  # Another VISITOR-pattern for Absyn tree to print tree
   # structure around each node.
-  class Tree < Juli::Intermediate::Visitor
+  class Tree < Juli::Absyn::Visitor
     include Juli::Util
 
-    # visit root to generate intermediate-tree structure.
+    # visit root to generate absyn-tree structure.
     def run_file(in_file, root)
       @depth = 0
       super

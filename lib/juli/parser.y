@@ -8,12 +8,12 @@ rule
     : blocks                    { @root = val[0] }
 
   blocks
-    : /* none */                { Intermediate::ArrayNode.new }
+    : /* none */                { Absyn::ArrayNode.new }
     | blocks block              { val[0].add(val[1]) if val[1]; val[0] }
 
   block
-    : textblock                 { Intermediate::StrNode.new(val[0]) }
-    | '(' textblock ')'         { Intermediate::Verbatim.new(val[1]) }
+    : textblock                 { Absyn::StrNode.new(val[0]) }
+    | '(' textblock ')'         { Absyn::Verbatim.new(val[1]) }
     | '{' chapters '}'          { val[1] }
     | '(' ulist ')'             { val[1] }
     | '(' olist ')'             { val[1] }
@@ -36,17 +36,17 @@ rule
   # It's the same as 'if ... elsif ... elsif ... end' in Ada, Eiffel, and Ruby.
   chapters
     : chapter {
-                h = Intermediate::ArrayNode.new
+                h = Absyn::ArrayNode.new
                 h.add(val[0])
               }
     | chapters chapter { val[0].add(val[1]) }
   chapter
-    : H STRING blocks { Intermediate::Chapter.new(val[0], val[1], val[2]) }
+    : H STRING blocks { Absyn::Chapter.new(val[0], val[1], val[2]) }
 
   # unordered list
   ulist
     : ulist_item {
-                l = Intermediate::UnorderedList.new
+                l = Absyn::UnorderedList.new
                 l.add(val[0])
               }
     | ulist ulist_item  { val[0].add(val[1]) }
@@ -56,7 +56,7 @@ rule
   # ordered list
   olist
     : olist_item {
-                l = Intermediate::OrderedList.new
+                l = Absyn::OrderedList.new
                 l.add(val[0])
               }
     | olist olist_item  { val[0].add(val[1]) }
@@ -65,20 +65,20 @@ rule
 
   # compact dictionary list
   cdlist
-    : cdlist_item         { l = Intermediate::CompactDictionaryList.new
+    : cdlist_item         { l = Absyn::CompactDictionaryList.new
                             l.add(val[0])
                           }
     | cdlist cdlist_item  { val[0].add(val[1]) }
   cdlist_item
-    : CDT STRING          { Intermediate::CompactDictionaryListItem.new(
+    : CDT STRING          { Absyn::CompactDictionaryListItem.new(
                                 val[0], val[1]) }
 
   # dictionary list
   dlist
-    : dlist_item        { l = Intermediate::DictionaryList.new; l.add(val[0]) }
+    : dlist_item        { l = Absyn::DictionaryList.new; l.add(val[0]) }
     | dlist dlist_item  { val[0].add(val[1]) }
   dlist_item
-    : DT '(' textblock ')'  { Intermediate::DictionaryListItem.new(val[0], val[2]) }
+    : DT '(' textblock ')'  { Absyn::DictionaryListItem.new(val[0], val[2]) }
 end
 
 ---- header
@@ -150,7 +150,7 @@ require 'juli/wiki'
     end
   end
 
-  # parse one file, build Intermediate tree, then generate HTML
+  # parse one file, build Absyn tree, then generate HTML
   def parse(in_file, visitor)
     @yydebug      = true          if ENV['YYDEBUG']
     @indent_stack = NestStack.new
@@ -165,7 +165,7 @@ require 'juli/wiki'
     visitor.run_file(in_file, @root)
   end
 
-  # return intermediate tree
+  # return absyn tree
   def tree
     @root
   end

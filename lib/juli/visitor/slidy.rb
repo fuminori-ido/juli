@@ -1,5 +1,5 @@
 module Juli::Visitor
-  # This visits Intermediate tree and generates HTML for Slideshow.
+  # This visits Absyn tree and generates HTML for Slideshow.
   #
   # Text files under juli-repository must have '.txt' extention.
   #

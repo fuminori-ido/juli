@@ -1,5 +1,5 @@
 module Juli::Visitor
-  # This visits Intermediate tree and generates HTML for
+  # This visits Absyn tree and generates HTML for
   # 'Takahashi method' slideshow.
   #
   # Text files under juli-repository must have '.txt' extention.

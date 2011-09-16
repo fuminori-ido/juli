@@ -2,17 +2,17 @@ require 'fileutils'
 require 'pathname'
 require 'juli/util'
 require 'juli/line_parser.tab'
-require 'juli/intermediate'
+require 'juli/absyn'
 
 module Juli::Visitor
-  # This visits Intermediate tree and generates HTML
+  # This visits Absyn tree and generates HTML
   #
   # Text files under juli-repository must have '.txt' extention.
   #
   # === OPTIONS
   # -f::            force update
   # -t template::   specify template
-  class Html < Juli::Intermediate::Visitor
+  class Html < Juli::Absyn::Visitor
     require 'juli/visitor/html/tag_helper'
     require 'juli/visitor/html/helper'
     
@@ -25,7 +25,7 @@ module Juli::Visitor
     # IdAssigner should be executed before running Html visitor since
     # ContentsDrawer also refers DOM id.  That is the reason why DOM id
     # assignment is isolated from Html visitor.
-    class IdAssigner < Juli::Intermediate::Visitor
+    class IdAssigner < Juli::Absyn::Visitor
       def initialize(opts={})
         super
         @uniq_id_seed   = 0
@@ -141,7 +141,7 @@ module Juli::Visitor
     # if str is in list, don't enclose by <p>
     def visit_str(n)
       if n.parent && n.parent.parent &&
-          n.parent.parent.is_a?(Juli::Intermediate::List)
+          n.parent.parent.is_a?(Juli::Absyn::List)
         str2html(n.str)
       else
         content_tag(:p, paragraph_css) do

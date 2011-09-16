@@ -23,6 +23,6 @@ $LOAD_PATH.insert(0, '../lib')
 libs  = ' -r juli'
 libs  <<' -r juli/command'
 libs  <<' -r juli/visitor'
-libs  <<' -r juli/intermediate'
+libs  <<' -r juli/absyn'
 libs  <<' -r juli/visitor/html'
 exec "irb -I ../lib #{libs}"

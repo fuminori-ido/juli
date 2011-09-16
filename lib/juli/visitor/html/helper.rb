@@ -43,7 +43,7 @@ class Juli::Visitor::Html
   module Helper
 
     # TRICKY PART: header_id is used for 'contents' helper link.
-    # Intermediate::HeaderNode.dom_id cannot be used directory for
+    # Absyn::HeaderNode.dom_id cannot be used directory for
     # this purpose since when clicking a header of 'contents',
     # document jumps to its contents rather than header so that
     # header is hidden on browser.  To resolve this, header_id
