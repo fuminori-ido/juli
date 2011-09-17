@@ -208,7 +208,7 @@ private
           debug_indent('in_verbatim', length)
           if @indent_stack.baseline > length     # end of verbatim
             dedent(length, &block)
-            end_of_verbatim(length, &block)
+            @in_verbatim = false
           else
             # do nothing (continue of verbatim)
           end
@@ -303,26 +303,6 @@ private
   def dedent(length=nil, &block)
     @indent_stack.pop(length) do
       yield [')', nil]
-    end
-  end
-
-  # Special case: 'continued string line just after verbatim, but its
-  # offset length is less than baseline'.  For example, this happens
-  # at test/repo/t022-2.txt 2nd line.
-  #
-  # Treat as:
-  #
-  # 1. end of verbatim
-  # 2. begin new verbatim if baseline < length, else
-  #    begin simple string
-  # 
-  def end_of_verbatim(length, &block)
-    debug_indent('end_of_verbatim', length)
-    if @indent_stack.baseline < length            # begin verbatim
-      indent(length, &block)
-      @in_verbatim = true
-    else
-      @in_verbatim = false
     end
   end
 
