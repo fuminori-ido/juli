@@ -5,25 +5,25 @@ class Juli::Parser
 rule
   # Racc action returns absyn node to build absyn-tree
   text
-    : blocks                    { @root = val[0] }
+    : blocks              { @root = val[0] }
 
   blocks
-    : /* none */                { Absyn::ArrayNode.new }
-    | blocks block              { val[0].add(val[1]) if val[1]; val[0] }
+    : /* none */          { Absyn::ArrayNode.new }
+    | blocks block        { val[0].add(val[1]) if val[1]; val[0] }
 
   block
-    : textblock                 { Absyn::StrNode.new(val[0]) }
-    | '(' textblock ')'         { Absyn::Verbatim.new(val[1]) }
-    | '{' chapters '}'          { val[1] }
-    | '(' ulist ')'             { val[1] }
-    | '(' olist ')'             { val[1] }
+    : textblock           { Absyn::StrNode.new(val[0]) }
+    | '(' textblock ')'   { Absyn::Verbatim.new(val[1]) }
+    | '{' chapters '}'    { val[1] }
+    | '(' ulist ')'       { val[1] }
+    | '(' olist ')'       { val[1] }
     | cdlist
     | dlist
-    | WHITELINE                 { nil }
+    | WHITELINE           { nil }
 
   textblock
     : STRING
-    | textblock STRING          { val[0] + val[1] }
+    | textblock STRING    { val[0] + val[1] }
 
   # chapters are list of chapter at the same level,
   # and chapter is header + blocks.
@@ -35,50 +35,38 @@ rule
   # racc parse headlines with *level* correctly.
   # It's the same as 'if ... elsif ... elsif ... end' in Ada, Eiffel, and Ruby.
   chapters
-    : chapter {
-                h = Absyn::ArrayNode.new
-                h.add(val[0])
-              }
-    | chapters chapter { val[0].add(val[1]) }
+    : chapter             { h = Absyn::ArrayNode.new; h.add(val[0]) }
+    | chapters chapter    { val[0].add(val[1]) }
   chapter
-    : H STRING blocks { Absyn::Chapter.new(val[0], val[1], val[2]) }
+    : H STRING blocks     { Absyn::Chapter.new(val[0], val[1], val[2]) }
 
   # unordered list
   ulist
-    : ulist_item {
-                l = Absyn::UnorderedList.new
-                l.add(val[0])
-              }
-    | ulist ulist_item  { val[0].add(val[1]) }
+    : ulist_item          { l = Absyn::UnorderedList.new; l.add(val[0]) }
+    | ulist ulist_item    { val[0].add(val[1]) }
   ulist_item
-    : '*' blocks        { val[1] }
+    : '*' blocks          { val[1] }
 
   # ordered list
   olist
-    : olist_item {
-                l = Absyn::OrderedList.new
-                l.add(val[0])
-              }
-    | olist olist_item  { val[0].add(val[1]) }
+    : olist_item          { l = Absyn::OrderedList.new; l.add(val[0]) }
+    | olist olist_item    { val[0].add(val[1]) }
   olist_item
-    : '#' blocks        { val[1] }
+    : '#' blocks          { val[1] }
 
   # compact dictionary list
   cdlist
-    : cdlist_item         { l = Absyn::CompactDictionaryList.new
-                            l.add(val[0])
-                          }
+    : cdlist_item         { l = Absyn::CompactDictionaryList.new; l.add(val[0])}
     | cdlist cdlist_item  { val[0].add(val[1]) }
   cdlist_item
-    : CDT STRING          { Absyn::CompactDictionaryListItem.new(
-                                val[0], val[1]) }
+    : CDT STRING          { Absyn::CompactDictionaryListItem.new(val[0],val[1])}
 
   # dictionary list
   dlist
-    : dlist_item        { l = Absyn::DictionaryList.new; l.add(val[0]) }
-    | dlist dlist_item  { val[0].add(val[1]) }
+    : dlist_item          { l = Absyn::DictionaryList.new; l.add(val[0]) }
+    | dlist dlist_item    { val[0].add(val[1]) }
   dlist_item
-    : DT '(' textblock ')'  { Absyn::DictionaryListItem.new(val[0], val[2]) }
+    : DT '(' textblock ')'{ Absyn::DictionaryListItem.new(val[0], val[2]) }
 end
 
 ---- header
