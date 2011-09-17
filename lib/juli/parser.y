@@ -207,7 +207,7 @@ private
         if @in_verbatim
           debug_indent('in_verbatim', length)
           if @indent_stack.baseline > length     # end of verbatim
-            pop(length, &block)
+            dedent(length, &block)
             end_of_verbatim(length, &block)
           else
             # do nothing (continue of verbatim)
@@ -215,10 +215,10 @@ private
         else
           debug_indent('NOTverbatim', length)
           if @indent_stack.baseline < length        # begin verbatim
-            push(length, &block)
+            indent(length, &block)
             @in_verbatim = true
           elsif @indent_stack.baseline > length     # end of nest ')'
-            pop(length, &block)
+            dedent(length, &block)
           end
         end
         yield [:STRING,
@@ -260,7 +260,7 @@ private
       else
         # after verbatim, dedent just 1-level because there is no
         # deeper nest in verbatim
-        pop(&block)
+        dedent(&block)
         @in_verbatim = false
         indent_or_dedent_on_non_verbatim(length, &block)
         yield [token, nil]
@@ -278,7 +278,7 @@ private
     if @in_verbatim
       debug_indent('in_verbatim', length)
       if @indent_stack.baseline > length    # end of verbatim
-        pop(length, &block)
+        dedent(length, &block)
         @in_verbatim = false
       end
     else
@@ -289,18 +289,18 @@ private
   def indent_or_dedent_on_non_verbatim(length, &block)
     debug_indent('NOTverbatim', length)
     if @indent_stack.baseline < length    # begin verbatim
-      push(length, &block)
+      indent(length, &block)
     elsif @indent_stack.baseline > length
-      pop(length, &block)
+      dedent(length, &block)
     end
   end
 
-  def push(length, &block)
+  def indent(length, &block)
     @indent_stack.push(length)
     yield ['(', nil]
   end
 
-  def pop(length=nil, &block)
+  def dedent(length=nil, &block)
     @indent_stack.pop(length) do
       yield [')', nil]
     end
@@ -319,7 +319,7 @@ private
   def end_of_verbatim(length, &block)
     debug_indent('end_of_verbatim', length)
     if @indent_stack.baseline < length            # begin verbatim
-      push(length, &block)
+      indent(length, &block)
       @in_verbatim = true
     else
       @in_verbatim = false
