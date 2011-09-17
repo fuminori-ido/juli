@@ -49,6 +49,15 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 2, t.array[0].array.size
   end
 
+  # even if list order is incorrect, parser shouldn't failed and
+  # it is recognized as top-level.
+  def test_nested_ordered_list_incorrect
+    assert_nothing_raised do
+      parser = Juli::Parser.new
+      parser.parse(data_path('t005.txt'), Juli::Visitor::Tree.new)
+    end
+  end
+
   def test_simple_unordered_list
     t = build_tree_on('t006.txt')
     assert_equal 1, t.array.size
@@ -59,6 +68,23 @@ class ParserTest < Test::Unit::TestCase
     t = build_tree_on('t007.txt')
     assert_equal 3, t.array.size
     assert_equal 2, t.array[0].array.size
+  end
+
+  def test_line_break
+    t = build_tree_on('t008.txt')
+
+    # [s s o o o o q h]
+    #
+    # Where, s = str, o = ordered list, q = quote, h = header
+    assert_equal 8, t.array.size
+    assert_equal Juli::Absyn::Verbatim,   t.array[6].class
+    assert_equal Juli::Absyn::ArrayNode,  t.array[7].class
+  end
+
+  def test_quote_or_nested_list
+    t = build_tree_on('t009.txt')
+    assert_equal 4, t.array.size
+    assert_equal 2, t.array[1].array.size
   end
 
   def test_verbatim
@@ -152,6 +178,12 @@ class ParserTest < Test::Unit::TestCase
 
   def test_nested_quote
     t = build_tree_on('t022.txt')
+    # 6 elements(text, quote, text, quote, list, text) at top level:
+    assert_equal 6, t.array.size
+
+    # 3rd element is quote and next is list:
+    assert_equal Juli::Absyn::Verbatim,    t.array[3].class
+    assert_equal Juli::Absyn::OrderedList, t.array[4].class
   end
 
   def test_nested_quote2
@@ -197,45 +229,6 @@ class ParserTest < Test::Unit::TestCase
                  t.array[0].class
     assert_equal 3, t.array[0].array.size
   end
-
-=begin
-  # even if list order is incorrect, parser shouldn't failed and
-  # it is recognized as top-level.
-  def test_nested_ordered_list_incorrect
-    assert_nothing_raised do
-      parser = Juli::Parser.new
-      parser.parse(data_path('t005.txt'), Juli::Visitor::Tree.new)
-    end
-  end
-
-  def test_line_break
-    t = build_tree_on('t008.txt')
-
-    # [s o o o o q h]
-    #
-    # Where, s = str, o = ordered list, q = quote, h = header
-    assert_equal 8, t.array.size
-    assert_equal Juli::Absyn::StrNode,     t.array[6].class
-    assert_equal Juli::Absyn::HeaderNode,  t.array[7].class
-  end
-
-  def test_quote_or_nested_list
-    t = build_tree_on('t009.txt')
-    assert_equal 4, t.array.size
-    assert_equal 2, t.array[1].array.size
-  end
-
-  # nested quote (e.g. source program) should be in 1 quote.
-  def test_quote_with_several_nest_level
-    t = build_tree_on('t022.txt')
-    # 6 elements(text, quote, text, quote, list, text) at top level:
-    assert_equal 6, t.array.size
-
-    # 3rd element is quote and next is list:
-    assert_equal Juli::Absyn::StrNode,     t.array[3].class
-    assert_equal Juli::Absyn::OrderedList, t.array[4].class
-  end
-=end
 
 private
   # return full path of test data file.
