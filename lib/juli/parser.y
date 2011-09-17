@@ -204,22 +204,8 @@ private
         yield [:STRING, $2]
       when /^(\s*)(.*)$/
         length = $1.length
-        if @in_verbatim
-          debug_indent('in_verbatim', length)
-          if @indent_stack.baseline > length     # end of verbatim
-            dedent(length, &block)
-            @in_verbatim = false
-          else
-            # do nothing (continue of verbatim)
-          end
-        else
-          debug_indent('NOTverbatim', length)
-          if @indent_stack.baseline < length        # begin verbatim
-            indent(length, &block)
-            @in_verbatim = true
-          elsif @indent_stack.baseline > length     # end of nest ')'
-            dedent(length, &block)
-          end
+        if indent_or_dedent(length, &block)
+          @in_verbatim = true
         end
         yield [:STRING,
                (@in_verbatim ?
@@ -274,6 +260,10 @@ private
   end
 
   # calculate indent level and yield '(' or ')' correctly
+  #
+  # === RETURN
+  # true::  not @in_verbatim and  @indent_stack.baseline < length
+  # false:: other case
   def indent_or_dedent(length, &block)
     if @in_verbatim
       debug_indent('in_verbatim', length)
@@ -281,6 +271,7 @@ private
         dedent(length, &block)
         @in_verbatim = false
       end
+      false
     else
       indent_or_dedent_on_non_verbatim(length, &block)
     end
@@ -290,8 +281,10 @@ private
     debug_indent('NOTverbatim', length)
     if @indent_stack.baseline < length    # begin verbatim
       indent(length, &block)
+      true
     elsif @indent_stack.baseline > length
       dedent(length, &block)
+      false
     end
   end
 
