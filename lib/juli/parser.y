@@ -207,9 +207,7 @@ private
         if @in_verbatim
           debug_indent('in_verbatim', length)
           if @indent_stack.baseline > length     # end of verbatim
-            @indent_stack.pop(length) do
-              yield [')', nil]
-            end
+            pop(length, &block)
             end_of_verbatim(length, &block)
           else
             # do nothing (continue of verbatim)
@@ -217,13 +215,10 @@ private
         else
           debug_indent('NOTverbatim', length)
           if @indent_stack.baseline < length        # begin verbatim
-            @indent_stack.push(length)
-            yield ['(', nil]
+            push(length, &block)
             @in_verbatim = true
           elsif @indent_stack.baseline > length     # end of nest ')'
-            @indent_stack.pop(length) do
-              yield [')', nil]
-            end
+            pop(length, &block)
           end
         end
         yield [:STRING,
@@ -257,36 +252,25 @@ private
   end
 
   def on_list_item(line, token, length1, length2, str, &block)
-        length  = length1 + length2
-        debug_indent("list item('#{token}')", length)
-        if @in_verbatim
-          if @indent_stack.baseline <= length1
-            yield [:STRING,  line]
-          else
-            # after verbatim, dedent just 1-level because there is no
-            # deeper nest in verbatim
-            @indent_stack.pop do
-              yield [')', nil]
-            end
-            @in_verbatim = false
-
-            # same as 'NOTverbatim' part of indent_or_dedent() 
-            if @indent_stack.baseline < length    # begin verbatim
-              @indent_stack.push(length)
-              yield ['(', nil]
-            elsif @indent_stack.baseline > length
-              @indent_stack.pop(length) do
-                yield [')', nil]
-              end
-            end
-            yield [token, nil]
-            yield [:STRING, str + "\n"]
-          end
-        else
-          indent_or_dedent(length, &block)
-          yield [token, nil]
-          yield [:STRING, str + "\n"]
-        end
+    length  = length1 + length2
+    debug_indent("list item('#{token}')", length)
+    if @in_verbatim
+      if @indent_stack.baseline <= length1
+        yield [:STRING,  line]
+      else
+        # after verbatim, dedent just 1-level because there is no
+        # deeper nest in verbatim
+        pop(&block)
+        @in_verbatim = false
+        indent_or_dedent_on_non_verbatim(length, &block)
+        yield [token, nil]
+        yield [:STRING, str + "\n"]
+      end
+    else
+      indent_or_dedent(length, &block)
+      yield [token, nil]
+      yield [:STRING, str + "\n"]
+    end
   end
 
   # calculate indent level and yield '(' or ')' correctly
@@ -294,21 +278,31 @@ private
     if @in_verbatim
       debug_indent('in_verbatim', length)
       if @indent_stack.baseline > length    # end of verbatim
-        @indent_stack.pop(length) do
-          yield [')', nil]
-        end
+        pop(length, &block)
         @in_verbatim = false
       end
     else
-      debug_indent('NOTverbatim', length)
-      if @indent_stack.baseline < length    # begin verbatim
-        @indent_stack.push(length)
-        yield ['(', nil]
-      elsif @indent_stack.baseline > length
-        @indent_stack.pop(length) do
-          yield [')', nil]
-        end
-      end
+      indent_or_dedent_on_non_verbatim(length, &block)
+    end
+  end
+
+  def indent_or_dedent_on_non_verbatim(length, &block)
+    debug_indent('NOTverbatim', length)
+    if @indent_stack.baseline < length    # begin verbatim
+      push(length, &block)
+    elsif @indent_stack.baseline > length
+      pop(length, &block)
+    end
+  end
+
+  def push(length, &block)
+    @indent_stack.push(length)
+    yield ['(', nil]
+  end
+
+  def pop(length=nil, &block)
+    @indent_stack.pop(length) do
+      yield [')', nil]
     end
   end
 
@@ -325,8 +319,7 @@ private
   def end_of_verbatim(length, &block)
     debug_indent('end_of_verbatim', length)
     if @indent_stack.baseline < length            # begin verbatim
-      @indent_stack.push(length)
-      yield ['(', nil]
+      push(length, &block)
       @in_verbatim = true
     else
       @in_verbatim = false
