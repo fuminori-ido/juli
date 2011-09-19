@@ -27,13 +27,13 @@ module Juli::Visitor::Html::Helper
       end
 
       def visit_chapter(n)
-        content_tag(:ol) do
-          content_tag(:li) do
-            content_tag(:a, :href=>'#' + header_id(n)) do
-              n.str
-            end
+        content_tag(:li) do
+          content_tag(:a, :href=>'#' + header_id(n)) do
+            n.str
           end +
-          n.blocks.accept(self)
+          content_tag(:ol) do
+            n.blocks.accept(self)
+          end
         end
       end
     end
@@ -51,7 +51,10 @@ module Juli::Visitor::Html::Helper
     # This visits document tree by ContentsDrawer visitor and
     # generate HTML contents list.
     def run(*args)
-      @root.accept(ContentsDrawer.new)
+      contents_drawer = ContentsDrawer.new
+      contents_drawer.content_tag(:ol) do
+        @root.accept(contents_drawer)
+      end
     end
   end
 end
