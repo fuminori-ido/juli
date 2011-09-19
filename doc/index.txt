@@ -374,19 +374,47 @@ will be:
   * juli
 1. World
 
-=== Dictionary List
+=== Compact Dictionary List
 
-The line with the following form is recognized as dictionary list:
+The line with the following form is recognized as compact dictionary list:
 
   term:: description
+  ...
 
 Example:
 
   Ruby::  programing language, or a gem
+  Juli::  an offline wiki, July in English
 
 will be:
 
 Ruby::  programing language, or a gem
+Juli::  an offline wiki, July in English
+
+=== Dictionary List
+
+The line with the following form is recognized as dictionary list:
+
+  term::
+    description statement
+    description statement(continued)
+  ...
+
+Example:
+
+  Ruby::
+    programing language, or a gem
+  Juli::
+    an offline wiki, July in English, or
+    a character in a famous comic written by Moto Hagio.
+
+will be:
+
+Ruby::
+  programing language, or a gem
+Juli::
+  an offline wiki, July in English, or
+  a character in a famous comic written by Moto Hagio.
 
 == Block Quote
 

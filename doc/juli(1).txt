@@ -33,8 +33,11 @@ You can edit the config file later.  It's just YAML format file.
 
 Following example creates:
 
-$HOME/my_memo_root::  juli-repo
-/var/www/juli::       output_top.  generated html can be browsed via internet if http server recognizes this.
+$HOME/my_memo_root::
+    juli-repo
+/var/www/juli::
+    output_top.
+    generated html can be browsed via internet if http server recognizes this.
 
 prepare output directory to browse at internet.  Of course, your http server
 is required to recognize /var/www/juli:
@@ -51,9 +54,19 @@ prepare memo root directory for juli-repo:
 
 
 ==== options for 'init'
--o <i>output_top</i>::  Specify output directory, which points to the top directory for generated html files. default = './html/'
--t <i>template</i>::    Specify template under 1) JULI_REPO/.juli or 2) RUBY_LIB/juli/template/. default = 'default.html'.
--e <i>ext</i>::         generating html file extention (default='.shtml')
+-o <i>output_top</i>::
+  Specify output directory, which points to the top directory for
+  generated html files.
+  default = './html/'
+
+-t <i>template</i>::
+  Specify template under
+  1) JULI_REPO/.juli or 2) RUBY_LIB/juli/template/.
+  default = 'default.html'.
+
+-e <i>ext</i>::
+  generating html file extention.
+  default = '.shtml'.
 
 Where, JULI_REPO is the directory which you are creating now.
 RUBY_LIB is the directory which juli library is installed
@@ -86,10 +99,22 @@ Wrong Example:
   juli doc/poem.txt       # the file is interpreted as command, so resulted error. 
 
 ==== options for 'gen'
--g <i>generator</i>:: specify generator.  Supported generators are in lib/juli/visitor/ directory.  Default is html.
--f::  force update.  Even generated HTML file is newer than source text, generate again.
--t <i>template</i>::  Specify template; it may be fullpath, relative path from current directory, under JULI_REPO/.juli, or under RUBY_LIB/juli/template/
--o <i>output_path</i>:: specify output file path.
+-g <i>generator</i>::
+  specify generator.
+  Supported generators are in lib/juli/visitor/ directory.
+  Default is html.
+
+-f::
+  force update.
+  Even generated HTML file is newer than source text, generate again.
+
+-t <i>template</i>::
+  Specify template; it may be fullpath,
+  relative path from current directory,
+  under JULI_REPO/.juli, or under RUBY_LIB/juli/template/
+
+-o <i>output_path</i>::
+  specify output file path.
 
 Template search priority is as follows:
 
