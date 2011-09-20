@@ -208,20 +208,12 @@ private
     yield [false, nil]
   end
 
+  class NoSrcLine < ParseError; end
+
   def on_error(et, ev, values)
-    File.open(@in_file) do |io|
-      line = 0
-      while line_str = io.gets do
-        line += 1
-        if @src_line == line
-          raise ParseError,
-                sprintf("%s: Juli syntax error\n%04d: %s\n",
-                    @in_file,
-                    @src_line,
-                    line_str)
-        end
-      end
-    end
+    print_line('Juli syntax error')
+    raise ParseError
+  rescue NoSrcLine
     raise ParseError, sprintf("Juli syntax error at line %d\n", @src_line)
   end
 
@@ -241,7 +233,12 @@ private
         yield [:STRING, str + "\n"]
       end
     else
+      base_line_before = @indent_stack.baseline
       indent_or_dedent(length, &block)
+      if base_line_before > 0 && @indent_stack.baseline == 0
+        warn('Incorrect nest here, but reset it and continue to process.')
+        indent(length, &block)
+      end
       yield [token, nil]
       yield [:STRING, str + "\n"]
     end
@@ -311,6 +308,29 @@ private
         @indent_stack.status,
         @indent_stack.baseline,
         length))
+  end
+
+  # print str with source text line info to $stderr.
+  # If @src_line is not found, NoSrcLine error is raised.
+  def print_line(str)
+    File.open(@in_file) do |io|
+      line = 0
+      while line_str = io.gets do
+        line += 1
+        if @src_line == line
+          return $stderr.printf("%s: %s\n%04d: %s\n",
+                    @in_file,
+                    str,
+                    @src_line,
+                    line_str)
+        end
+      end
+    end
+    raise NoSrcError
+  end
+
+  def warn(str)
+    print_line('WARN: ' + str)
   end
 
   # general debug method
