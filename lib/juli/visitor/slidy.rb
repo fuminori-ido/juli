@@ -23,7 +23,8 @@ module Juli::Visitor
         attr.merge!(:class=>'slide')
       end
       content_tag(:div, attr) do
-        header_link(n) + header_content(n)
+        header_link(n) +
+        n.blocks.accept(self)
       end + "\n"
     end
 

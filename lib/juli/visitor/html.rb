@@ -54,6 +54,7 @@ module Juli::Visitor
     # * hyperlink on wikiname.
     # * hyperlink on url like http://...
     class HtmlLine < Juli::LineAbsyn::Visitor
+      include Juli::Util
       include TagHelper
   
       def visit_array(n)

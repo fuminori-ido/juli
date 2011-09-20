@@ -15,6 +15,12 @@ require 'test_helper'
         Juli::Visitor::Html.new.run_bulk
       end
     end
+
+  def test_run_file
+    assert_nothing_raised do
+      Juli::Parser.new.parse('t001.txt', Juli::Visitor::Html.new)
+    end
+  end
   
     def test_html_helper_relative_from
       h = Juli::Visitor::Html.new
