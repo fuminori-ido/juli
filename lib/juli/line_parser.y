@@ -120,7 +120,7 @@ private
   # 3. for remaining in head & trail, do 2. above recursively
   def scan(&block)
     scan_r(@remain, &block)
-    yield false, nil
+    yield [false, nil]
   end
 
   URL = '(https?:|mailto:|ftp:)\S+'
@@ -141,39 +141,39 @@ private
       # I choose latter for simple usage.
       when /\A([^<]*)(<a[^>]*>[^<]*<\/a>)(.*)\z/m
         scan_r($1, &block)
-        yield :STRING, $2     # <a>...</a> is just string even wikiname be there
+        yield [:STRING, $2]   # <a>...</a> is just string even wikiname be there
         scan_r($3, &block)
         return
 
       # to escape wikiname string in tag, tag is prior to wikiname
       when /\A([^<]*)(<[^>]*>)(.*)\z/m
         scan_r($1, &block)
-        yield :STRING, $2     # <a>...</a> is just string even wikiname be there
+        yield [:STRING, $2]   # <a>...</a> is just string even wikiname be there
         scan_r($3, &block)
         return
 
       # explicit escape by \{...}
       when /\A([^\\]*)\\\{([^}]+)\}(.*)\z/m
         scan_r($1, &block)
-        yield :STRING, $2
+        yield [:STRING, $2]
         scan_r($3, &block)
         return
       
       # URL is piror to wikiname
       when /\A(|.*\s+)(#{URL})(.*)\z/m
         scan_r($1, &block)
-        yield :URL, $2
+        yield [:URL, $2]
         scan_r($4, &block)    # not $3 since URL itself has (...)
         return
 
       when /\A(.*)#{w}(.*)\z/m
         scan_r($1, &block)
-        yield :WIKINAME, w
+        yield [:WIKINAME, w]
         scan_r($2, &block)
         return
       end
     end
-    yield :STRING, str
+    yield [:STRING, str]
   end
 
 ---- footer
