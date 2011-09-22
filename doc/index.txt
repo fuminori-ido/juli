@@ -174,7 +174,7 @@ TBD
 == from package
 Prerequisites:
 * rsync
-* ruby-1.8
+* ruby-1.8 or ruby-1.9
 
 1. download package from http://sourceforge.net/projects/jjjuli/files/
 1. run setup.rb as follows:
@@ -187,7 +187,7 @@ Prerequisites:
 
 Prerequisites:
 * rsync
-* ruby-1.8
+* ruby-1.8 or ruby-1.9
 * <a href='http://i.loveruby.net/en/projects/racc/'>racc</a>
 * rake
 * git
