@@ -230,6 +230,21 @@ class ParserTest < Test::Unit::TestCase
     assert_equal 3, t.array[0].array.size
   end
 
+  def test_dictionary_list_in_list
+    t = build_tree_on('t029.txt')
+    assert_equal 1, t.array.size
+    assert_equal 3, t.array[0].array.size
+    assert_equal 2, t.array[0].array[0].array[1].array.size
+    assert_equal 2, t.array[0].array[1].array[1].array.size
+  end
+
+  def test_dictionary_list_in_verbatim
+    t = build_tree_on('t030.txt')
+    assert_equal 5, t.array.size
+    assert_equal Juli::Absyn::Verbatim,   t.array[1].class
+    assert_equal Juli::Absyn::Verbatim,   t.array[3].class
+  end
+
 private
   # return full path of test data file.
   def data_path(filename)

@@ -182,14 +182,15 @@ private
         on_list_item(line, '#', $1.length, $2.length, $3, &block)
       when /^(\s*)(\*\s+)(.*)$/
         on_list_item(line, '*', $1.length, $2.length, $3, &block)
-      when /^(\S.*)::\s*$/
-        indent_or_dedent(0, &block)
-        yield [:DT, $1]
-      when /^(\S.*)::\s+(.*)$/
-        # since compact dictionary list is not nested, indent control is
-        # not necessary.
-        yield [:CDT, $1]
-        yield [:STRING, $2]
+      when /^(\s*)(\S.*)::\s*$/
+        if !on_item($1.length, $2 + "::\n", &block)
+          yield [:DT, $2]
+        end
+      when /^(\s*)((\S.*)::\s+(.*))$/
+        if !on_item($1.length, $2 + "\n", &block)
+          yield [:CDT, $3]
+          yield [:STRING, $4]
+        end
       when /^(\s*)(.*)$/
         length = $1.length
         if indent_or_dedent(length, &block)
@@ -242,6 +243,25 @@ private
       yield [token, nil]
       yield [:STRING, str + "\n"]
     end
+  end
+
+  # action on dictionary list and compact dictionary list
+  #
+  # 1st, check indent, dedent, or continue.
+  # 2nd, if in verbatime, yield string.
+  # otherwise, return in_verbatim to tell caller to do the 'NON verbatim'
+  # case.
+  #
+  # === RETURN
+  # in verbatim
+  def on_item(length, str, &block)
+    if indent_or_dedent(length, &block)
+      @in_verbatim = true
+    end
+    if @in_verbatim
+      yield [:STRING, str]
+    end
+    @in_verbatim
   end
 
   # calculate indent level and yield '(' or ')' correctly

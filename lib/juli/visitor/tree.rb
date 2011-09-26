@@ -85,12 +85,7 @@ module Juli::Visitor
     end
 
     def visit_compact_dictionary_list_item(n)
-      print_depth
-      printf("CompactDictionaryListItem\n")
-      @depth += 1
-      process_str(n.term)
-      process_str(n.str)
-      @depth -= 1
+      visit_x_dictionary_list_item(n, "CompactDictionaryListItem\n")
     end
 
     def visit_dictionary_list(n)
@@ -98,7 +93,7 @@ module Juli::Visitor
     end
 
     def visit_dictionary_list_item(n)
-      visit_compact_dictionary_list_item(n)
+      visit_x_dictionary_list_item(n, "DictionaryListItem\n")
     end
 
     def visit_quote(n)
@@ -118,6 +113,16 @@ module Juli::Visitor
       for child in n.array do
         child.accept(self)
       end
+      @depth -= 1
+    end
+
+    # common for both dictionary list item and compact dictionary list item
+    def visit_x_dictionary_list_item(n, node_name)
+      print_depth
+      printf(node_name)
+      @depth += 1
+      process_str(n.term)
+      process_str(n.str)
       @depth -= 1
     end
 

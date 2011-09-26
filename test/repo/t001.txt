@@ -77,6 +77,10 @@ both::        t001 and t002 are linked.
 * t022          nested quote (found bug at v1.00.00)
 * t023          list + quote doesn't work well
 * t024          header + quote without list
+* t027          compact dictionary list
+* t028          dictionary list
+* t029          dictionary list in list
+* t030          dictionary list in verbatim
 
 = SEE ALSO
 

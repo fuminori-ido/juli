@@ -357,22 +357,6 @@ will be:
 
 Same as ordrered list.  See ordered list.
 
-=== Mixture of Ordered and Unordered list
-
-Of course, both ordered and unordered list can be nested each other.
-Example:
-
-  |1. Hello
-  |  * Welcome
-  |  * juli
-  |1. World
-
-will be:
-
-1. Hello
-  * Welcome
-  * juli
-1. World
 
 === Compact Dictionary List
 
@@ -415,6 +399,51 @@ Ruby::
 Juli::
   an offline wiki, July in English, or
   a character in a famous comic written by Moto Hagio.
+
+=== Mixture of each kind of list
+
+==== Ordered and Unordered list
+
+Both ordered and unordered list can be nested each other.
+Example:
+
+  |1. Hello
+  |  * Welcome
+  |  * juli
+  |1. World
+
+will be:
+
+1. Hello
+  * Welcome
+  * juli
+1. World
+
+==== Dictionary list in Ordered/Unordered list
+
+Dictionary list (Compact Dictionary list also) can be written in
+Ordered/Unordered list.  Offset should be the same as previous
+list item as follows:
+
+  |* f = ma
+  |  f:: force
+  |  m:: mass
+  |  a:: accelaration
+  |* e = mc<sup>2</sup>
+  |  e:: energy
+  |  m:: mass
+  |  c:: light speed
+
+will be:
+
+* f = ma
+  f:: force
+  m:: mass
+  a:: accelaration
+* e = mc<sup>2</sup>
+  e:: energy
+  m:: mass
+  c:: light speed
 
 == Block Quote
 
@@ -528,7 +557,7 @@ I also see similar tools since juli project started.
 
 See <a href='compare.ods'>Comparison table</a> for the detail.
 
-I found following competitor...:
+I found the following competitors also after the comparison research:
 
 * http://ikiwiki.info/
 * http://gitit.net/
