@@ -430,9 +430,13 @@ list item as follows:
   |  m:: mass
   |  a:: accelaration
   |* e = mc<sup>2</sup>
-  |  e:: energy
-  |  m:: mass
-  |  c:: light speed
+  |  e::
+  |     energy
+  |  m::
+  |     mass
+  |  c::
+  |     light speed,
+  |     299,792,458 [m/s]
 
 will be:
 
@@ -441,9 +445,13 @@ will be:
   m:: mass
   a:: accelaration
 * e = mc<sup>2</sup>
-  e:: energy
-  m:: mass
-  c:: light speed
+  e::
+    energy
+  m::
+    mass
+  c::
+    light speed,
+    299,792,458 [m/s]
 
 == Block Quote
 
