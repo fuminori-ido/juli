@@ -1,0 +1,13 @@
+dictionary format in verbatim should be treated as verbatim
+
+  term::
+    description
+    description2
+
+How?
+
+  term::  desc
+  term2:: desc2
+
+How x 2?
+
