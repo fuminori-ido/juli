@@ -5,14 +5,6 @@ module Juli::Command
     include Juli::Util
     include Juli::Visitor::Html::TagHelper
   
-    class FileEntry
-      attr_accessor :path, :mtime
-      def initialize(path, mtime)
-        @path   = path
-        @mtime  = mtime
-      end
-    end
-  
     # define maximum file limit in order to reduce process time.
     FILE_LIMIT = 20
 

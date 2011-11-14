@@ -52,8 +52,9 @@ class UtilTest < Test::Unit::TestCase
     end
 
     # if -o is specified, it should be used rather than wikiname
-    @opts[:o] = 'special.html'
-    assert_equal 'special.html', File.basename(out_filename('a/b/hello.txt'))
+    assert_equal(
+        'special.html',
+        File.basename(out_filename('a/b/hello.txt', 'special.html')))
   end
 
   def test_in_filename

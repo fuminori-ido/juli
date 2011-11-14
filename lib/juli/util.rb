@@ -142,16 +142,17 @@ EOM
 
     # === INPUTS
     # in_filename:: relative path under repository
+    # o_opt::       output path which -o command-line option specifies
     #
     # === RETURN
-    # full path of out filename.  if -o option is specified,
+    # full path of out filename.  if o_opt is specified,
     # it is used.
     #
     # === EXAMPLE
     # diary/2010/12/31.txt -> OUTPUT_TOP/diary/2010/12/31.shtml
     #
-    def out_filename(in_filename)
-      @opts[:o] ||
+    def out_filename(in_filename, o_opt = nil)
+      o_opt ||
           File.join(conf['output_top'],
                     in_filename.gsub(/\.[^\.]*$/,'') + conf['ext'])
     end
@@ -170,5 +171,45 @@ EOM
                 File.basename(out_filename).gsub(/\.[^\.]*$/,''))
     end
     module_function :in_filename
+
+    # find erb template in the following order:
+    #
+    # if t_opt ('-t' command-line option arg) is specified:
+    #   1st) template_path in absolute or relative from current dir, or
+    #   2nd) -t template_path in JULI_REPO/.juli/, or
+    #   3rd) -t template_path in lib/juli/template/
+    #   otherwise, error
+    # else:
+    #   4th) {template} in JULI_REPO/.juli/, or
+    #   5th) {template} in lib/juli/template.
+    #   otherwise, error
+    #
+    # Where, {template} means conf['template']
+    #
+    # === INPUTS
+    # template::  template name
+    # t_opt::     template name which -t command-line option specifies
+    def find_template(template, t_opt = nil)
+      if t_opt
+        if File.exist?(t_opt)
+          t_opt
+        else
+          find_template_sub(t_opt)
+        end
+      else
+        find_template_sub(template)
+      end
+    end
+    module_function :find_template
+
+  private
+    # find template 't' in dirs
+    def find_template_sub(t)
+      for path in [File.join(juli_repo, Juli::REPO), Juli::TEMPLATE_PATH] do
+        template = File.join(path, t)
+        return template if File.exist?(template)
+      end
+      raise Errno::ENOENT, "no #{t} found"
+    end
   end
 end

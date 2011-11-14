@@ -1,5 +1,7 @@
 require 'juli/util'
 require 'juli/parser.tab'
+require 'juli/command/file_entry'
+require 'juli/command/sitemap'
 require 'juli/command/recent_update'
 
 module Juli
@@ -14,7 +16,7 @@ module Juli
       case command_str
       when 'init';          init(opts)
       when 'gen';           gen(opts)
-      when 'sitemap';       sitemap(opts)
+      when 'sitemap';       Juli::Command::Sitemap.new.run(opts)
       when 'recent_update'; Juli::Command::RecentUpdate.new.run(opts)
       else
         STDERR.print "Unknown juli command: '#{command_str}'\n\n", usage, "\n"
@@ -121,32 +123,6 @@ EOM
       end
     end
 
-    # generate $JULI_REPO/sitemap.html
-    def sitemap(opts)
-      Dir.chdir(juli_repo) {
-        outdir = File.join(conf['output_top'])
-        FileUtils.mkdir(outdir) if !File.directory?(outdir)
-        body = ''
-        for textfile in Dir.glob('**/*.txt').sort do
-          html = textfile.gsub(/.txt$/, conf['ext'])
-          body += sprintf("<a href='%s'>%s</a><br/>\n",
-                      textfile.gsub(/.txt$/, conf['ext']),  # url
-                      textfile.gsub(/.txt$/, ''))           # label
-        end
-
-      title       = 'Sitemap'
-      prototype   = 'prototype.js'
-      javascript  = 'juli.js'
-      stylesheet  = 'juli.css'
-      erb         = ERB.new(File.read(File.join(Juli::TEMPLATE_PATH,
-                        'sitemap.html')))
-      out_path    = 'sitemap' + conf['ext']
-      File.open(File.join(outdir, out_path), 'w') do |f|
-        f.write(erb.result(binding))
-      end
-      }
-    end
-
   private
     def write_config(f, key, value)
       if value
@@ -155,3 +131,4 @@ EOM
     end
   end
 end
+

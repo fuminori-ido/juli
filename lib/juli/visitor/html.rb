@@ -130,13 +130,13 @@ module Juli::Visitor
       stylesheet  = relative_from(in_file, 'juli.css')
       sitemap     = relative_from(in_file, 'sitemap' + conf['ext'])
       body        = root.accept(self)
-      erb         = ERB.new(File.read(find_template))
-      out_path    = out_filename(in_file)
+      erb         = ERB.new(File.read(find_template(conf['template'], @opts[:t])))
+      out_path    = out_filename(in_file, @opts[:o])
       mkdir(out_path)
       File.open(out_path, 'w') do |f|
         f.write(erb.result(binding))
       end
-      printf("generated:       %s\n", out_filename(in_file))
+      printf("generated:       %s\n", out_path)
     end
 
     # if str is in list, don't enclose by <p>
@@ -207,31 +207,6 @@ module Juli::Visitor
       content_tag(:dd, str2html(n.str),  dd_css)
     end
 
-    # find erb template in the following order:
-    #
-    # if -t options is specified:
-    #   1st) template_path in absolute or relative from current dir, or
-    #   2nd) -t template_path in JULI_REPO/.juli/, or
-    #   3rd) -t template_path in lib/juli/template/
-    #   otherwise, error
-    # else:
-    #   4th) {template} in JULI_REPO/.juli/, or
-    #   5th) {template} in lib/juli/template.
-    #   otherwise, error
-    #
-    # Where, {template} means conf['template']
-    def find_template
-      dirs = [File.join(juli_repo, Juli::REPO), Juli::TEMPLATE_PATH]
-      if @opts[:t]
-        if File.exist?(@opts[:t])
-          @opts[:t]
-        else
-          find_template_sub(@opts[:t])
-        end
-      else
-        find_template_sub(conf['template'])
-      end
-    end
 
   private
     HELPER = [
@@ -321,7 +296,7 @@ module Juli::Visitor
       # When new file exists, generate it.
       # When repo's file timestamp is newer than OUTPUT_TOP, regenerate it.
       for f,v in repo do
-        out_file = out_filename(f)
+        out_file = out_filename(f, @opts[:o])
         if !@opts[:f] &&
            File.exist?(out_file) &&
            File.stat(out_file).mtime >= File.stat(File.join(juli_repo,f)).mtime
@@ -374,15 +349,6 @@ module Juli::Visitor
     # 1. visit the tree by HtmlLine and generate HTML
     def str2html(str)
       Juli::LineParser.new.parse(str, Juli::Wiki.wikinames).accept(HtmlLine.new)
-    end
-
-    # find template 't' in dirs
-    def find_template_sub(t)
-      for path in [File.join(juli_repo, Juli::REPO), Juli::TEMPLATE_PATH] do
-        template = File.join(path, t)
-        return template if File.exist?(template)
-      end
-      raise Errno::ENOENT, "no #{t} found"
     end
 
     def paragraph_css
