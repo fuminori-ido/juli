@@ -36,9 +36,12 @@ JULI::      for debug (only for developer)
 1. It is recommended to set JULI_REPO at ~/.bashrc etc. also.
 1. create juli repository also
     $ juli init
-  * NOTE: I recommend to add .juli/ subdirectory, which is created here,
-    in git repository now.  It is not integreated with je now so that
-    run the followings manually to do that:
+  * NOTE: It depends whether to add .juli/ subdirectory, which is
+    created here, in git repository or not.
+    If .juli/* is totally the same as other sites, you can.
+    Otherwise you can not.
+  * If you decide to include .juli/* in repository, do the followings
+    since je(1) has not been integrated with git yet:
       $ git add .juli/
       $ git commit -v
 1. From any directory without worry about current working directory,
