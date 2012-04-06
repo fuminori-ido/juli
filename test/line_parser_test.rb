@@ -35,10 +35,15 @@ class LineParserTest < Test::Unit::TestCase
 # <a>...</a> is interpreted just string to escape wikiname in <a> contents
 [['abc', '<a href="#x">test</a>', 'def'],
     'abc<a href="#x">test</a>def', ['test']],
+# escape of escape.  NOTE: following Ruby single-quote string '\\\\{...'
+# means '\\{...' in actual byte data.
+[%w(abc \\{ ! W:test }def),       'abc\\\\{!test}def', %w(test)],
 # explicit escape
-[%w(abc test def),                'abc\{test}def', %w(test)],
+[%w(abc test def),                'abc\{!test}def', %w(X)],
 # beggining with URL
 [['','U:http://abc', ' def'],     'http://abc def', %w(X)],
+# macro
+[%w(abc M:amazon:ISBN... def),    'abc\{amazon ISBN...}def', %w(X)],
 ]
 
     for t in tests do

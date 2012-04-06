@@ -53,10 +53,17 @@ module Juli::Visitor
     #
     # * hyperlink on wikiname.
     # * hyperlink on url like http://...
+    # * macro result
     class HtmlLine < Juli::LineAbsyn::Visitor
+      require 'juli/macro'
+
       include Juli::Util
       include TagHelper
-  
+
+      def initialize
+        register_macro
+      end
+
       def visit_array(n)
         n.array.inject('') do |result, n|
           result += n.accept(self)
@@ -74,6 +81,27 @@ module Juli::Visitor
   
       def visit_url(n)
         content_tag(:a, n.str, :class=>'url', :href=>n.str)
+      end
+
+      def visit_macro(n)
+        if macro = @_macros[camelize(n.name).to_sym]
+          macro.run(n.arg)
+        else
+          s = "juli ERR: UNKNOWN macro name: '#{n.name}'"
+          STDERR.print s, "\n"
+          s
+        end
+      end
+
+    private
+      # create Macro object and register it in @_macros hash.
+      def register_macro
+        @_macros = {}
+        for macro_symbol in Juli::Macro.constants do
+          next if macro_symbol == :Base
+          macro_class = Juli::Macro.module_eval(macro_symbol.to_s)
+          @_macros[macro_symbol] = macro_class.new
+        end
       end
     end
 
@@ -94,6 +122,7 @@ module Juli::Visitor
         'recent_update' + conf['ext'] => 1,
       }
 
+      @html_line_visitor  = HtmlLine.new
       register_helper
 
       if !File.directory?(conf['output_top'])
@@ -348,7 +377,9 @@ module Juli::Visitor
     # 1. parse str and build Juli::LineAbsyn tree
     # 1. visit the tree by HtmlLine and generate HTML
     def str2html(str)
-      Juli::LineParser.new.parse(str, Juli::Wiki.wikinames).accept(HtmlLine.new)
+      Juli::LineParser.new.parse(
+          str,
+          Juli::Wiki.wikinames).accept(@html_line_visitor)
     end
 
     def paragraph_css

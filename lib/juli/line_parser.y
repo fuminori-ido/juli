@@ -15,6 +15,7 @@ rule
     | WIKINAME            { LineAbsyn::WikiName.new(val[0]) }
     | TAG                 { LineAbsyn::StringNode.new(val[0]) }
     | URL                 { LineAbsyn::Url.new(val[0]) }
+    | MACRO               { LineAbsyn::Macro.new(val[0][0], val[0][1]) }
 end
 ---- header
 module Juli::LineAbsyn
@@ -47,7 +48,20 @@ module Juli::LineAbsyn
       visitor.visit_url(self)
     end
   end
+
+  class Macro < Node
+    attr_accessor :name, :arg
+
+    def initialize(name, arg)
+      @name = name
+      @arg  = arg
+    end
   
+    def accept(visitor)
+      visitor.visit_macro(self)
+    end
+  end
+
   class ArrayNode < Node
     attr_accessor :array
   
@@ -78,6 +92,7 @@ module Juli::LineAbsyn
     def visit_string(n); end
     def visit_wikiname(n); end
     def visit_url(n); end
+    def visit_macro(n); end
   end
 
   # visitor for debug
@@ -98,6 +113,10 @@ module Juli::LineAbsyn
 
     def visit_url(n)
       @array << sprintf("U:%s", n.str)
+    end
+
+    def visit_macro(n)
+      @array << sprintf("M:%s:%s", n.name, n.arg)
     end
   end
 end
@@ -145,18 +164,32 @@ private
         scan_r($3, &block)
         return
 
-      # to escape wikiname string in tag, tag is prior to wikiname
+      # to escape wikiname string in HTML tag, it is prior to wikiname
       when /\A([^<]*)(<[^>]*>)(.*)\z/m
         scan_r($1, &block)
         yield [:STRING, $2]   # <a>...</a> is just string even wikiname be there
         scan_r($3, &block)
         return
 
-      # explicit escape by \{...}
-      when /\A([^\\]*)\\\{([^}]+)\}(.*)\z/m
+      # escape of escape: \\{ -> \{
+      when /\A([^\\]*)\\\\{(.*)\z/m
+        scan_r($1, &block)
+        yield [:STRING, '\\{']
+        scan_r($2, &block)
+        return
+
+      # explicit escape by \{!...}
+      when /\A([^\\]*)\\{!([^}]+)}(.*)\z/m
         scan_r($1, &block)
         yield [:STRING, $2]
         scan_r($3, &block)
+        return
+
+      # macro \{command rest}
+      when /\A([^\\]*)\\{(\w+)\s*([^}]*)}(.*)\z/m
+        scan_r($1, &block)
+        yield [:MACRO, [$2, $3]]
+        scan_r($4, &block)
         return
       
       # URL is piror to wikiname
