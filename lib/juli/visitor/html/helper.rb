@@ -33,14 +33,25 @@ class Juli::Visitor::Html
   # 1. WeatherForecast should inherit
   #    Juli::Visitor::Html::Helper::AbstractHelper.
   # 1. implement each method: initialize, on_root, run.
-  # 1. register the class at Juli::Visitor::Html::HELPER in 
-  #    LIB/juli/visitor/html.rb
   #
   # Then, weather_forecast method can be used in ERB template.
   # This method is dynamically defined at Html visitor and equivalent 
   # to WeatherForecast#run.
   #
   module Helper
+    class AbstractHelper
+      # called when juli(1) starts.
+      def initialize
+      end
+
+      # called on each parsed document
+      def on_root(root)
+      end
+
+      # This will be a helper like 'abstract_helper(args)'
+      def run(*args)
+      end
+    end
 
     # TRICKY PART: header_id is used for 'contents' helper link.
     # Absyn::HeaderNode.dom_id cannot be used directory for
@@ -65,11 +76,8 @@ class Juli::Visitor::Html
       File.join(result, dest)
     end
 
-    require 'juli/visitor/html/helper/abstract_helper'
-
-    # import all of helper/*.rb files other than abstract_helper
+    # import all of helper/*.rb files
     Dir.glob(File.join(File.dirname(__FILE__), 'helper/*.rb')){|v|
-      next if File.basename(v) == 'abstract_helper'
       require File.join('juli/visitor/html/helper', File.basename(v))
     }
   end

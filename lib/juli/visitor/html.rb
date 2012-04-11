@@ -147,7 +147,7 @@ module Juli::Visitor
       @header_sequence  = HeaderSequence.new
       IdAssigner.new.run(in_file, root)
 
-      for helper in @_helpers do
+      for key, helper in @_helpers do
         helper.on_root(root)
       end
 
@@ -238,10 +238,6 @@ module Juli::Visitor
 
 
   private
-    HELPER = [
-      Juli::Visitor::Html::Helper::Contents
-    ]
-
     # Similar to Rails underscore() method.
     #
     # Example: 'A::B::HelperMethod' -> 'helper_method'
@@ -261,25 +257,23 @@ module Juli::Visitor
       FileUtils.cp(src, dest, :preserve=>true)
     end
 
-    # define each XHelper instance variable as '@_helper_x_helper'.
-    # These objects will be used at helper method 'x_helper()',
-    # which is also defined below (*).
+    # register each XHelper instance in @_helpers hash.
     def register_helper
-      @_helpers = []
-      for helper_class in HELPER do
-        eval <<-end_of_dynamic_define_of_instance_var
-          @_helper_#{Html.to_method(helper_class)} = #{helper_class}.new
-          @_helpers << @_helper_#{Html.to_method(helper_class)}
-        end_of_dynamic_define_of_instance_var
+      @_helpers = {}
+      for helper_symbol in Juli::Visitor::Html::Helper.constants do
+        next if helper_symbol == :AbstractHelper
+        helper_class = Juli::Visitor::Html.module_eval(helper_symbol.to_s)
+        @_helpers[helper_symbol] = helper_class.new
       end
     end
 
-    # (*) define helper method 'x_helper()' from XHelper class to call
-    # @_helper_Helper1.run(*args)
-    for helper_class in HELPER do
+    # define helper method 'x' from XHelper class to call
+    # @_helpers[:x].run(*args)
+    for helper_symbol in Juli::Visitor::Html::Helper.constants do
+      next if helper_symbol == :AbstractHelper
       class_eval <<-end_of_dynamic_method, __FILE__, __LINE__ + 1
-        def #{to_method(helper_class)}(*args)
-          @_helper_#{to_method(helper_class)}.run(*args)
+        def #{to_method(helper_symbol)}(*args)
+          @_helpers[:#{helper_symbol}].run(*args)
         end
       end_of_dynamic_method
     end
