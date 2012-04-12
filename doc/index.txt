@@ -633,7 +633,7 @@ Any feedback is welcome.  Please check the followings:
 * <a href='http://sourceforge.net/tracker/?group_id=390715'>Bug Report, Feature Requests</a>
 
 == Author
-Fumisky Wells, https://sourceforge.net/users/fwells00
+Fuminori Ido, https://sourceforge.net/users/ido00
 
 == License
 
