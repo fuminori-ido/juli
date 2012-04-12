@@ -563,7 +563,8 @@ The HTML template for the amazon association link can be defined at
 
 Where,
 
-1. YOUR_ID above should be replaced with your actual Amazon id.
+1. YOUR_ID above should be replaced with your actual Amazon associate
+   (affiliate) tracking-id.
 1. %s above will be replaced to the actual ASIN parameter in the macro
    calling.
 
