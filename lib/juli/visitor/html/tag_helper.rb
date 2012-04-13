@@ -16,7 +16,7 @@ class Juli::Visitor::Html
     
     private
       BOOLEAN_ATTRIBUTES = %w(disabled readonly multiple checked)
-      BOOLEAN_ATTRIBUTES << BOOLEAN_ATTRIBUTES.map(&:to_sym)
+      BOOLEAN_ATTRIBUTES << BOOLEAN_ATTRIBUTES.map{|s| s.to_sym}
     
       def content_tag_string(name, content, options)
         tag_options = tag_options(options) if options
