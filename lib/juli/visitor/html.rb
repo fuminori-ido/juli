@@ -263,7 +263,7 @@ module Juli::Visitor
       for helper_symbol in Juli::Visitor::Html::Helper.constants do
         next if helper_symbol == :AbstractHelper
         helper_class = Juli::Visitor::Html.module_eval(helper_symbol.to_s)
-        @_helpers[helper_symbol] = helper_class.new
+        @_helpers[helper_symbol.to_sym] = helper_class.new
       end
     end
 
@@ -273,7 +273,7 @@ module Juli::Visitor
       next if helper_symbol == :AbstractHelper
       class_eval <<-end_of_dynamic_method, __FILE__, __LINE__ + 1
         def #{to_method(helper_symbol)}(*args)
-          @_helpers[:#{helper_symbol}].run(*args)
+          @_helpers[:#{helper_symbol}.to_sym].run(*args)
         end
       end_of_dynamic_method
     end

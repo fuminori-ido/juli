@@ -172,21 +172,21 @@ private
         return
 
       # escape of escape: \\{ -> \{
-      when /\A([^\\]*)\\\\{(.*)\z/m
+      when /\A([^\\]*)\\\\\{(.*)\z/m
         scan_r($1, &block)
         yield [:STRING, '\\{']
         scan_r($2, &block)
         return
 
       # explicit escape by \{!...}
-      when /\A([^\\]*)\\{!([^}]+)}(.*)\z/m
+      when /\A([^\\]*)\\\{!([^}]+)\}(.*)\z/m
         scan_r($1, &block)
         yield [:STRING, $2]
         scan_r($3, &block)
         return
 
       # macro \{command rest}
-      when /\A([^\\]*)\\{(\w+)\s*([^}]*)}(.*)\z/m
+      when /\A([^\\]*)\\\{(\w+)\s*([^}]*)\}(.*)\z/m
         scan_r($1, &block)
         yield [:MACRO, [$2, $3]]
         scan_r($4, &block)
