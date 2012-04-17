@@ -2,6 +2,7 @@ $LOAD_PATH.insert(0, File.join(File.dirname(__FILE__), 'lib'))
 
 require 'rake'
 require 'rake/testtask'
+gem 'rdoc', '~> 3.12'
 require 'rdoc/task'
 require 'juli'
 require 'racc'
@@ -66,7 +67,7 @@ namespace :doc do
     EOSH
   end
 
-  Rake::RDocTask.new('app') do |t|
+  RDoc::Task.new('app') do |t|
     t.rdoc_dir  = 'doc/app'
     t.title     = 'juli API'
     t.options  << '--line-numbers'  << '--inline-source' <<
@@ -112,4 +113,3 @@ namespace :test do
     task :coverage => "test:coverage:juli"
   end
 end
-
