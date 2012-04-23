@@ -1,0 +1,20 @@
+= Hello
+
+This is test photo 01:
+\{photo 2012-04-17/01.jpg}
+
+= Photo Test 2
+
+This is test photo 02:
+\{photo 2012-04-17/02.jpg}
+
+= Hidden image
+
+Hidden image should not be accessed:
+<img src='2012-04-17/private_01.jpg'>
+
+Of course, the private_01.jpg can be accessed by '../..' ...
+when accessing by file:/// URL since both photo and wiki are under
+the same file system.
+
+Photo-macro's inaccessibility is established on web server.

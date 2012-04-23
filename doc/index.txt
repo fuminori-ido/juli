@@ -509,8 +509,9 @@ Please look at http://w3c.org if you are not familiar with HTML.
 
 \\{...} is juli macro.  Currently (v1.09), following macros are supported:
 
-\\{!...}::         Escaping wikiname
-\\{amazon ASIN}::  amazon association link
+\\{!...}::          Escaping wikiname
+\\{amazon ASIN}::   amazon association link
+\\{photo path}::    embed photo(image).  See photo(macro).
 
 === Escaping wikiname
 

@@ -5,6 +5,7 @@ $LOAD_PATH.insert(0,
     File.expand_path(File.join(File.dirname(__FILE__), '../lib')))
 
 # require lib/**/*.rb
+require 'juli'
 Dir.glob(File.join(File.dirname(__FILE__), '../lib/juli/*.rb')){|f|
   require f
 }

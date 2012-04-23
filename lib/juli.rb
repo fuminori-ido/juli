@@ -2,10 +2,12 @@ require 'pathname'
 
 # namespace for all of Juli library elements
 module Juli
-  VERSION       = '1.09.01'
+  VERSION       = '1.10.00'
 
   # sentinel to search juli-repo.  Also it's a directory name to sotre config.
   REPO          = '.juli'
   LIB           = File.join(Pathname.new(File.dirname(__FILE__)).realpath, 'juli')
   TEMPLATE_PATH = File.join(LIB, 'template')
+
+  class JuliError < StandardError; end
 end

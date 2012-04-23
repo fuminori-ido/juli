@@ -2,3 +2,5 @@ output_top: ../html
 template:   default.html
 ext:        .html
 amazon:     '<span class="juli_macro_amazon">%s</x>'
+photo:
+  mount:        ../protected_photo

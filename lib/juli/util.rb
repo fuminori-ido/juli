@@ -118,8 +118,8 @@ EOM
       attr_reader :conf
 
       def initialize
-        @conf = YAML::load_file(
-                    File.join(Juli::Util::juli_repo, Juli::REPO, 'config'))
+        @conf = YAML::load(ERB.new(File.read(
+            File.join(Juli::Util::juli_repo, Juli::REPO, 'config'))).result)
 
         raise Error if !@conf
       end

@@ -1,0 +1,150 @@
+index &gt; photo(macro)
+
+= NAME
+photo   - embed photo(image) in juli wiki text with minimum maintenance cost
+
+= SYNOPSIS
+\\{photo path}
+
+= DESCRIPTION
+
+Juli photo macro is designed to minimize maintenance cost
+to embed photo in Juli wiki textfile under Unix/Linux environment.
+
+This has the following features:
+
+1. small photo embed in juli wiki.
+1. show large photo by clicking the small photo.
+1. eliminate Exif information
+1. protect private photo from internet access; only photos called
+   by this macro are allowed public access.
+1. (TBD) link to Google map by photo's GPS info.
+
+== How to use
+
+Example: 
+
+  \{photo 2012-04-22/DCIM/101_PANA/P1010441.JPG}
+
+  When I visited the ruins of Hachioji-Castle in Japan,
+  I saw many beautiful statues of Buddha.
+  Here is one of them.
+
+will be:
+
+\{photo 2012-04-22/DCIM/101_PANA/P1010441.JPG}
+
+When I visited the ruins of Hachioji-Castle in Japan,
+I saw many beautiful statue of Buddha.
+Here is one of them.
+
+In general, in Juli wiki text, write as follows:
+
+  \{photo a/b/c.jpg}
+
+Where, a/b/c.jpg is a relative-path of the photo file from 'mount'
+directory (see 'setup' section below).
+
+As you see this example, by clicking this small photo,
+you can see large photo.
+
+These features are done by this macro.
+
+<br clear=all>
+
+== Architecture
+
+Following figure shows the architecture of photo macro.
+Here is the step how photo macro is interpreted by juli.
+
+<center><img src='photo(macro)/architecture_1.png'></center>
+
+Where,
+
+* 'output_top' above is a juli configuration parameter specified in .juli/config.
+  See juli(1) and/or tutorial.
+* 'photo.mount' above is new configuration parameter introduced in this macro.
+  See 'Setup' section below.
+
+== Setup
+
+1. Decide one location of directory of all of your photos
+   on the same file system as JULI_REPO.
+   We call it 'mount' directory in this macro.
+   Maintenace of the mount directory is up to you.
+   If you have several directories, create one directory, and
+   move the directories under it or symlink to each.
+1. In .juli/config, setup photo related entries like the followings:
+    photo:
+      mount:        /home/wells/photo
+      small:
+        width:      512
+        style:      '...'
+      large:
+        width:      1024
+
+Where, each key mean as follows:
+
+mount::
+  Top directory of photos.
+  It is usually photo master file directory, photo uploade directory, or
+  SD-card back-up directory on the web server.
+  It SHOULD be NON-PUBLIC directory to protect annonymous
+  access from web. Example: /home/wells/photo
+small::
+  small photo related configurations.  See below for the detail.
+small.width::
+  Small photo's width you like.
+  Default is 512 pixel.
+small.style::
+  Small photo's style sheet.
+  'img.juli_photo_small' entry in the
+  doc/.juli/sourceforge.html file (in this package) is one of the example.
+large::
+  large photo related configurations.  See below for the detail.
+large.width::
+  Large photo's width you like.
+  Default is 1024 pixel.
+
+(Note: there is no large.style configuration now)
+
+Please see doc/.juli/config and test/repo/.juli/config in this package
+for the example.
+
+This setup is one-shot task.
+
+== Maintenance
+
+When you add photo, just sync (by e.g. rsync) your photo SD card and
+'mount' directory.
+
+== Security
+
+1. When you set 'mount', it SHOULD be out-of-url so that any photo
+   under the 'mount' cannot be accessed via internet.
+1. Only photo referring by this macro can be accessed via internet.
+
+== File permission
+
+The following permission is required on juli(1):
+
+* write permission on output_top/public_photo/ directory.
+  Where, output_top is the directory for generated HTML
+  specified at .juli/config.
+* read  permission under 'mount' directory.
+
+== Example
+
+=== Juli document case
+
+<a href='#'>This document</a>'s \\{photo} macro setup is as follows:
+
+  photo:
+    mount:    ../sample/protected_photo/
+    small:
+      width:  200
+      style:  'float: right'
+
+<hr>
+
+index &gt; photo(macro)
