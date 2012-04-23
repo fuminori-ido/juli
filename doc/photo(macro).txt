@@ -1,7 +1,7 @@
 index &gt; photo(macro)
 
 = NAME
-photo   - embed photo(image) in juli wiki text with minimum maintenance cost
+photo   - embed photo in juli-wiki-text with minimum maintenance cost
 
 = SYNOPSIS
 \\{photo path}
@@ -54,16 +54,20 @@ These features are done by this macro.
 
 == Architecture
 
-Following figure shows the architecture of photo macro.
-Here is the step how photo macro is interpreted by juli.
+Following figure shows the architecture of photo macro
+and the step how it is interpreted by juli.
 
 <center><img src='photo(macro)/architecture_1.png'></center>
 
 Where,
 
-* 'output_top' above is a juli configuration parameter specified in .juli/config.
+* 'output_top' above is the juli configuration parameter specified in .juli/config
+  for HTML generated document top directory.
   See juli(1) and/or tutorial.
-* 'photo.mount' above is new configuration parameter introduced in this macro.
+* 'photo.mount' above is new configuration parameter introduced in this macro
+  for all of your photo master file directory which may include
+  some private photos.  Of course, only photos you specify in
+  \\{photo ...} macro are copied to public_photo as above figure shows.
   See 'Setup' section below.
 
 == Setup
