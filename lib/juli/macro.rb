@@ -1,6 +1,11 @@
 module Juli
   module Macro
     class Base
+      # called on 'juli init' to generate config sample template.
+      def self.conf_template
+        ''
+      end
+
       # called when juli(1) starts.
       def initialize
       end

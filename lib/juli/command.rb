@@ -62,16 +62,6 @@ EXT_COMMENT = <<EOM
 # you may not use SSI.  In such a case, you can change to '.html'.
 
 EOM
-OTHER_COMMENT = <<EOM
-
-# (>= v1.09) amazon association link with any ASIN can be rendered
-# at any location in juli text.  Its template is as follows.
-# This HTML is just an example so that you can change as you like.
-# '%s' in the template will be replaced by actual ASIN:
-
-#amazon:     '<iframe src="http://rcm-jp.amazon.co.jp/e/cm?o=9&p=8&l=as1&asins=%s&ref=tf_til&fc1=000000&IS2=1&lt1=_blank&m=amazon&lc1=0000FF&bc1=000000&bg1=FFFFFF&f=ifr" style="float:right; width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe>'
-
-EOM
     # init does:
     #
     # 1. create juli-repository at the current directory, if not yet.
@@ -100,7 +90,7 @@ EOM
           write_config(f, 'template',   opts[:t])
           f.print EXT_COMMENT
           write_config(f, 'ext',        opts[:e])
-          f.print OTHER_COMMENT
+          write_macro_conf(f)
         end
       else
         STDERR.print "WARN: config file is already created\n"
@@ -138,6 +128,16 @@ EOM
     def write_config(f, key, value)
       if value
         f.printf("%s: %s\n", key, value)
+      end
+    end
+
+    # write each macro conf sample to initial .juli/conf file
+    # by calling 'conf_template' method on each macro.
+    def write_macro_conf(f)
+      for macro_symbol in Juli::Macro.constants do
+        next if macro_symbol == :Base
+        macro_class = Juli::Macro.module_eval(macro_symbol.to_s)
+        f.print "\n", macro_class.conf_template
       end
     end
   end

@@ -24,6 +24,20 @@ module Juli
 
       attr_accessor :mount
     
+      def self.conf_template
+        <<EOM
+# (>= v1.10) photo macro setup sample is as follows.
+
+#photo:
+# mount:    /home/YOUR_NAME/Photos
+# small:
+#   width:  512
+#   style:  'float: right'
+# large:
+#   width:  1024
+EOM
+      end
+
       def initialize
         super
 
