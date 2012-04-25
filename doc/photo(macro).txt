@@ -92,9 +92,14 @@ Where, each key mean as follows:
 mount::
   Top directory of photos.
   It is usually photo master file directory, photo uploade directory, or
-  SD-card back-up directory on the web server.
+  SD-card back-up directory on your PC.
   It SHOULD be NON-PUBLIC directory to protect annonymous
-  access from web. Example: /home/wells/photo
+  access from web.
+  It SHOULD NOT be under JULI_REPO because any files except wikipage
+  under JULI_REPO are copied to output_top ( = public).
+  Relative path can be used, which is relative from JULI_REPO, not
+  from .juli/config.
+  Example: /home/wells/photo
 small::
   small photo related configurations.  See below for the detail.
 small.width::
