@@ -131,9 +131,9 @@ EOM
                     else
                       SIZE_DEFAULT[size]
                     end
+          img.resize_to_fit!(width, img.rows * width / img.columns)
           self.rotate(img).
               strip!.
-              resize_to_fit(width, img.rows * width / img.columns).
               write(public_phys_path).destroy!
         end
         photo_path(path, size, url)
