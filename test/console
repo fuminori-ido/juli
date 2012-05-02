@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 #
+# coding: UTF-8
+#
 # = NAME
 # console     - irb with Juli modules/classes
 #
@@ -13,10 +15,16 @@
 #
 # = EXAMPLE
 #
-#   $ test/console
-#   >>
-#   >> h = Juli::Visitor::Html.new
-#   >> h.content_tag(:div, 'hello')     # call ..Html::TagHelper method
+# 1. call helper
+#     $ test/console
+#     >> h = Juli::Visitor::Html.new
+#     >> h.content_tag(:div, 'hello')     # call ..Html::TagHelper method
+# 1. dump tag DB
+#     $ test/console
+#     >> Dir.chdir(ENV['JULI_REPO'])
+#     >> include Juli::Util
+#     >> t = Juli::Macro::Tag.new
+#     >> t.dump
 
 Dir.chdir('doc/')
 $LOAD_PATH.insert(0, '../lib')

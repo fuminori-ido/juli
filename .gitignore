@@ -1,9 +1,13 @@
 *~
-lib/juli/parser.tab.rb
-lib/juli/line_parser.tab.rb
-bin/juli.rb
-doc/app
-test/html
-doc_html/
-coverage/
-parser.output
+/lib/juli/parser.tab.rb
+/lib/juli/line_parser.tab.rb
+/bin/juli.rb
+/doc/app
+/test/html
+/doc_html/
+/coverage/
+/parser.output
+
+# tag DB
+/doc/.juli/*.gdbm
+/test/repo/.juli/*.gdbm

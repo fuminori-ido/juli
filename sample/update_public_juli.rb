@@ -67,4 +67,5 @@ end
     end
     system 'juli sitemap'
     system 'juli recent_update'
+    system 'juli tag'
   end

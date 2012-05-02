@@ -11,11 +11,13 @@ module Juli
       end
 
       # called on each parsed document
-     #def on_root(root)
-     #end
+      def on_root(file, root)
+      end
 
-      # called on each macro as "\{macro_name args...}" in text
+      # called on each macro as "\{macro_name args...}" in text.
+      # String should be returned.
       def run(*args)
+        ''
       end
     end
 

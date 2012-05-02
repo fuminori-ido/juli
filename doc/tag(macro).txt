@@ -1,0 +1,26 @@
+index &gt; tag(macro)
+
+= NAME
+tag   - define tags to this page
+
+= SYNOPSIS
+\\{tag tag1 ...}
+
+= DESCRIPTION
+
+Juli tag macro defines tags to this page.
+
+== Example
+
+This:
+
+  \{tag DIY DOG}
+
+defines 'DIY' and 'DOG' tags to this page for tag-search later
+(see juli(1) 'tag' command).
+
+= FILES
+
+.juli/*.gdbm::  tag DB.
+
+index &gt; tag(macro)

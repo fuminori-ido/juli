@@ -35,9 +35,7 @@ module Juli
       wikiname = {}
       Dir.chdir(Juli::Util.juli_repo){
         Dir.glob('**/*.txt'){|f|
-          if f =~ /^(.*).txt$/
-            wikiname[encode($1)] = 1
-          end
+          wikiname[encode(Juli::Util.to_wikiname(f))] = 1
         }
       }
       wikiname.keys.sort_by{|a| -1 * a.length}

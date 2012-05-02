@@ -174,7 +174,9 @@ TBD
 == from package
 Prerequisites:
 * rsync
-* ruby-1.8 or ruby-1.9
+* ruby-1.9
+* RMagick (for photo(macro))
+* gdbm (for tag(macro))
 
 1. download package from http://sourceforge.net/projects/jjjuli/files/
 1. run setup.rb as follows:
@@ -187,7 +189,9 @@ Prerequisites:
 
 Prerequisites:
 * rsync
-* ruby-1.8 or ruby-1.9
+* ruby-1.9
+* RMagick (for photo(macro))
+* gdbm (for tag(macro))
 * <a href='http://i.loveruby.net/en/projects/racc/'>racc</a>
 * rake
 * git
@@ -509,9 +513,10 @@ Please look at http://w3c.org if you are not familiar with HTML.
 
 \\{...} is juli macro.  Currently (v1.09), following macros are supported:
 
-\\{!...}::          Escaping wikiname
-\\{amazon ASIN}::   amazon association link
-\\{photo path}::    embed photo(image).  See photo(macro).
+\\{!...}::              Escaping wikiname
+\\{amazon ASIN}::       amazon association link
+\\{photo path}::        embed photo(image).  See photo(macro).
+\\{tag tag1 tag2 ...}:: define tags.  See tag(macro).
 
 === Escaping wikiname
 

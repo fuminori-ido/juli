@@ -50,11 +50,11 @@ module Juli::LineAbsyn
   end
 
   class Macro < Node
-    attr_accessor :name, :arg
+    attr_accessor :name, :rest
 
-    def initialize(name, arg)
+    def initialize(name, rest)
       @name = name
-      @arg  = arg
+      @rest = rest
     end
   
     def accept(visitor)
@@ -116,7 +116,7 @@ module Juli::LineAbsyn
     end
 
     def visit_macro(n)
-      @array << sprintf("M:%s:%s", n.name, n.arg)
+      @array << sprintf("M:%s:%s", n.name, n.rest)
     end
   end
 end

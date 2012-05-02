@@ -70,7 +70,7 @@ prepare memo root directory for juli-repo:
 
 Where, JULI_REPO is the directory which you are creating now.
 RUBY_LIB is the directory which juli library is installed
-(e.g. /usr/local/lib/ruby/site_ruby/1.8/).
+(e.g. /usr/local/lib/ruby/site_ruby/1.9/).
 
 (v1.01) When you want to customize template, please follow the steps below
 after executing 'juli init':
@@ -138,6 +138,12 @@ automatically generated.
 generates recent_update.shtml under <i>output_top</i>/.
 je(1) supports this; when edit text by je(1), the recent_update is
 automatically generated.
+
+=== tag
+generates _tag.shtml under <i>output_top</i>/.
+This page shows tag list and wiki page related to the tag.
+
+See tag(macro) to define tag.
 
 = FILES
 

@@ -1,8 +1,8 @@
 require 'juli/util'
 require 'juli/parser.tab'
-require 'juli/command/file_entry'
-require 'juli/command/sitemap'
-require 'juli/command/recent_update'
+Dir.glob(File.join(File.dirname(__FILE__), 'command/*.rb')){|sub_command_file|
+  require sub_command_file
+}
 
 module Juli
   # This is a top level module for juli(1) command execution.
@@ -18,6 +18,7 @@ module Juli
       when 'gen';           gen(opts)
       when 'sitemap';       Juli::Command::Sitemap.new.run(opts)
       when 'recent_update'; Juli::Command::RecentUpdate.new.run(opts)
+      when 'tag';           Juli::Command::Tag.new.run(opts)
       else
         STDERR.print "Unknown juli command: '#{command_str}'\n\n", usage, "\n"
         raise Error
@@ -36,7 +37,7 @@ TEMPLATE_COMMENT = <<EOM
 #
 # Current available templates are under RUBY_LIB/juli/template/, where
 # RUBY_LIB is is the directory which juli library is installed
-# (e.g. /usr/local/lib/ruby/site_ruby/1.8/).
+# (e.g. /usr/local/lib/ruby/site_ruby/1.9/).
 #
 # (>= v1.01.00) You can put your customized template under JULI_REPO/.juli/
 # rather than ruby standard library directory.  For example,

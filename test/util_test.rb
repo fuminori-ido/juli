@@ -39,6 +39,19 @@ class UtilTest < Test::Unit::TestCase
     assert_nil      conf['** NEVER DEFINED KEY! **']
   end
 
+  def test_to_wikiname
+    tests = [
+      # expected            in-file
+      ['a/b/hello',         'a/b/hello.txt'],
+      ['a/b/Ubuntu 10',     'a/b/Ubuntu 10.txt'],
+      ['a/b/Ubuntu 10.04',  'a/b/Ubuntu 10.04.txt'],
+    ]
+
+    for t in tests do
+      assert_equal t[0], to_wikiname(t[1])
+    end
+  end
+
   def test_out_filename
     tests = [
       # expected            in-file

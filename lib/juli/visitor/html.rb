@@ -15,7 +15,8 @@ module Juli::Visitor
   class Html < Juli::Absyn::Visitor
     require 'juli/visitor/html/tag_helper'
     require 'juli/visitor/html/helper'
-    
+    require 'juli/macro'
+
     include Juli::Util
     include Juli::Visitor::Html::TagHelper
     include Juli::Visitor::Html::Helper
@@ -55,13 +56,11 @@ module Juli::Visitor
     # * hyperlink on url like http://...
     # * macro result
     class HtmlLine < Juli::LineAbsyn::Visitor
-      require 'juli/macro'
-
       include Juli::Util
       include TagHelper
 
-      def initialize
-        register_macro
+      def initialize(macros)
+        @_macros = macros
       end
 
       def visit_array(n)
@@ -85,22 +84,11 @@ module Juli::Visitor
 
       def visit_macro(n)
         if macro = @_macros[camelize(n.name).to_sym]
-          macro.run(n.arg)
+          macro.run(*n.rest.split(' '))
         else
           s = "juli ERR: UNKNOWN macro name: '#{n.name}'"
           STDERR.print s, "\n"
           s
-        end
-      end
-
-    private
-      # create Macro object and register it in @_macros hash.
-      def register_macro
-        @_macros = {}
-        for macro_symbol in Juli::Macro.constants do
-          next if macro_symbol == :Base
-          macro_class = Juli::Macro.module_eval(macro_symbol.to_s)
-          @_macros[macro_symbol] = macro_class.new
         end
       end
     end
@@ -122,8 +110,9 @@ module Juli::Visitor
         'recent_update' + conf['ext'] => 1,
       }
 
-      @html_line_visitor  = HtmlLine.new
       register_helper
+      register_macro
+      @html_line_visitor  = HtmlLine.new(@_macros)
 
       if !File.directory?(conf['output_top'])
         FileUtils.mkdir_p(conf['output_top'])
@@ -149,6 +138,9 @@ module Juli::Visitor
 
       for key, helper in @_helpers do
         helper.on_root(root)
+      end
+      for macro_symbol, macro in @_macros do
+        macro.on_root(in_file, root)
       end
 
       # store to instance var for 'contents' helper
@@ -276,6 +268,17 @@ module Juli::Visitor
           @_helpers[:#{helper_symbol}.to_sym].run(*args)
         end
       end_of_dynamic_method
+    end
+
+
+    # create Macro object and register it in @_macros hash.
+    def register_macro
+      @_macros = {}
+      for macro_symbol in Juli::Macro.constants do
+        next if macro_symbol == :Base
+        macro_class = Juli::Macro.module_eval(macro_symbol.to_s)
+        @_macros[macro_symbol] = macro_class.new
+      end
     end
 
     # synchronize repository and OUTPUT_TOP.

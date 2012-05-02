@@ -51,6 +51,8 @@ COMMAND (default = gen):
                       (see below), or by modifying JULI_REPO/.juli/config
                       'ext' entry later anytime.
 
+  tag                 generate tag-list page.  see tag(macro) manual.
+
 command_options for:
   init:
     -o output_top     default='../html/'
@@ -140,6 +142,18 @@ EOM
     end
     module_function :mkdir
 
+    # input filename to wikiname
+    #
+    # === INPUTS
+    # in_filename:: juli repo file path
+    #
+    # === EXAMPLE
+    # diary/2010/12/31.txt -> diary/2010/12/31
+    def to_wikiname(in_filename)
+      in_filename.gsub(/\.[^\.]*$/,'')
+    end
+    module_function :to_wikiname
+
     # === INPUTS
     # in_filename:: relative path under repository
     # o_opt::       output path which -o command-line option specifies
@@ -154,7 +168,7 @@ EOM
     def out_filename(in_filename, o_opt = nil)
       o_opt ||
           File.join(conf['output_top'],
-                    in_filename.gsub(/\.[^\.]*$/,'') + conf['ext'])
+                    to_wikiname(in_filename) + conf['ext'])
     end
     module_function :out_filename
 
