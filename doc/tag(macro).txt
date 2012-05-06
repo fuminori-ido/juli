@@ -14,13 +14,17 @@ Juli tag macro defines tags to this page.
 
 This:
 
-  \{tag DIY DOG}
+  \{tag DIY BOOK}
 
-defines 'DIY' and 'DOG' tags to this page for tag-search later
-(see juli(1) 'tag' command).
+defines 'DIY' and 'BOOK' tags to this page for tag-search later.
 
 = FILES
 
 .juli/*.gdbm::  tag DB.
+
+= SEE ALSO
+
+juli(1) 'tag' command::
+  generates '_tag.shtml' page
 
 index &gt; tag(macro)
