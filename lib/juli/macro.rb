@@ -1,6 +1,8 @@
 module Juli
   module Macro
     class Base
+      include Juli::Util
+
       # called on 'juli init' to generate config sample template.
       def self.conf_template
         ''

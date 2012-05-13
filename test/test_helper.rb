@@ -6,9 +6,10 @@ $LOAD_PATH.insert(0,
 
 # require lib/**/*.rb
 require 'juli'
-Dir.glob(File.join(File.dirname(__FILE__), '../lib/juli/*.rb')){|f|
-  require f
-}
+require 'juli/command'
+require 'juli/macro'
+require 'juli/visitor'
+require 'juli/wiki'
 
 class Test::Unit::TestCase
   include Juli::Util

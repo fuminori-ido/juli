@@ -4,3 +4,9 @@ ext:        .html
 amazon:     '<span class="juli_macro_amazon">%s</x>'
 photo:
   mount:        ../protected_photo
+url_prefix:     'http://local:PORT/JULI'
+facebook:
+  like:
+    template:   '<fb:like href="%s"></fb:like>'
+  comments:
+    template:   ''

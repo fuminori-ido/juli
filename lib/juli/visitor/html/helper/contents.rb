@@ -39,7 +39,7 @@ module Juli::Visitor::Html::Helper
     end
 
     # called on each parsed document
-    def on_root(root)
+    def on_root(in_file, root)
       @root = root
     end
 

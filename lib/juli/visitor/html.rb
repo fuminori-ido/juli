@@ -137,7 +137,7 @@ module Juli::Visitor
       IdAssigner.new.run(in_file, root)
 
       for key, helper in @_helpers do
-        helper.on_root(root)
+        helper.on_root(in_file, root)
       end
       for macro_symbol, macro in @_macros do
         macro.on_root(in_file, root)

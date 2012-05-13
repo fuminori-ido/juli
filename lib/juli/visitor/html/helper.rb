@@ -40,12 +40,14 @@ class Juli::Visitor::Html
   #
   module Helper
     class AbstractHelper
+      include Juli::Util
+
       # called when juli(1) starts.
       def initialize
       end
 
       # called on each parsed document
-      def on_root(root)
+      def on_root(in_file, root)
       end
 
       # This will be a helper like 'abstract_helper(args)'
