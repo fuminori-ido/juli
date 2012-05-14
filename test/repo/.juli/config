@@ -9,4 +9,4 @@ facebook:
   like:
     template:   '<fb:like href="%s"></fb:like>'
   comments:
-    template:   ''
+    template:   '<fb:comments href="%s"></fb:comments>'
