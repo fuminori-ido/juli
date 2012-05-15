@@ -73,7 +73,7 @@ Where,
 == Setup
 
 1. Decide one location of directory of all of your photos
-   on the same file system as JULI_REPO.
+   on the same file system.
    We call it 'mount' directory in this macro.
    Maintenace of the mount directory is up to you.
    If you have several directories, create one directory, and
@@ -87,7 +87,7 @@ Where,
       large:
         width:      1024
 
-Where, each key mean as follows:
+Where, each key means as follows:
 
 mount::
   Top directory of photos.
