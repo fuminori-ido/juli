@@ -1,3 +1,5 @@
+index &gt; \{!je(1)}
+
 = NAME
 je    - edit wikipage and run juli(1)
 
@@ -71,3 +73,6 @@ JULI::      for debug (only for developer)
 
 = FILES
 /tmp/juli_je.log::  log file for je(1) time consuming tasks(e.g. gen -f)
+
+<hr>
+index &gt; \{!je(1)}

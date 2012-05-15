@@ -1,0 +1,396 @@
+index &gt; \{!juli formatting}
+
+= Juli Formatting
+
+Juli document format syntax is a very small subset of
+<a href='http://rubyforge.org/projects/rdtool/'>RD</a>, but
+some syntax are a little bit of different.
+
+== Header
+
+Beggining '=' in line means header.  6 level headers can be used as follows:
+
+1. '= Top level header title'
+1. '== Second level header title'
+1. '=== 3rd level header title'
+1. '==== 4th level header title'
+1. '===== 5th level header title'
+1. '====== 6th level header title'
+
+Example:
+
+
+  = NAME
+  juli    - Outline processor
+
+  = SYNOPSIS
+  juli [-g generator] file
+
+will be what you see at juli(1) page...
+
+== List
+=== Ordered List
+
+==== Basic
+The line starts with "1. " (One dot space) is recognized as ordered list.
+Not only '1' but also any number can be used.  However, actual assigned
+numbers for ordered-list starts '1' and increments 1 for each. 
+
+Example:
+
+  |1. Hello
+  |1. World
+  |1. This is a pen.
+
+will be:
+
+1. Hello
+1. World
+1. This is a pen.
+
+(Please ignore '|' above.  It just let juli(1) interpret to quote,
+not ordered list).
+
+==== Nested list
+When putting leading spaces, it is interpreted as nested list.  Example:
+
+  |1. Hello
+  |  1. Welcome
+  |  1. juli
+  |1. World
+
+will be:
+
+1. Hello
+  1. Welcome
+  1. juli
+1. World
+
+(Where, please ignore '|' above).
+
+==== Continued list
+When length of a list becomes longer than editor window width,
+next line can be the continued line of the list if it starts with the same
+offset as follows:
+
+  |A group is a set, G, together with an operation • (called the
+  |group law of G) that combines any two elements a and b to form
+  |another element, denoted a • b or ab. To qualify as a group,
+  |the set and operation, (G, •), must satisfy four requirements
+  |known as the group axioms:
+  |
+  |1. For all a, b in G, the result of the operation, a • b,
+  |   is also in G.
+  |1. For all a, b and c in G, (a • b) • c = a • (b • c).
+  |1. There exists an element e in G, such that for every element a in G,
+  |   the equation e • a = a • e = a holds.
+  |   The identity element of a group G is often written as 1 or 1G,
+  |   a notation inherited from the multiplicative identity.
+  |1. For each a in G, there exists an element b in G such that
+  |   a • b = b • a = 1G.
+  |
+  |(from http://en.wikipedia.org/wiki/Group_%28mathematics%29 )
+
+will be:
+
+<hr>
+A group is a set, G, together with an operation • (called the
+group law of G) that combines any two elements a and b to form
+another element, denoted a • b or ab. To qualify as a group,
+the set and operation, (G, •), must satisfy four requirements
+known as the group axioms:
+
+1. For all a, b in G, the result of the operation, a • b,
+   is also in G.
+1. For all a, b and c in G, (a • b) • c = a • (b • c).
+1. There exists an element e in G, such that for every element a in G,
+   the equation e • a = a • e = a holds.
+   The identity element of a group G is often written as 1 or 1G,
+   a notation inherited from the multiplicative identity.
+1. For each a in G, there exists an element b in G such that
+   a • b = b • a = 1G.
+
+(from http://en.wikipedia.org/wiki/Group_%28mathematics%29 )
+<hr>
+
+
+(Where, please ignore '|' and &lt;hr&gt; line above.  Those are just
+for explanation purpose).
+
+=== Unordered List
+
+The line starts with "* " (astarisk space) is recognized as unordered list.
+
+==== Basic
+Example:
+
+  |* Hello
+  |* World
+  |* This is a pen.
+
+will be:
+
+* Hello
+* World
+* This is a pen.
+
+==== Nested list
+When putting leading spaces, it is interpreted as nested list.  Example:
+
+  |* Hello
+  |  * Welcome
+  |  * juli
+  |* World
+
+will be:
+
+* Hello
+  * Welcome
+  * juli
+* World
+
+(Where, please ignore '|' above).
+
+==== Continued list
+
+Same as ordrered list.  See ordered list.
+
+
+=== Compact Dictionary List
+
+The line with the following form is recognized as compact dictionary list:
+
+  term:: description
+  ...
+
+Example:
+
+  Ruby::  programing language, or a gem
+  Juli::  an offline wiki, July in English
+
+will be:
+
+Ruby::  programing language, or a gem
+Juli::  an offline wiki, July in English
+
+=== Dictionary List
+
+The line with the following form is recognized as dictionary list:
+
+  term::
+    description statement
+    description statement(continued)
+  ...
+
+Example:
+
+  Ruby::
+    programing language, or a gem
+  Juli::
+    an offline wiki, July in English, or
+    a character in a famous comic written by Moto Hagio.
+
+will be:
+
+Ruby::
+  programing language, or a gem
+Juli::
+  an offline wiki, July in English, or
+  a character in a famous comic written by Moto Hagio.
+
+=== Mixture of each kind of list
+
+==== Ordered and Unordered list
+
+Both ordered and unordered list can be nested each other.
+Example:
+
+  |1. Hello
+  |  * Welcome
+  |  * juli
+  |1. World
+
+will be:
+
+1. Hello
+  * Welcome
+  * juli
+1. World
+
+==== Dictionary list in Ordered/Unordered list
+
+Dictionary list (Compact Dictionary list also) can be written in
+Ordered/Unordered list.  Offset should be the same as previous
+list item as follows:
+
+  |* f = ma
+  |  f:: force
+  |  m:: mass
+  |  a:: accelaration
+  |* e = mc<sup>2</sup>
+  |  e::
+  |     energy
+  |  m::
+  |     mass
+  |  c::
+  |     light speed,
+  |     299,792,458 [m/s]
+
+will be:
+
+* f = ma
+  f:: force
+  m:: mass
+  a:: accelaration
+* e = mc<sup>2</sup>
+  e::
+    energy
+  m::
+    mass
+  c::
+    light speed,
+    299,792,458 [m/s]
+
+== Block Quote
+
+The line with leading spaces is recognized as blockquote.
+Where, spaces should longer than Baseline.
+
+Block Quote can contain WHITELINE.
+
+Example:
+
+  |   "The load to hell is paved with good intentions."
+  |
+  |   -- derived proverb from original thought of Saint Bernard of Clairvaux
+
+will be:
+
+  "The load to hell is paved with good intentions."
+
+  -- derived proverb from original thought of Saint Bernard of Clairvaux
+
+(Where, '|' above is to avoid deleting spaces.  Please ignore it.)
+
+=== Block Quote and List
+
+Block Quote can be written in list.
+
+Example:
+
+  |1. A
+  |     B
+  |   What did you do?
+  |1. C
+
+will be:
+
+1. A
+     B
+   What did you do?
+1. C
+
+== URL autolink
+
+When text contains URL like http://..., it is automatically hyperlinked.
+Currently, http, https, mailto, and ftp are supported.
+
+Example:
+
+  Please look at http://w3c.org if you are not familiar with HTML.
+
+will be:
+
+Please look at http://w3c.org if you are not familiar with HTML.
+
+== Macro
+
+\\{...} is juli macro.  Currently (v1.09), following macros are supported:
+
+\\{!...}::              Escaping wikiname
+\\{amazon ASIN}::       amazon association link
+\\{photo path}::        embed photo(image).  See photo(macro).
+\\{tag tag1 tag2 ...}:: define tags.  See tag(macro).
+
+=== Escaping wikiname
+
+\\{!...} notation escapes wikiname.  Example:
+
+  \{!tutorial}, in general meaning, shouldn't link to juli's tutorial docment.
+
+will be:
+
+\{!tutorial}, in general meaning, shouldn't link to juli's tutorial docment.
+
+NOTE: Following special cases are automatically escaped:
+
+1. wikiname in tag.
+1. wikiname in &lt;a&gt;...&lt;/a&gt; contents.
+
+==== NOTE for users who have used juli &lt;= v1.08
+
+Sorry for this incompatibility between v1.08 and v1.09:
+
+&lt;=v1.08::  \\{wikiname}
+&gt;=v1.09::  \\{!wikiname}
+
+=== amazon association link
+
+This is my favorite book.
+\{amazon 4048538098}
+
+This is generated by the following juli macro calling:
+
+  This is my favorite book.
+  \{amazon 4048538098}
+
+Amazon association link tag like the above can be embedded at any place
+in juli text (&gt;= v1.09) with ASIN parameter.
+Above example's ASIN is 4048538098 which is an ID in Amazon to referre
+my favorite book "Gundam; The Origin".  Of course, you can use any ASIN
+for your amazon association in juli.  General notation is as follows:
+
+  \{amazon ASIN}
+
+You can find ASIN in amazon association site.
+ 
+==== How to customize
+
+The HTML \{!template} for the amazon association link can be defined at
+.juli/config file's "amazon" entry like this:
+
+  amazon: '&lt;iframe src="http://rcm-jp.amazon.co.jp/e/cm?t=YOUR_ID...asins=%s..." ...&gt;&lt;/iframe&gt;'
+
+Where,
+
+1. YOUR_ID above should be replaced with your actual Amazon associate
+   (affiliate) tracking-id.
+1. %s above will be replaced to the actual ASIN parameter in the macro
+   calling.
+
+== HTML Extention
+
+HTML tag can be written anyplace so you can use any html as follows:
+
+* <i>Italic</i> by &lt;i&gt;Italic&lt;/i&gt;
+* <b>Bold</b> by &lt;b&gt;Bold&lt;/b&gt;
+* <u>Underline</u> by &lt;u&gt;Underline&lt;/u&gt;
+* <s>Strikethrough</s> by &lt;s&gt;Strikethrough&lt;/s&gt;
+
+=== Restriction
+
+You can use any HTML. However, <b>juli markup syntax is higher priority</b>.
+So, for example, tag nesting doesn't work because leading space at line is
+recognized as blockquote.
+
+Bad Example:
+
+  |&lt;table&gt;
+  |  &lt;tr&gt;&lt;td&gt;A&lt;/td&gt;&lt;td&gt;B&lt;/td&gt;&lt;/tr&gt;
+  |  &lt;tr&gt;&lt;td&gt;C&lt;/td&gt;&lt;td&gt;D&lt;/td&gt;&lt;/tr&gt;
+  |&lt;/table&gt;
+
+(Where, '|' above is to avoid deleting spaces.  Please ignore it.)
+
+<hr>
+index &gt; \{!juli formatting}

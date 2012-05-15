@@ -1,3 +1,5 @@
+index &gt; \{!juli(1)}
+
 = NAME
 juli    - Outline processor, personal &amp; offline wiki
 
@@ -167,3 +169,6 @@ This distribution include files that are copyrighted by
 somebody else, and these files can be re-distributed under those own
 license.
 These files include the condition of those licenses in themselves.
+
+<hr>
+index &gt; \{!juli(1)}

@@ -1,4 +1,4 @@
-index &gt; photo(macro)
+index &gt; juli formatting &gt; \{!photo(macro)}
 
 = NAME
 photo   - embed photo in juli-wiki-text with minimum maintenance cost
@@ -155,5 +155,4 @@ The following permission is required on juli(1):
       style:  'float: right'
 
 <hr>
-
-index &gt; photo(macro)
+index &gt; juli formatting &gt; \{!photo(macro)}

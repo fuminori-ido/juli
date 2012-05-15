@@ -1,0 +1,223 @@
+index &gt; \{!template}
+
+Template format is described here.
+
+= template = ERB file = HTML(+ ruby) file
+
+Template in Juli follows ERB format, where ERB is a HTML file with
+ruby script in &lt;%= ... %&gt; and/or &lt;% ... %&gt; tag.
+Any ruby script can be written in the tag.
+
+= helper
+
+Helper is a ruby method which can be used in template file.
+
+Juli supports two kind of helpers.  One is standard helper, which
+has been already provided by juli.  The other is custom helper.
+
+== Standard helper
+
+Followings are standard helper in alphabetical order.
+You can use them in your template.
+
+body::        generated html from juli text page
+fb_like::     Facebook 'Like!' button (>= v1.12)
+fb_comments:: Facebook 'Comments' entry (>= v1.12)
+javascript::  javascript url
+prototype::   prototype url
+stylesheet::  stylesheet url
+title::       HTML title
+
+Details of these are described below.
+
+=== body
+HTML main part generated from juli text page
+
+=== fb_like
+You can place 'Like!' button in the template as you like.
+
+The following one-shot setup is required.
+
+==== Setup
+
+Note: this setup section is for both fb_like and fb_comments.
+
+1. modify your juli \{!template}
+   As you see the developer's page in facebook site
+   ( https://developers.facebook.com/docs/guides/web/ ),
+   in order to place 'Like!' button, please follow the steps below:
+  1. &lt;html&gt; tag should be as follows as facebook site
+     comments-plug-in describes:
+      &lt;html xmlns:fb="http://ogp.me/ns/fb#"&gt;
+  1. put the following just after &lt;body&gt; tag as facebook site describes:
+      &lt;div id="fb-root"&gt;&lt;/div&gt;
+      &lt;script&gt;(function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=YOUR_APPID";
+        fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+      &lt;/script&gt;
+     Where, YOUR_APPID above should be replaced to your own application
+     ID for your site which can be taken 
+     at https://developers.facebook.com/apps .
+  1. put &lt;%= fb_like %&gt; in the \{!template}.  This will be replaced 
+     to the XFBML tag when juli(1) executed, and will be interpreted
+     as 'Like!' button when reading at browser.
+1. add the following entry in your .juli/config:
+   url_prefix::
+      Required.
+      URL prefix for this page.
+      For example, if the juli page URL for the juli text 'hello.txt' is
+      http://a.b.com/juli/hello.shtml, then url_prefix here
+      is 'http://a.b.com/juli'.
+   facebook::
+      Facebook related entry starts here.
+   facebook.like::
+      Facebook 'like!' button related entry starts here.
+   facebook.like.\{!template}::
+      Optional.
+      If you don't like the default html for the 'Like!' button
+      defined at Juli::Visitor::Html::Helper::FbLike.TEMPLATE in
+      lib/juli/visitor/html/helper/fb_like.rb, you can overwrite
+      here as you like.
+      %s will be replaced to the current Juli wiki page URL.
+   facebook.comments::
+      Facebook 'comments' fields related entry starts here.
+   facebook.comments.\{!template}::
+      Optional.
+      If you don't like the default html for the 'Comments'
+      defined at Juli::Visitor::Html::Helper::FbComments.TEMPLATE in
+      lib/juli/visitor/html/helper/fb_comments.rb, you can overwrite
+      here as you like.
+      %s will be replaced to the current Juli wiki page URL.
+
+==== Example
+
+If your Juli site URL prefix is http://a.b.com/juli , and
+you need both facebook 'Like!' button and 'comments' field,
+\{!template} is like this:
+
+  &lt;html xmlns:fb="http://ogp.me/ns/fb#"&gt;
+  &lt;head&gt;
+    :
+    :
+  &lt;/head&gt;
+  &lt;body&gt;
+  &lt;div id="fb-root"&gt;&lt;/div&gt;
+  &lt;script&gt;(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/ja_JP/all.js#xfbml=1&appId=123456789";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+  &lt;/script&gt;
+    :
+    :
+  &lt;%= body %&gt;
+    :
+    :
+  &lt;%= fb_like %&gt;
+  &lt;%= fb_comments %&gt;
+  &lt;/body&gt;
+  &lt;/html&gt;
+
+Again, appId 123456789 in the above example is <b>JUST</b> example.
+You <b>SHOULD</b> replace 123456789 in the above example
+to your actual APP_ID.
+
+.juli/config is like this:
+
+  output_top: ...
+    :
+    :
+  url_prefix: 'http://a.b.com/juli'
+  facebook:
+    like:
+      template:   '&lt;fb:like href="%s" send="false" layout="button_count" width="450" show_faces="false"&gt;&lt;/fb:like&gt;'
+    comments:
+      template:   '&lt;fb:comments href="%s" num_posts="2" width="470"&gt;&lt;/fb:comments&gt;'
+
+==== Restriction
+
+1. Currently, only XFBML is supported.
+   See https://developers.facebook.com/docs/reference/plugins/like/
+   for more detail.
+1. When you see juli generated HTML in your local PC as static file
+   (URL = file:///...) ,
+   Facebook 'Like!' button and comments fields are not shown.
+   It is facebook restriction.  In order to avoid this,
+   setup local web server and see the juli generated html document
+   via it by http://...
+
+==== Files
+
+See lib/juli/\{!template}/facebook.html as an example.
+Compare it with default.html for the difference.
+
+==== Implementation Note
+
+Facebook 'Like!' href looks optional while 'comments' href looks required
+according to 'href' attributes description in both documents below:
+
+* https://developers.facebook.com/docs/reference/plugins/like/
+* https://developers.facebook.com/docs/reference/plugins/comments/
+
+I am not sure comments href is really required or optional.
+If both href are optional and you are OK to set href to the current page,
+then it is simpler to use facebook tag directly than using Juli facebook
+helper.
+
+For now, in juli, I assume facebook 'comments' href is required.
+
+=== fb_comments
+Facebook 'Comments' entry.
+See fb_like description for the detailed setup.
+Also, see lib/juli/template/facebook.html as an example.
+
+=== javascript
+javascript url
+
+=== prototype
+prototype url
+
+=== stylesheet
+stylesheet url
+
+=== title
+HTML title
+
+== Custom helper
+
+Custom helper can be added.  Please read rdoc in
+lib/juli/visitor/html/helper.rb
+
+== 'helper' vs 'macro'
+
+In Juli, helper is quite similar to macro.
+Actually, both ruby script structures are exactly the same,
+but the purpose is different.
+Helper is used for template and macro is used in juli wiki page.
+
+Currently, there is no plan to integrate them.
+If you need, please request me it with the detailed reason via sourceforge page
+http://sourceforge.net/projects/jjjuli/
+-&gt; Tracker
+-&gt; Feature Request, thank you!
+
+
+= FILES
+
+Template files reside as follows:
+
+.juli/*.html::
+  Your customized \{!template}.  '\{!template}' entry in .juli/config
+  should refer the file.
+\{!lib/juli/template/*.html}::
+  Default \{!templates}.  Directory depends on your OS / Ruby.
+  For example, it may be \{!/usr/lib/ruby/site_ruby/1.9.1/juli/template/}
+
+<hr>
+index &gt; \{!template}

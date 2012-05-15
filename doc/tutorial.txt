@@ -1,3 +1,5 @@
+index &gt; \{!tutorial}
+
 Several usages are explained here.
 It is assumed that installation has been already done.
 
@@ -123,3 +125,5 @@ The difference between juli+git and usual wiki is:
 Currently (v0.03.*), juli doesn't integrate git so you need to setup
 git manually.
 
+<hr>
+index &gt; \{!tutorial}

@@ -1,4 +1,4 @@
-index &gt; tag(macro)
+index &gt; juli formatting &gt; \{!tag(macro)}
 
 = NAME
 tag   - define tags to this page
@@ -27,4 +27,4 @@ defines 'DIY' and 'BOOK' tags to this page for tag-search later.
 juli(1) 'tag' command::
   generates '_tag.shtml' page
 
-index &gt; tag(macro)
+index &gt; juli formatting &gt; \{!tag(macro)}
