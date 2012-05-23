@@ -28,7 +28,7 @@ module JuliUnitTest
 
     def test_template
       # template in .juli/config
-      assert_equal '<fb:like href="%s"></fb:like>', @fb_like.send(:template)
+      assert_equal '<fb:like href="%{href}"></fb:like>', @fb_like.send(:template)
 
       # default template
       saved = conf['facebook']['like']['template']

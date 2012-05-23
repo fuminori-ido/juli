@@ -82,7 +82,7 @@ Note: this setup section is for both fb_like and fb_comments.
       defined at Juli::Visitor::Html::Helper::FbLike.TEMPLATE in
       lib/juli/visitor/html/helper/fb_like.rb, you can overwrite
       here as you like.
-      %s will be replaced to the current Juli wiki page URL.
+      %{href} will be replaced to the current Juli wiki page URL.
    facebook.comments::
       Facebook 'comments' fields related entry starts here.
    facebook.comments.\{!template}::
@@ -91,7 +91,7 @@ Note: this setup section is for both fb_like and fb_comments.
       defined at Juli::Visitor::Html::Helper::FbComments.TEMPLATE in
       lib/juli/visitor/html/helper/fb_comments.rb, you can overwrite
       here as you like.
-      %s will be replaced to the current Juli wiki page URL.
+      %{href} will be replaced to the current Juli wiki page URL.
 
 ==== Example
 
@@ -136,9 +136,9 @@ to your actual APP_ID.
   url_prefix: 'http://a.b.com/juli'
   facebook:
     like:
-      template:   '&lt;fb:like href="%s" send="false" layout="button_count" width="450" show_faces="false"&gt;&lt;/fb:like&gt;'
+      template:   '&lt;fb:like href="%{href}" send="false" layout="button_count" width="450" show_faces="false"&gt;&lt;/fb:like&gt;'
     comments:
-      template:   '&lt;fb:comments href="%s" num_posts="2" width="470"&gt;&lt;/fb:comments&gt;'
+      template:   '&lt;fb:comments href="%{href}" num_posts="2" width="470"&gt;&lt;/fb:comments&gt;'
 
 ==== Restriction
 

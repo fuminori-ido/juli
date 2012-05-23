@@ -4,10 +4,10 @@ module Juli::Visitor::Html::Helper
     # default HTML template for facebook 'like' button.
     # You can customize it in .juli/config facebook.like.template entry.
     #
-    # %s in the template will be replaced to the actual URL of
+    # %{href} in the template will be replaced to the actual URL of
     # current wiki page.
     TEMPLATE =
-      '<fb:comments href="%s" num_posts="2" width="470">' +
+      '<fb:comments href="%{href}" num_posts="2" width="470">' +
       '</fb:comments>'
 
     def initialize
@@ -20,8 +20,8 @@ module Juli::Visitor::Html::Helper
     end
 
     def run(*args)
-      sprintf(template, conf['url_prefix'] + '/' + 
-          to_wikiname(@in_file) + conf['ext'])
+      template.gsub('%{href}',
+          conf['url_prefix'] + '/' + to_wikiname(@in_file) + conf['ext'])
     end
 
   private

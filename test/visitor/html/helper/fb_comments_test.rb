@@ -28,7 +28,7 @@ module JuliUnitTest
 
     def test_template
       # template in .juli/config
-      assert_equal '<fb:comments href="%s"></fb:comments>', @fb_comments.send(:template)
+      assert_equal '<fb:comments href="%{href}"></fb:comments>', @fb_comments.send(:template)
 
       # default template
       saved = conf['facebook']['comments']['template']
