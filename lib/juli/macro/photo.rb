@@ -57,6 +57,7 @@ EOM
         return img if !(exif && exif[0] && exif[0][0] == :Orientation)
         case exif[0][1]
         when '1'  # Normal
+          img
         when '6'  #  90 degree
           img.rotate(90)    # 90[deg] to clock direction
         when '8'  # 270 degree
