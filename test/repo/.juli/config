@@ -1,12 +1,13 @@
 output_top: ../html
 template:   default.html
 ext:        .html
-amazon:     '<span class="juli_macro_amazon">%s</x>'
+amazon:     '<span class="juli_macro_amazon">%{asins}</x>'
 photo:
   mount:        ../protected_photo
 url_prefix:     'http://local:PORT/JULI'
 facebook:
   like:
-    template:   '<fb:like href="%s"></fb:like>'
+    template:   '<fb:like href="%{href}"></fb:like>'
   comments:
-    template:   '<fb:comments href="%s"></fb:comments>'
+    template:   '<fb:comments href="%{href}"></fb:comments>'
+jmap:           '<iframe src="http://map_test/%{coord}"></iframe><a href="http://map_test/%{coord}">Map</a>'

@@ -1,0 +1,59 @@
+index &gt; juli formatting &gt; \{!jmap(macro)}
+
+= NAME
+jmap   - embed map in wiki page
+
+= SYNOPSIS
+\\{jmap coordinate}
+
+= DESCRIPTION
+
+Juli jmap macro embeds map in wiki page.
+
+Another purpose is to provide I/F for the map.  For example,
+currently Google map is used, but if Google map API/URL is changed, or
+Google may stop the map service, it is enough to change this plug-in only
+to another map service site
+so that it is not necessary to modify all of wiki pages which use jmap.
+
+coordinate format is as follows:
+
+  coordinate ::= latitute,longtitude
+  latitude   ::= DECIMAL
+  longtitude ::= DECIMAL
+  DECIMAL    ::= (floating decimal values like this: (|-)[0-9]+(|\.([0-9]+)
+
+(In short, google ll=... value format;-)
+
+== Example
+
+This:
+
+  \{jmap 35.546557,139.328501}
+
+will be:
+
+\{jmap 35.546557,139.328501}
+
+== How to customize
+
+The HTML \{!template} for jmap macro can be defined at
+.juli/config file's "jmap" entry like this:
+
+  jmap: '&lt;iframe ... src="http://maps.google.co.jp/maps?q=%{coord}...&lt;/iframe&gt;...'
+
+Where, %{coord} above will be replaced to the actual coordinate value
+in the macro calling.
+
+http://mapki.com/wiki/Google_Map_Parameters is very useful for this
+customization.
+
+=== For Japanese Google map
+
+Currently (as of 20012/05/23), Google map Japanese version can be
+set as follows:
+
+  jmap:       '&lt;iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.co.jp/maps?q=loc:%{coord}&amp;hl=ja&amp;num=1&amp;ie=UTF8&amp;t=m&amp;z=14&amp;output=embed"&gt;&lt;/iframe&gt;&lt;br /&gt;&lt;small&gt;&lt;a href="http://maps.google.co.jp/maps?q=loc:%{coord}&amp;hl=ja&amp;num=1&amp;ie=UTF8&amp;t=m&amp;z=14&amp;source=embed" style="color:#0000FF;text-align:left"&gt;大きな地図で見る&lt;/a&gt;&lt;/small&gt;'
+
+
+index &gt; juli formatting &gt; \{!jmap(macro)}
