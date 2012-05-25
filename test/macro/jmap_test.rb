@@ -19,6 +19,17 @@ module Macro
       Dir.chdir(@saved_cwd)
     end
 
+    # Even if no config on jmap, it should be ok on new() and on_root().
+    def test_no_conf
+      saved = conf['jmap']
+        conf['jmap'] = nil
+        assert p = Juli::Macro::Photo.new
+        assert_nothing_raised do
+          p.on_root('t001.txt', nil)
+        end
+      conf['jmap'] = saved
+    end
+
     def test_run_config
       assert_equal(
         '<iframe src="http://map_test/-1,-2"></iframe>' +

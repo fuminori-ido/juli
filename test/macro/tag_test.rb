@@ -35,6 +35,17 @@ module Macro
       assert @tag
     end
 
+    # Even if no config, it should be ok on new() and on_root().
+    def test_no_conf
+      #saved = conf['photo']
+        #conf['photo'] = nil
+        assert p = Juli::Macro::Tag.new
+        assert_nothing_raised do
+          p.on_root('t001.txt', nil)
+        end
+      #conf['photo'] = saved
+    end
+
     def test_on_root
       @tag.page_db['t001'] = ''
       assert_equal      '', @tag.page_db['t001']

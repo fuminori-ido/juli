@@ -22,6 +22,9 @@ module Juli::Visitor::Html::Helper
     end
 
     def run(*args)
+      raise NoConfig if !conf['url_prefix']
+      raise NoConfig if !@in_file
+
       template.gsub('%{href}',
           conf['url_prefix'] + '/' + to_wikiname(@in_file) + conf['ext'])
     end

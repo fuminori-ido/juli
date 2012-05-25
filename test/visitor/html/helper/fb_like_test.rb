@@ -26,6 +26,18 @@ module JuliUnitTest
       assert @fb_like
     end
 
+    # Even if no config, it should be ok on new() and on_root().
+    def test_no_conf
+      saved0 = conf['url_prefix']; saved = conf['facebook']
+        conf['url_prefix'] = conf['facebook'] = nil
+        assert p = Juli::Visitor::Html::Helper::FbLike.new
+        assert_nothing_raised do
+          p.on_root('t001.txt', nil)
+        end
+      conf['facebook'] = saved
+      conf['url_prefix'] = saved0
+    end
+
     def test_template
       # template in .juli/config
       assert_equal '<fb:like href="%{href}"></fb:like>', @fb_like.send(:template)

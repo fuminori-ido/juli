@@ -19,7 +19,6 @@ module Juli
       }
 
       class DirNameConflict < Juli::JuliError; end
-      class NoConfig        < Juli::JuliError; end
       class ConfigNoMount   < Juli::JuliError; end
 
       attr_accessor :mount
@@ -42,11 +41,13 @@ EOM
         super
 
         @conf_photo = conf['photo']
-        raise NoConfig if !@conf_photo
 
-        @mount = @conf_photo['mount']
-        raise ConfigNoMount if !@mount
-        @mount = File.realpath(@mount)
+        if @conf_photo
+          @mount = @conf_photo['mount']
+          if @mount
+            @mount = File.realpath(@mount)
+          end
+        end
 
         @mangle = false
       end
@@ -153,8 +154,16 @@ EOM
               :style  => style)
         end
       end
-=begin
     private
+
+      # check_conf should be called at run because it may not be configured
+      # at no-photo juli site.
+      def check_conf
+        raise NoConfig      if !@conf_photo
+        raise ConfigNoMount if !@mount
+      end
+
+=begin
       def seed
         conf['photo']['seed'] || SEED_DEFAULT
       end
