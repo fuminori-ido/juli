@@ -10,6 +10,19 @@ module Juli::Visitor::Html::Helper
       '<fb:comments href="%{href}" num_posts="2" width="470">' +
       '</fb:comments>'
 
+    # called on 'juli init' to generate config sample template.
+    def self.conf_template
+      <<EOM
+#
+#url_prefix: 'http://YOUR_HOST/juli'
+#facebook:
+#  like:
+#    template:  '#{Juli::Visitor::Html::Helper::FbLike::TEMPLATE}'
+#  comments:
+#    template:  '#{TEMPLATE}'
+EOM
+    end
+
     def initialize
       @fb_conf  = conf['facebook']
     end

@@ -26,6 +26,12 @@ module Juli
     end
 
 OUTPUT_TOP_COMMENT = <<EOM
+# Juli-repo config file.
+#
+# This is YAML format.
+#
+# Starting '#' at each line means just comment.
+# You can delete these comments.
 
 # Specify output top directory (default = ../html).
 
@@ -39,7 +45,7 @@ TEMPLATE_COMMENT = <<EOM
 # RUBY_LIB is is the directory which juli library is installed
 # (e.g. /usr/local/lib/ruby/site_ruby/1.9/).
 #
-# (>= v1.01.00) You can put your customized template under JULI_REPO/.juli/
+# You can put your customized template under JULI_REPO/.juli/
 # rather than ruby standard library directory.  For example,
 # if you want to use your customized template 'blue_ocean.html',
 # create it under JULI_REPO/ and specify it at config as follows:
@@ -50,14 +56,14 @@ TEMPLATE_COMMENT = <<EOM
 #
 #   template: blue_ocean.html
 #
-# (>= v1.02.00) File extention (e.g. .html) is required in this config.
+# File extention (e.g. .html) is required in this config.
 # -t option at 'juli gen' command line execution can be also supported.
 # 
 
 EOM
 EXT_COMMENT = <<EOM
 
-# generating file extention (default = .shtml).
+# Generated file's extention (default = .shtml).
 # The reason why '.shtml' is because to use SSI (server side include)
 # for recent_update.  Of course, it depends on web-server configuration and
 # you may not use SSI.  In such a case, you can change to '.html'.
@@ -84,7 +90,6 @@ EOM
       config_file = File.join(Juli::REPO, 'config')
       if !File.exist?(config_file)
         File.open(config_file, 'w') do |f|
-          f.print "# put juli-repo config here.\n\n"
           f.print OUTPUT_TOP_COMMENT
           write_config(f, 'output_top', opts[:o])
           f.print TEMPLATE_COMMENT
@@ -92,6 +97,7 @@ EOM
           f.print EXT_COMMENT
           write_config(f, 'ext',        opts[:e])
           write_macro_conf(f)
+          write_helper_conf(f)
         end
       else
         STDERR.print "WARN: config file is already created\n"
@@ -139,6 +145,16 @@ EOM
         next if macro_symbol == :Base
         macro_class = Juli::Macro.module_eval(macro_symbol.to_s)
         f.print "\n", macro_class.conf_template
+      end
+    end
+
+    # write each helper conf sample to initial .juli/conf file
+    # by calling 'conf_template' method on each macro.
+    def write_helper_conf(f)
+      for helper_symbol in Juli::Visitor::Html::Helper.constants do
+        next if helper_symbol == :AbstractHelper
+        helper_class = Juli::Visitor::Html::Helper.module_eval(helper_symbol.to_s)
+        f.print "\n", helper_class.conf_template
       end
     end
   end
