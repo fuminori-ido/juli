@@ -26,8 +26,8 @@ module Juli
     
       def self.conf_template
         <<EOM
-# (>= v1.10) photo macro setup sample is as follows.
-
+# Photo macro setup sample is as follows.
+#
 #photo:
 # mount:    /home/YOUR_NAME/Photos
 # small:

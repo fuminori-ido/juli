@@ -26,7 +26,7 @@ module Juli
 # HTML template to draw map.  If not set, default defined at
 # Juli::Macro::Jmap::DEFAULT_TEMPLATE is used.
 # %{coord} in the template wiil be replaced to the actual 1st parameter.
-
+#
 #jmap: '#{DEFAULT_TEMPLATE}'
 EOM
       end
