@@ -1,11 +1,38 @@
-index &gt; tips
+index &gt; \{!tips}
 
-This page contains several tips.
+This page contains several \{!tips}.
 
-(Please add your tips here since this is wiki.
+(Please add your \{!tips} here since this is wiki.
 In order to do that, please contact me to grant you to write access
 to this git repository.  Currently, juli code and this document are in the
 same repository because it is very small for now.)
+
+= How to customize css and js files
+
+Original juli.css and juli.js are copied from \{!template} library to output_top
+when generating HTML at first time.
+
+You can change by the following sections.
+
+== Modify juli.css and juli.js in your JULI_REPO
+
+Create your customized juli.css and juli.js in your JULI_REPO.
+These files are sync-ed to output_top by rsync(1) in juli(1) execution time
+so that these files will be used for CSS and javascript execution.
+
+== Specify another css and/or js file at template
+
+You can put your own css and js in JULI_REPO and specify it at template
+as follows (file names 'mine.css' and 'mine.js' below are just example):
+
+  &lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt;
+  &lt;html&gt;
+  &lt;head&gt;
+      :
+      :
+    &lt;script src="mine.js" type="text/javascript"&gt;&lt;/script&gt;
+    &lt;link href="mine.css" rel="stylesheet" type="text/css" /&gt;
+
 
 = TODO
 
@@ -35,4 +62,4 @@ sample/update_public_juli.rb is an example implementation to update
 juli contents at web-server.  Please see the description in the source.
 
 <hr>
-index &gt; tips
+index &gt; \{!tips}
