@@ -234,11 +234,7 @@ module Juli::Visitor
     #
     # Example: 'A::B::HelperMethod' -> 'helper_method'
     def self.to_method(helper_class)
-      helper_class.to_s.gsub(/.*::/,'').
-          gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-          gsub(/([a-z\d])([A-Z])/,'\1_\2').
-          tr("-", "_").
-          downcase
+      Juli::Util::underscore(helper_class.to_s)
     end
 
     def copy_to_output_top(file)

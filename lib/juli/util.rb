@@ -88,6 +88,18 @@ EOM
     end
     module_function :str_trim
 
+    # Similar to Rails underscore() method.
+    #
+    # Example: 'A::B::HelperMethod' -> 'helper_method'
+    def underscore(str)
+      str.gsub(/.*::/,'').
+          gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+          gsub(/([a-z\d])([A-Z])/,'\1_\2').
+          tr("-", "_").
+          downcase
+    end
+    module_function :underscore
+    
     # find juli-repository root from the specified path.
     class Repo
       attr_reader :juli_repo 

@@ -1,4 +1,5 @@
 # coding: UTF-8
+require 'juli/macro/template_base'
 
 module Juli
   module Macro
@@ -17,7 +18,7 @@ module Juli
     # method so that necessary to avoid name confusion.
     #
     # Currently, Google map is used.
-    class Jmap < Base
+    class Jmap < TemplateBase
       # Thank you, http://mapki.com/wiki/Google_Map_Parameters !!
       DEFAULT_TEMPLATE = '<iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.com/maps?q=loc:%{coord}&amp;num=1&amp;ie=UTF8&amp;t=m&amp;z=14&amp;output=embed"></iframe><br /><small><a href="http://maps.google.com/maps?q=loc:%{coord}&amp;num=1&amp;ie=UTF8&amp;t=m&amp;z=14&amp;source=embed" style="color:#0000FF;text-align:left">View Larger Map</a></small>'
 
@@ -31,11 +32,7 @@ module Juli
 EOM
       end
 
-      def run(*args)
-        template  = conf['jmap'] || DEFAULT_TEMPLATE
-        coord     = args[0]
-        template.gsub('%{coord}', coord)
-      end
+      def place_holder; 'coord'; end
     end
   end
 end

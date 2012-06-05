@@ -1,0 +1,31 @@
+index &gt; juli formatting &gt; \{!wikipedia(macro)}
+
+= NAME
+wikipedia   - interwiki link to Wikipedia word
+
+= SYNOPSIS
+\\{wikipedia word}
+
+= DESCRIPTION
+
+Juli 'wikipedia' macro generates link the word to Wikipedia's word.
+
+Example
+
+  I haven't try \{wikipedia Pitaya} yet.  I'll do!
+
+will be:
+
+I haven't try \{wikipedia Pitaya} yet.  I'll do!
+
+== How to customize
+
+The HTML \{!template} for wikipedia macro can be defined at
+.juli/config file's "wikipedia" entry like this:
+
+  wikipedia:  '&lt;a href="http://ja.wikipedia.org/wiki/%{wikipedia}"&gt;%{wikipedia}&lt;/a&gt;'
+
+Where, %{wikipedia} above will be replaced to the actual word
+in the macro calling.
+
+index &gt; juli formatting &gt; \{!wikipedia(macro)}

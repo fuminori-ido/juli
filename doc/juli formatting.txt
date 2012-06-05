@@ -305,13 +305,14 @@ Please look at http://w3c.org if you are not familiar with HTML.
 
 == Macro
 
-\\{...} is juli macro.  Currently (v1.09), following macros are supported:
+\\{...} is juli macro.  Currently (v1.14), following macros are supported:
 
 \\{!...}::              Escaping wikiname
 \\{amazon ASIN}::       amazon association link
 \\{jmap coord}::        embed Google map.  See jmap(macro).
 \\{photo path}::        embed photo(image).  See photo(macro).
 \\{tag tag1 tag2 ...}:: define tags.  See tag(macro).
+\\{wikipedia word}::    Interwiki to Wikipedia.  See wikipedia(macro).
 
 === Escaping wikiname
 
