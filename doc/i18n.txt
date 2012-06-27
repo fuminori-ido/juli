@@ -1,0 +1,46 @@
+index &gt; \{!i18n}
+
+= NAME
+i18n    - Internationalization in Juli
+
+= DESCRIPTION
+
+Some Juli words are internationalized.
+
+For the detail which word is internationalized, please
+look at RUBY_LIB/juli/template/locale/*.yml.
+Where, RUBY_LIB is the directory which juli library is installed
+(e.g. /usr/local/lib/ruby/site_ruby/1.9/).
+
+== Specify locale
+
+Default locale is 'en'.  You can change it at JULI_REPO/.juli/config
+'locale' entry.
+
+== How to customize current locale catalog
+
+If you don't like current default locale words,
+you can customize those by putting your customized locale file under
+JULI_REPO/.juli/
+without any modification at RUBY_LIB/juli/template/locale/.
+
+== How to add New locale
+
+Currently only 'en' and 'ja' are supported, but, of course,
+you can add your favorite locale file as follows
+(Let's assume 'it' (Italian) here):
+
+1. specify it at JULI_REPO/.juli/config:
+    locale: it
+1. copy default english locale under .juli/ as it.yml:
+    $ cp RUBY_LIB/juli/template/locale/en.yml $JULI_REPO/.juli/it.yml
+1. modify the it.yml to follow Italian.
+1. clean output_html and re-run juli.
+
+= FILES
+
+RUBY_LIB/juli/template/locale/*.yml:: Default Locale files.
+JULI_REPO/.juli/*.yml::               Your customized locale files.
+
+<hr>
+index &gt; \{!i18n}
