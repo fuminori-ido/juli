@@ -62,9 +62,9 @@ sitemap.html::  sitemap template (alphabetical order)
 
 <table class=sitemap>
   <tr>
-    <th>Num</th>
-    <th><a href='sitemap.shtml'>Name</a></th>
-    <th>Last Modified at ▼</a></th>
+    <th><%= I18n.t('num') %></th>
+    <th><a href='sitemap.shtml'><%= I18n.t('name') %></a></th>
+    <th><%= I18n.t('last_modified_at') %> ▼</a></th>
   </tr>
   <%= body %>
 </table>

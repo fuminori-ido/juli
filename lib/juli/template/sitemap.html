@@ -62,9 +62,9 @@ sitemap_order_by_mtime_DESC.html::  sitemap template (mtime decendant order)
 
 <table class=sitemap>
   <tr>
-    <th>Num</th>
-    <th>Name ▲</th>
-    <th><a href='sitemap_order_by_mtime_DESC.shtml'>Last Modified at</a></th>
+    <th><%= I18n.t('num') %></th>
+    <th><%= I18n.t('name') %> ▲</th>
+    <th><a href='sitemap_order_by_mtime_DESC.shtml'><%= I18n.t('last_modified_at') %></a></th>
   </tr>
   <%= body %>
 </table>

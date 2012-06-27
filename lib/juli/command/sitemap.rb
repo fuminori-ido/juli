@@ -41,7 +41,7 @@ module Juli::Command
                       File.stat(textfile).mtime.strftime("%Y/%m/%d %H:%M:%S"))
         end
 
-        title       = 'Sitemap'
+        title       = I18n.t('sitemap')
         prototype   = 'prototype.js'
         javascript  = 'juli.js'
         stylesheet  = 'juli.css'

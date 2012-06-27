@@ -26,6 +26,11 @@ module Juli
     end
 
 OUTPUT_TOP_COMMENT = <<EOM
+# Locale(default = en)
+
+#locale: en
+
+
 # Juli-repo config file.
 #
 # This is YAML format.

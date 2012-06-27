@@ -2,10 +2,12 @@ require 'test_helper'
 
 class JuliTest < Test::Unit::TestCase
   def test_command
-    check(true,   '--help')
-    check(true,   '--version')
-    check(false,  '-z')
-    check(false,  '/etc/group')
+    Dir.chdir(repo4test) do
+      check(true,   '--help')
+      check(true,   '--version')
+      check(false,  '-z')
+      check(false,  '/etc/group')
+    end
   end
 
   def test_find_template
@@ -36,7 +38,7 @@ class JuliTest < Test::Unit::TestCase
 
 private
   def check(expected, *args)
-    assert_equal expected, run_command(args)
+    assert_equal expected, run_command(args), args
   end
 
   def run_command(*args)

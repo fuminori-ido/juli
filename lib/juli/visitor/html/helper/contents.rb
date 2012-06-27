@@ -1,14 +1,23 @@
 module Juli::Visitor::Html::Helper
   # Helper-class for 'contents' helper
   class Contents < AbstractHelper
+    # Check if chapter exists or not
+    class ChapterChecker < Juli::Absyn::Visitor
+      attr_accessor :chapter_exists
+
+      def initialize(opts = {})
+        @chapter_exists = false
+        super
+      end
+
+      def visit_chapter(n)
+        @chapter_exists = true
+      end
+    end
+
     class ContentsDrawer < Juli::Absyn::Visitor
       include Juli::Visitor::Html::TagHelper
       include Juli::Visitor::Html::Helper
-
-      def initialize
-        super
-        content_tag(:b, 'Contents') + ":\n"
-      end 
 
       def visit_node(n); ''; end
       def visit_str(n); ''; end
@@ -52,8 +61,15 @@ module Juli::Visitor::Html::Helper
     # generate HTML contents list.
     def run(*args)
       contents_drawer = ContentsDrawer.new
-      contents_drawer.content_tag(:ol) do
-        @root.accept(contents_drawer)
+      chapter_checker = ChapterChecker.new
+      @root.accept(chapter_checker)
+      if chapter_checker.chapter_exists
+        contents_drawer.content_tag(:b, I18n.t('contents')) +
+        contents_drawer.content_tag(:ol) do
+          @root.accept(contents_drawer)
+        end
+      else
+        ''
       end
     end
   end

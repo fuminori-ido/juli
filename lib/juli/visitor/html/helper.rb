@@ -1,3 +1,5 @@
+require 'i18n'
+
 class Juli::Visitor::Html
   # This provides methods used in HTML Erb; called 'helper'.
   #

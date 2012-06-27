@@ -13,7 +13,7 @@ module Juli::Command
     def run(opts)
       # tag list
       body = content_tag(:a, '', :name=>'top').force_encoding('UTF-8') +
-             "<h2>tag list</h2>\n".force_encoding('UTF-8')
+             "<h2>#{I18n.t('tag_list')}</h2>\n".force_encoding('UTF-8')
       for tag, val in @tag_macro.tag_db do
         body += (content_tag(:a, tag, :href=>"##{tag}") + ' ').force_encoding('UTF-8')
       end
@@ -33,11 +33,11 @@ module Juli::Command
         end
         body += '</table>' + 
                 '<br/>' +
-                '<a href="#top">Back to Top</a>' +
+                '<a href="#top">' + I18n.t('back_to_top') + '</a>' +
                 '<br/>'*30
       end
 
-      title       = 'tag list'
+      title       = I18n.t('tag_list')
       contents    = ''
       prototype   = 'prototype.js'
       javascript  = 'juli.js'

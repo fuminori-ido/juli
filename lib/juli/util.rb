@@ -239,3 +239,5 @@ EOM
     end
   end
 end
+
+require 'juli/util/juli_i18n'
