@@ -178,6 +178,7 @@ Prerequisites:
 * ruby-1.9
 * RMagick (for photo(macro))
 * gdbm (for tag(macro))
+* i18n
 
 1. download package from http://sourceforge.net/projects/jjjuli/files/
 1. run setup.rb as follows:
