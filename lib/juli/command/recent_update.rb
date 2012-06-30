@@ -27,7 +27,7 @@ module Juli::Command
 
   private
     def gen(opts)
-      title   = 'Recent Updates'
+      title   = I18n.t('recent_updates')
       content_tag(:table, :class=>'juli_recent_update') do
         content_tag(:tr, content_tag(:th, title, :colspan=>2)) +
         begin
