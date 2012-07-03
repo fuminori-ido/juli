@@ -43,7 +43,9 @@ module Juli::Command
 
   private
     def gen_tag_list(tag, tag_label=tag)
-      (content_tag(:a, tag_label, :href=>"##{tag}") + ' ').force_encoding('UTF-8')
+      (content_tag(:a, tag_label,
+          :class  => sprintf("juli_tag_%02d", @tag_macro.tag_weight_ratio(tag)),
+          :href   => "##{tag}") + ' ').force_encoding('UTF-8')
     end
 
     def gen_tag_detail(tag, tag_label=tag)

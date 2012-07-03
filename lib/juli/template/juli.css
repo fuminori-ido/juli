@@ -143,3 +143,18 @@ table.juli_recent_update th {
 div.sitemap {
   text-align:       left;
 }
+
+/*----------------------------------------------------------------
+Tag list
+----------------------------------------------------------------*/
+a.juli_tag_00 { font-size:  90%;  }
+a.juli_tag_01 { font-size:  90%;  }
+a.juli_tag_02 { font-size: 105%;  }
+a.juli_tag_03 { font-size: 120%;  }
+a.juli_tag_04 { font-size: 135%;  }
+a.juli_tag_05 { font-size: 150%;  }
+a.juli_tag_06 { font-size: 165%;  }
+a.juli_tag_07 { font-size: 180%;  }
+a.juli_tag_08 { font-size: 195%;  }
+a.juli_tag_09 { font-size: 210%;  }
+a.juli_tag_10 { font-size: 225%;  }
