@@ -15,27 +15,20 @@ module Juli::Command
       body = content_tag(:a, '', :name=>'top').force_encoding('UTF-8') +
              "<h2>#{I18n.t('tag_list')}</h2>\n".force_encoding('UTF-8')
       for tag, val in @tag_macro.tag_db do
-        body += (content_tag(:a, tag, :href=>"##{tag}") + ' ').force_encoding('UTF-8')
+        body += gen_tag_list(tag)
       end
+      body += gen_tag_list(
+                  Juli::Macro::Tag::NO_TAG,
+                  I18n.t(Juli::Macro::Tag::NO_TAG))
       body += "\n\n" + '<br/>'*50
 
       # tag detail
       for tag, val in @tag_macro.tag_db do
-        body += content_tag(:a, '', :name=>tag).force_encoding('UTF-8')
-        body += content_tag(:h2, tag).force_encoding('UTF-8')
-        body += '<table>'
-        for page in @tag_macro.pages(@tag_macro.to_utf8(tag)) do
-          page_utf8 = @tag_macro.to_utf8(page)
-          body += sprintf("<tr><td><a href='%s'>%s</a></td><td>%s</td></tr>\n",
-              page_utf8 + @tag_macro.to_utf8(conf['ext']),
-              page_utf8,
-              File.stat(page + '.txt').mtime.strftime("%Y/%m/%d %H:%M"))
-        end
-        body += '</table>' + 
-                '<br/>' +
-                '<a href="#top">' + I18n.t('back_to_top') + '</a>' +
-                '<br/>'*30
+        body += gen_tag_detail(tag)
       end
+      body += gen_tag_detail(
+                  Juli::Macro::Tag::NO_TAG,
+                  I18n.t(Juli::Macro::Tag::NO_TAG))
 
       title       = I18n.t('tag_list')
       contents    = ''
@@ -49,5 +42,29 @@ module Juli::Command
     end
 
   private
+    def gen_tag_list(tag, tag_label=tag)
+      (content_tag(:a, tag_label, :href=>"##{tag}") + ' ').force_encoding('UTF-8')
+    end
+
+    def gen_tag_detail(tag, tag_label=tag)
+      content_tag(:a, '', :name=>tag).force_encoding('UTF-8') +
+      content_tag(:h2, tag_label).force_encoding('UTF-8') +
+      '<table>' +
+      begin
+        s = ''
+        for page in @tag_macro.pages(@tag_macro.to_utf8(tag)) do
+          page_utf8 = @tag_macro.to_utf8(page)
+          s += sprintf("<tr><td><a href='%s'>%s</a></td><td>%s</td></tr>\n",
+              page_utf8 + @tag_macro.to_utf8(conf['ext']),
+              page_utf8,
+              File.stat(page + '.txt').mtime.strftime("%Y/%m/%d %H:%M"))
+        end
+        s
+      end +
+      '</table>' + 
+      '<br/>' +
+      '<a href="#top">' + I18n.t('back_to_top') + '</a>' +
+      '<br/>'*30
+    end
   end
 end

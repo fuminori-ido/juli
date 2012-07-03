@@ -23,6 +23,11 @@ module Juli
       def run(*args)
         ''
       end
+
+      # called at final on each parsed document
+      def after_root(file, root)
+      end
+
     end
 
     Dir.glob(File.join(File.dirname(__FILE__), 'macro/*.rb')){|m|

@@ -151,6 +151,11 @@ module Juli::Visitor
       stylesheet  = relative_from(in_file, 'juli.css')
       sitemap     = relative_from(in_file, 'sitemap' + conf['ext'])
       body        = root.accept(self)
+
+      for macro_symbol, macro in @_macros do
+        macro.after_root(in_file, root)
+      end
+
       erb         = ERB.new(File.read(find_template(conf['template'], @opts[:t])))
       out_path    = out_filename(in_file, @opts[:o])
       mkdir(out_path)

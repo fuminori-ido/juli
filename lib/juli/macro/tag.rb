@@ -18,6 +18,7 @@ module Juli
     # JURI_REPO/.juli/tag_page.gdbm:: tag-page intersection DB
     class Tag < Base
       SEPARATOR = '_, _'
+      NO_TAG    = '_no_tag_'
 
       attr_accessor :tag_db, :page_db, :tag_page_db
 
@@ -34,17 +35,26 @@ module Juli
       def on_root(file, root)
         @wikiname           = Juli::Util::to_wikiname(file)
         @page_db[@wikiname] = '1'
+        @tag_exists         = false
       end
 
       def run(*args)
         for tag in args do
-          @tag_db[tag] = '1'
+          @tag_exists   = true
+          @tag_db[tag]  = '1'
           if @wikiname
             @tag_page_db[sprintf("%s%s%s", @wikiname, SEPARATOR, tag)] = '1'
           end
         end
-
         ''
+      end
+
+      # follow-up process to register 'no-tag' if there is no tag in the
+      # file.
+      def after_root(file, root)
+        if !@tag_exists
+          @tag_page_db[sprintf("%s%s%s", @wikiname, SEPARATOR, NO_TAG)] = '1'
+        end
       end
 
       # value in gdbm in ruby 1.9 looks not to support encoding
