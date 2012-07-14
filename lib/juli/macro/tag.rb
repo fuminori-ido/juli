@@ -56,8 +56,11 @@ module Juli
       # follow-up process to register 'no-tag' if there is no tag in the
       # file.
       def after_root(file, root)
-        if !@tag_exists
-          @tag_page_db[sprintf("%s%s%s", @wikiname, SEPARATOR, NO_TAG)] = '1'
+        key = sprintf("%s%s%s", @wikiname, SEPARATOR, NO_TAG)
+        if @tag_exists
+          @tag_page_db.delete(key)
+        else
+          @tag_page_db[key] = '1'
         end
       end
 

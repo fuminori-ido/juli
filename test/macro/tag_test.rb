@@ -74,5 +74,28 @@ module Macro
       assert_equal ['t001'],          @tag.pages('DOG').sort
       assert_equal ['t002'],          @tag.pages('CAT').sort
     end
+
+    # simulate 'no_tag' case on t002.txt
+    def test_no_tag
+      @tag.on_root('t002.txt', nil)
+      @tag.after_root('t002.txt', nil)
+      assert_equal '1', @tag.tag_page_db['t002_, __no_tag_']
+    end
+
+    # simulate to set tag after 'no_tag' case on t002.txt
+    def test_no_tag_then_tag_set
+      @tag.on_root('t002.txt', nil)
+      @tag.after_root('t002.txt', nil)
+
+      @tag.on_root('t002.txt', nil)
+      @tag.run('CAR')
+      @tag.after_root('t002.txt', nil)
+      assert_nil        @tag.tag_page_db['t002_, __no_tag_']
+      assert_equal '1', @tag.tag_page_db['t002_, _CAR']
+    end
+
+  private
+    def check_no_tag
+    end
   end
 end
