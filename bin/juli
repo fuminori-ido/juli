@@ -34,7 +34,6 @@ Version       = Juli::VERSION
   include Juli::Util
   include Juli::Command
 
-  Juli::Util::JuliI18n.new(conf, juli_repo)
   command = 'gen'
 
   # parse common & default options

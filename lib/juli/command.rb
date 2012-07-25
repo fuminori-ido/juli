@@ -13,15 +13,19 @@ module Juli
     # top level command execution.  command_str will be checked and
     # dispatched to each method.
     def run(command_str, opts = {})
-      case command_str
-      when 'init';          init(opts)
-      when 'gen';           gen(opts)
-      when 'sitemap';       Juli::Command::Sitemap.new.run(opts)
-      when 'recent_update'; Juli::Command::RecentUpdate.new.run(opts)
-      when 'tag';           Juli::Command::Tag.new.run(opts)
+      if command_str == 'init'
+        init(opts)
       else
-        STDERR.print "Unknown juli command: '#{command_str}'\n\n", usage, "\n"
-        raise Error
+        Juli::Util::JuliI18n.new(conf, juli_repo)
+        case command_str
+        when 'gen';           gen(opts)
+        when 'sitemap';       Juli::Command::Sitemap.new.run(opts)
+        when 'recent_update'; Juli::Command::RecentUpdate.new.run(opts)
+        when 'tag';           Juli::Command::Tag.new.run(opts)
+        else
+          STDERR.print "Unknown juli command: '#{command_str}'\n\n", usage, "\n"
+          raise Error
+        end
       end
     end
 
