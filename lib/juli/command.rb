@@ -51,7 +51,7 @@ TEMPLATE_COMMENT = <<EOM
 # means that RUBY_LIB/juli/template/default.html is used).
 #
 # Current available templates are under RUBY_LIB/juli/template/, where
-# RUBY_LIB is is the directory which juli library is installed
+# RUBY_LIB is the directory which juli library is installed
 # (e.g. /usr/local/lib/ruby/site_ruby/1.9/).
 #
 # You can put your customized template under JULI_REPO/.juli/

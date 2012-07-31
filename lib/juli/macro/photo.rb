@@ -159,8 +159,8 @@ EOM
       # check_conf should be called at run because it may not be configured
       # at no-photo juli site.
       def check_conf
-        raise NoConfig      if !@conf_photo
-        raise ConfigNoMount if !@mount
+        raise Juli::NoConfig  if !@conf_photo
+        raise ConfigNoMount   if !@mount
       end
 
 =begin

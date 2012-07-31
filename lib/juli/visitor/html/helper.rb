@@ -44,8 +44,6 @@ class Juli::Visitor::Html
     class AbstractHelper
       include Juli::Util
 
-      class NoConfig        < Juli::JuliError; end
-
       # called on 'juli init' to generate config sample template.
       def self.conf_template
         ''

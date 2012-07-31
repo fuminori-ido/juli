@@ -18,6 +18,16 @@ module Juli
         Juli::Util::underscore(self.class.to_s)
       end
 
+      # set default value in conf if no .juli/conf defined.
+      #
+      # Please overwrite this method when this implementation is not your
+      # case.
+      def set_conf_default(conf)
+        if !conf[conf_key]
+          conf[conf_key] = self.class::DEFAULT_TEMPLATE
+        end
+      end
+
       # return string used to be replaced with %{...} in conf[conf_key] string.
       #
       # Please overwrite this method if it is not just underscore-ed.
@@ -26,7 +36,7 @@ module Juli
       end
 
       def run(*args)
-        template = conf[conf_key] || self.class::DEFAULT_TEMPLATE
+        template = conf[conf_key]
         template.gsub("%{#{place_holder}}", args[0])
       end
     end

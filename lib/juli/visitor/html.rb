@@ -273,13 +273,18 @@ module Juli::Visitor
 
 
     # create Macro object and register it in @_macros hash.
+    #
+    # call set_conf_default() to set conf[key] default value for each macro
     def register_macro
       @_macros = {}
       for macro_symbol in Juli::Macro.constants do
         next if macro_symbol == :Base
         macro_class = Juli::Macro.module_eval(macro_symbol.to_s)
-        @_macros[macro_symbol] = macro_class.new
+        macro = macro_class.new
+        macro.set_conf_default(conf)
+        @_macros[macro_symbol] = macro
       end
+#p conf.inspect
     end
 
     # synchronize repository and OUTPUT_TOP.

@@ -36,12 +36,5 @@ module Macro
         '<a href="http://map_test/-1,-2">Map</a>',
           @jmap.run('-1,-2'))
     end
-
-    def test_run_default
-      saved = conf['jmap']
-        conf['jmap'] = nil
-        assert_match /google.com\/maps\?q=loc:-1,-2/, @jmap.run('-1,-2')
-      conf['jmap'] = saved
-    end
   end
 end

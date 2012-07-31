@@ -43,14 +43,5 @@ module Macro
         '<a href="http://ja.wikipedia.org/wiki/Pitaya">Pitaya</a>',
           @wp.run('Pitaya'))
     end
-
-    def test_run_default
-      saved = conf['wikipedia']
-        conf['wikipedia'] = nil
-        assert_equal(
-        '<a href="http://en.wikipedia.org/wiki/Pitaya">Pitaya</a>',
-          @wp.run('Pitaya'))
-      conf['wikipedia'] = saved
-    end
   end
 end

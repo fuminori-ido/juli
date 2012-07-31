@@ -4,6 +4,7 @@
 /bin/juli.rb
 /doc/app
 /test/html
+/test/html_for_test
 /doc_html/
 /coverage/
 /parser.output
@@ -11,3 +12,4 @@
 # tag DB
 /doc/.juli/*.gdbm
 /test/repo/.juli/*.gdbm
+/test/repo2/.juli/*.gdbm

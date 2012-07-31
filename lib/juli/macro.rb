@@ -3,8 +3,6 @@ module Juli
     class Base
       include Juli::Util
 
-      class NoConfig        < Juli::JuliError; end
-
       # called on 'juli init' to generate config sample template.
       def self.conf_template
         ''
@@ -12,6 +10,10 @@ module Juli
 
       # called when juli(1) starts.
       def initialize
+      end
+
+      # called on setting up conf to set default key=val
+      def set_conf_default(conf)
       end
 
       # called on each parsed document

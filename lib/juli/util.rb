@@ -126,16 +126,36 @@ EOM
     end
     module_function :juli_repo
 
+    # config with hard-coded default
     class Config
+      DEFAULT = {
+        'output_top'  => '../html',
+        'template'    => 'default.html',
+        'ext'         => '.shtml'
+      }
+
       include Singleton
       class Error < Exception; end
       attr_reader :conf
 
       def initialize
-        @conf = YAML::load(ERB.new(File.read(
-            File.join(Juli::Util::juli_repo, Juli::REPO, 'config'))).result)
+        path  = File.join(Juli::Util::juli_repo, Juli::REPO, 'config')
+        @conf = File.exist?(path) ?
+            YAML::load(ERB.new(File.read(path)).result) :
+            {}
 
-        raise Error if !@conf
+        # YAML::load('') returns false so that set empty hash
+        @conf = {} if @conf == false
+        set_default
+      end
+
+    private
+      def set_default
+        for k, v in DEFAULT do
+          if !@conf[k]
+            @conf[k] = v
+          end
+        end
       end
     end
 

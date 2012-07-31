@@ -1,4 +1,4 @@
-output_top: ../html
+output_top: ../html_for_test
 template:   default.html
 ext:        .html
 amazon:     '<span class="juli_macro_amazon">%{asins}</x>'
