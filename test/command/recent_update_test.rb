@@ -1,3 +1,5 @@
+require 'test_helper'
+
 module Command
   class RecentUpdateTest < Test::Unit::TestCase
     def setup
