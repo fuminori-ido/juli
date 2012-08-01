@@ -82,4 +82,27 @@ class UtilTest < Test::Unit::TestCase
       assert_equal t[0], File.basename(in_filename(t[1]))
     end
   end
+
+  def test_output_top
+    # test 'test/repo' directory's config
+    Dir.chdir(repo4test) do
+      assert_equal '../html_for_test', conf['output_top']
+    end
+
+    # test 'test/repo2' directory's config
+    reset_conf do
+      Dir.chdir(repo2_4test) do
+        assert_equal '../html', conf['output_top']
+      end
+    end
+  end
+
+  def test_default_conf_for_a_macro
+    reset_conf do
+      Dir.chdir(repo2_4test) do
+        Juli::Visitor::Html.new   # register default for each macro
+        assert_equal Juli::Macro::Jmap::DEFAULT_TEMPLATE, conf['jmap']
+      end
+    end
+  end
 end

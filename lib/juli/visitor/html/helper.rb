@@ -53,6 +53,10 @@ class Juli::Visitor::Html
       def initialize
       end
 
+      # called on setting up conf to set default key=val
+      def set_conf_default(conf)
+      end
+
       # called on each parsed document
       def on_root(in_file, root)
       end

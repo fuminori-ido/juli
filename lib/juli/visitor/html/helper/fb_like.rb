@@ -6,7 +6,7 @@ module Juli::Visitor::Html::Helper
     #
     # %{href} in the template will be replaced to the actual URL of
     # current wiki page.
-    TEMPLATE =
+    DEFAULT_TEMPLATE =
       '<fb:like href="%{href}" ' +
           'send="false" layout="button_count" width="450" ' +
           'show_faces="false">' +
@@ -31,8 +31,7 @@ module Juli::Visitor::Html::Helper
 
   private
     def template
-      @fb_conf && @fb_conf['like'] && @fb_conf['like']['template'] ||
-      TEMPLATE
+      @fb_conf['like']['template']
     end
   end
 end

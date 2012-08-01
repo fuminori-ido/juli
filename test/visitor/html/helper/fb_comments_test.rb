@@ -16,6 +16,7 @@ module JuliUnitTest
       Dir.chdir(repo4test)
       Dir.glob('.juli/*.gdbm'){|f| FileUtils.rm_f(f) }
       @fb_comments = Juli::Visitor::Html::Helper::FbComments.new
+      @fb_comments.set_conf_default(conf)
     end
   
     def teardown
@@ -40,13 +41,21 @@ module JuliUnitTest
 
     def test_template
       # template in .juli/config
-      assert_equal '<fb:comments href="%{href}"></fb:comments>', @fb_comments.send(:template)
+      assert_equal(
+          '<fb:comments href="%{href}"></fb:comments>',
+          conf['facebook']['comments']['template'])
 
       # default template
-      saved = conf['facebook']['comments']['template']
-        conf['facebook']['comments']['template'] = nil
-        assert_match /width=/, @fb_comments.send(:template)          #/
-      conf['facebook']['comments']['template'] = saved
+      reset_conf do
+        Dir.chdir(repo2_4test) do
+          f = Juli::Visitor::Html::Helper::FbComments.new
+          f.set_conf_default(conf)
+
+          assert_equal(
+              Juli::Visitor::Html::Helper::FbComments::DEFAULT_TEMPLATE,
+              conf['facebook']['comments']['template'])
+        end
+      end
     end
 
     def test_run

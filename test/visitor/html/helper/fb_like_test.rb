@@ -40,13 +40,23 @@ module JuliUnitTest
 
     def test_template
       # template in .juli/config
-      assert_equal '<fb:like href="%{href}"></fb:like>', @fb_like.send(:template)
+      assert_equal(
+          '<fb:like href="%{href}"></fb:like>',
+          conf['facebook']['like']['template'])
 
       # default template
-      saved = conf['facebook']['like']['template']
-        conf['facebook']['like']['template'] = nil
-        assert_match /width=/, @fb_like.send(:template)          #/
-      conf['facebook']['like']['template'] = saved
+      reset_conf do
+        Dir.chdir(repo2_4test) do
+          # NOTE: Both FbLike and FbComments conf initialization
+          # are done at FbComments
+          f = Juli::Visitor::Html::Helper::FbComments.new
+          f.set_conf_default(conf)
+
+          assert_equal(
+              Juli::Visitor::Html::Helper::FbLike::DEFAULT_TEMPLATE,
+              conf['facebook']['like']['template'])
+        end
+      end
     end
 
     def test_run

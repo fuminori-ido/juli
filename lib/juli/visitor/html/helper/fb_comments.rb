@@ -6,7 +6,7 @@ module Juli::Visitor::Html::Helper
     #
     # %{href} in the template will be replaced to the actual URL of
     # current wiki page.
-    TEMPLATE =
+    DEFAULT_TEMPLATE =
       '<fb:comments href="%{href}" num_posts="2" width="470">' +
       '</fb:comments>'
 
@@ -17,14 +17,32 @@ module Juli::Visitor::Html::Helper
 #url_prefix: 'http://YOUR_HOST/juli'
 #facebook:
 #  like:
-#    template:  '#{Juli::Visitor::Html::Helper::FbLike::TEMPLATE}'
+#    template:  '#{Juli::Visitor::Html::Helper::FbLike::DEFAULT_TEMPLATE}'
 #  comments:
-#    template:  '#{TEMPLATE}'
+#    template:  '#{DEFAULT_TEMPLATE}'
 EOM
     end
 
     def initialize
       @fb_conf  = conf['facebook']
+    end
+
+    # set default value in conf if no .juli/conf defined.
+    #
+    # Please overwrite this method when this implementation is not your
+    # case.
+    def set_conf_default(conf)
+      conf['facebook'] = {} if !conf['facebook']
+      if !conf['facebook']['comments']
+        conf['facebook']['comments'] = {
+          'template'  => self.class::DEFAULT_TEMPLATE
+        }
+      end
+      if !conf['facebook']['like']
+        conf['facebook']['like'] = {
+          'template'  => Juli::Visitor::Html::Helper::FbLike::DEFAULT_TEMPLATE
+        }
+      end
     end
 
     # called on each parsed document
@@ -42,8 +60,7 @@ EOM
 
   private
     def template
-      @fb_conf && @fb_conf['comments'] && @fb_conf['comments']['template'] ||
-      TEMPLATE
+      @fb_conf['comments']['template']
     end
   end
 end
