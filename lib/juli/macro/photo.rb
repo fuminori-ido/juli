@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'digest/sha1'
 require 'RMagick'
+require 'pp'
 
 module Juli
   module Macro
@@ -26,8 +27,6 @@ module Juli
       class DirNameConflict < Juli::JuliError; end
       class ConfigNoMount   < Juli::JuliError; end
 
-      attr_accessor :mount
-    
       def self.conf_template
         <<EOM
 # Photo macro setup sample is as follows.
@@ -40,21 +39,6 @@ module Juli
 # large:
 #   width:  #{CONF_DEFAULT['large']['width']}
 EOM
-      end
-
-      def initialize
-        super
-
-        @conf_photo = conf['photo']
-
-        if @conf_photo
-          @mount = @conf_photo['mount']
-          if @mount && File.exist?(@mount)
-            @mount = File.realpath(@mount)
-          end
-        end
-
-        @mangle = false
       end
 
       def set_conf_default(conf)
@@ -99,15 +83,11 @@ EOM
       #
       # === Example
       # path::        a/b/c.jpg
-      # photo_name::  a_b_c_#{size}.jpg (when @mangle==false)
+      # photo_name::  a_b_c_#{size}.jpg
       def photo_name(path, size)
-        if @mangle
-          raise 'not yet implemented'
-        else
-          flat = path.gsub(/\//, '_')
-          sprintf("%s_%s%s",
-              File.basename(flat, '.*'), size, File.extname(flat))
-        end
+        flat = path.gsub(/\//, '_')
+        sprintf("%s_%s%s",
+            File.basename(flat, '.*'), size, File.extname(flat))
       end
 
       # cached photo path
@@ -131,13 +111,13 @@ EOM
       # size::  :small, or :large
       # url::   when true, return url, else, return physical file-system path
       def intern(path, size = :small, url = true)
-        protected_path    = File.join(@mount, path)
+        protected_path    = File.join(conf_photo['mount'], path)
         public_phys_path  = photo_path(path, size, false)
         if !File.exist?(public_phys_path) ||
             File::Stat.new(public_phys_path).mtime < File::Stat.new(protected_path).mtime
 
           img     = Magick::ImageList.new(protected_path)
-          width   = (s = @conf_photo[size.to_s]) && s['width']
+          width   = (s = conf_photo[size.to_s]) && s['width']
           img.resize_to_fit!(width, img.rows * width / img.columns)
           self.rotate(img).
               strip!.
@@ -149,7 +129,7 @@ EOM
       # return <img...> HTML tag for the photo with this macro features.
       def run(*args)
         path      = args[0].gsub(/\.\./, '')     # sanitize '..'
-        style     = @conf_photo['small'] ? @conf_photo['small']['style'] : nil
+        style     = conf_photo['small']['style']
         small_url = intern(path)
         large_url = intern(path, :large)
         content_tag(:a, :href=>large_url) do
@@ -159,25 +139,12 @@ EOM
               :style  => style)
         end
       end
+
+      def conf_photo
+        @conf_photo ||= conf['photo']
+      end
+
     private
-
-      # check_conf should be called at run because it may not be configured
-      # at no-photo juli site.
-      def check_conf
-        raise Juli::NoConfig  if !@conf_photo
-        raise ConfigNoMount   if !@mount
-      end
-
-=begin
-      def seed
-        conf['photo']['seed'] || SEED_DEFAULT
-      end
-
-      def mangle(path)
-        Digest::SHA1.hexdigest(path + seed)
-      end
-=end
-
       def set_conf_default_sub(hash, key, val)
         case val
         when Hash

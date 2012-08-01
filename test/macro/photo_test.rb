@@ -20,12 +20,6 @@ module Macro
       Dir.chdir(@saved_cwd)
     end
 
-    def test_new
-      assert_equal(
-          File.realpath(File.join(repo4test, '../protected_photo')),
-          @photo.mount)
-    end
-
     # Even if no config on photo, it should be ok on new() and on_root().
     def test_no_conf
       saved = conf['photo']
