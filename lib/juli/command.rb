@@ -30,17 +30,20 @@ module Juli
     end
 
 OUTPUT_TOP_COMMENT = <<EOM
-# Locale(default = en)
-
-#locale: en
-
-
 # Juli-repo config file.
 #
 # This is YAML format.
 #
 # Starting '#' at each line means just comment.
 # You can delete these comments.
+#
+# The commented-out settings shown in this file represent the default values.
+
+
+# Locale(default = en)
+#
+#locale: en
+
 
 # Specify output top directory (default = ../html).
 

@@ -13,6 +13,7 @@ module Macro
       @saved_cwd = Dir.pwd
       Dir.chdir(repo4test)
       @photo = Juli::Macro::Photo.new
+      @photo.set_conf_default(conf)
     end
   
     def teardown
@@ -77,7 +78,9 @@ module Macro
       assert_equal(
           "<a href=\"public_photo/2012-04-17_01_large.jpg\">" +
             "<img class=\"juli_photo_small\"" +
-            " src=\"public_photo/2012-04-17_01_small.jpg\" />" +
+            " src=\"public_photo/2012-04-17_01_small.jpg\"" +
+            " style=\"float: right\"" +
+            " />" +
           "</a>",
           @photo.run('2012-04-17/01.jpg'))
     end

@@ -12,10 +12,15 @@ module Juli
 
       PUBLIC_PHOTO_DIR_DEFAULT  = 'public_photo'
       SEED_DEFAULT              = '-- Juli seed default!! --'
-      SIZE_DEFAULT              = {
-        :small  => 512,   # default small width in pixel
-        :large  => 1024,  # default large width in pixel
-       #:same   => nil    # same as original size, but drop exif info
+      CONF_DEFAULT = {
+        'mount'     => '/home/YOUR_NAME/Photos',
+        'small'     => {
+          'width'   => 512,           # default small width in pixel
+          'style'   => 'float: right'
+        },
+        'large'     => {
+          'width'   => 1024           # default large width in pixel
+        }
       }
 
       class DirNameConflict < Juli::JuliError; end
@@ -28,12 +33,12 @@ module Juli
 # Photo macro setup sample is as follows.
 #
 #photo:
-# mount:    /home/YOUR_NAME/Photos
+# mount:    '#{CONF_DEFAULT['mount']}'
 # small:
-#   width:  512
-#   style:  'float: right'
+#   width:  #{CONF_DEFAULT['small']['width']}
+#   style:  '#{CONF_DEFAULT['small']['style']}'
 # large:
-#   width:  1024
+#   width:  #{CONF_DEFAULT['large']['width']}
 EOM
       end
 
@@ -44,12 +49,16 @@ EOM
 
         if @conf_photo
           @mount = @conf_photo['mount']
-          if @mount
+          if @mount && File.exist?(@mount)
             @mount = File.realpath(@mount)
           end
         end
 
         @mangle = false
+      end
+
+      def set_conf_default(conf)
+        set_conf_default_sub(conf, 'photo', CONF_DEFAULT)
       end
 
       # rotate image to fit orientation
@@ -128,11 +137,7 @@ EOM
             File::Stat.new(public_phys_path).mtime < File::Stat.new(protected_path).mtime
 
           img     = Magick::ImageList.new(protected_path)
-          width   = if (s = @conf_photo[size.to_s]) && s['width']
-                      s['width']
-                    else
-                      SIZE_DEFAULT[size]
-                    end
+          width   = (s = @conf_photo[size.to_s]) && s['width']
           img.resize_to_fit!(width, img.rows * width / img.columns)
           self.rotate(img).
               strip!.
@@ -172,6 +177,18 @@ EOM
         Digest::SHA1.hexdigest(path + seed)
       end
 =end
+
+      def set_conf_default_sub(hash, key, val)
+        case val
+        when Hash
+          hash[key] = {} if !hash[key]
+          for k, v in val do
+            set_conf_default_sub(hash[key], k, v)
+          end
+        else
+          hash[key] = val if !hash[key]
+        end
+      end
     end
   end
 end

@@ -256,7 +256,9 @@ module Juli::Visitor
       for helper_symbol in Juli::Visitor::Html::Helper.constants do
         next if helper_symbol == :AbstractHelper
         helper_class = Juli::Visitor::Html.module_eval(helper_symbol.to_s)
-        @_helpers[helper_symbol.to_sym] = helper_class.new
+        helper = helper_class.new
+        helper.set_conf_default(conf)
+        @_helpers[helper_symbol.to_sym] = helper
       end
     end
 
@@ -284,7 +286,6 @@ module Juli::Visitor
         macro.set_conf_default(conf)
         @_macros[macro_symbol] = macro
       end
-#p conf.inspect
     end
 
     # synchronize repository and OUTPUT_TOP.

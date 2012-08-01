@@ -13,6 +13,7 @@ module Juli::Visitor::Html::Helper
     # called on 'juli init' to generate config sample template.
     def self.conf_template
       <<EOM
+# Facebook related setup is here.
 #
 #url_prefix: 'http://YOUR_HOST/juli'
 #facebook:
@@ -32,7 +33,8 @@ EOM
     # Please overwrite this method when this implementation is not your
     # case.
     def set_conf_default(conf)
-      conf['facebook'] = {} if !conf['facebook']
+      conf['url_prefix']  = 'http://YOUR_HOST/juli' if !conf['url_prefix']
+      conf['facebook']    = {}                      if !conf['facebook']
       if !conf['facebook']['comments']
         conf['facebook']['comments'] = {
           'template'  => self.class::DEFAULT_TEMPLATE
