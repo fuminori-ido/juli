@@ -2,7 +2,7 @@ require 'pathname'
 
 # namespace for all of Juli library elements
 module Juli
-  VERSION       = '1.16.02'
+  VERSION       = '1.16.03'
 
   # sentinel to search juli-repo.  Also it's a directory name to sotre config.
   REPO          = '.juli'
