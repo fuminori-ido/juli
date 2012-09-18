@@ -83,7 +83,7 @@ module Juli
       end
 
       def max_tag_weight
-        @tag_db.values.map{|v| v.to_i}.max
+        @tag_db.values.map{|v| v.to_i}.max || 1
       end
 
       # return 0..10 in tag weight v.s. max-weight
