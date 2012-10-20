@@ -137,10 +137,10 @@ module Juli::Visitor
       IdAssigner.new.run(in_file, root)
 
       for key, helper in @_helpers do
-        helper.on_root(in_file, root)
+        helper.on_root(in_file, root, self)
       end
       for macro_symbol, macro in @_macros do
-        macro.on_root(in_file, root)
+        macro.on_root(in_file, root, self)
       end
 
       # store to instance var for 'contents' helper
@@ -156,7 +156,7 @@ module Juli::Visitor
         macro.after_root(in_file, root)
       end
 
-      erb         = ERB.new(File.read(find_template(conf['template'], @opts[:t])))
+      erb         = ERB.new(File.read(template))
       out_path    = out_filename(in_file, @opts[:o])
       mkdir(out_path)
       File.open(out_path, 'w') do |f|
@@ -233,6 +233,9 @@ module Juli::Visitor
       content_tag(:dd, str2html(n.str),  dd_css)
     end
 
+    def template=(name)
+      @template = name
+    end
 
   private
     # Similar to Rails underscore() method.
@@ -361,8 +364,8 @@ module Juli::Visitor
       id = n.dom_id
       content_tag("h#{n.level + 1}", :id=>header_id(n)) do
         content_tag(:span, :class=>'juli_toggle', :onclick=>"Juli.toggle('#{id}');") do
-          content_tag(:span, '[+] ', :id=>"#{id}_p", :class=>'juli_toggle_node',  :style=>'display:none;') +
-          content_tag(:span, '[-] ', :id=>"#{id}_m", :class=>'juli_toggle_node') +
+         #content_tag(:span, '[+] ', :id=>"#{id}_p", :class=>'juli_toggle_node',  :style=>'display:none;') +
+         #content_tag(:span, '[-] ', :id=>"#{id}_m", :class=>'juli_toggle_node') +
           @header_sequence.gen(n.level) + '. ' + n.str
         end
       end + "\n"
@@ -406,6 +409,17 @@ module Juli::Visitor
     # default dictionary list item description part CSS
     def dd_css
       {}
+    end
+
+    # return specified template.
+    #
+    # 1. If 'template' macro is used, it is used rather than defined at
+    #    conf file.
+    # 1. Then, find_template() algorithm is used.
+    #
+    # Total template search logic is described in template(macro) document.
+    def template
+      find_template(@template || conf['template'], @opts[:t])
     end
   end
 

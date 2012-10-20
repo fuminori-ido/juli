@@ -17,7 +17,7 @@ module Juli
       end
 
       # called on each parsed document
-      def on_root(file, root)
+      def on_root(file, root, visitor = nil)
       end
 
       # called on each macro as "\{macro_name args...}" in text.

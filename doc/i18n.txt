@@ -8,7 +8,7 @@ i18n    - Internationalization in Juli
 Some Juli words are internationalized.
 
 For the detail which word is internationalized, please
-look at RUBY_LIB/juli/template/locale/*.yml.
+look at \{!RUBY_LIB/juli/template/locale/*.yml}.
 Where, RUBY_LIB is the directory which juli library is installed
 (e.g. /usr/local/lib/ruby/site_ruby/1.9/).
 
@@ -22,7 +22,7 @@ Default locale is 'en'.  You can change it at JULI_REPO/.juli/config
 If you don't like current default locale words,
 you can customize those by putting your customized locale file under
 JULI_REPO/.juli/
-without any modification at RUBY_LIB/juli/template/locale/.
+without any modification at \{!RUBY_LIB/juli/template/locale/}.
 
 == How to add New locale
 
@@ -39,7 +39,7 @@ you can add your favorite locale file as follows
 
 = FILES
 
-RUBY_LIB/juli/template/locale/*.yml:: Default Locale files.
+\{!RUBY_LIB/juli/template/locale/*.yml}:: Default Locale files.
 JULI_REPO/.juli/*.yml::               Your customized locale files.
 
 <hr>

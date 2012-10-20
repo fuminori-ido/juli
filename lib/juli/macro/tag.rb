@@ -34,7 +34,7 @@ module Juli
       end
 
       # register page
-      def on_root(file, root)
+      def on_root(file, root, visitor = nil)
         @wikiname           = Juli::Util::to_wikiname(file)
         @page_db[@wikiname] = '1'
         @tag_exists         = false

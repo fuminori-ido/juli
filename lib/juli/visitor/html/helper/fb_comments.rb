@@ -48,7 +48,7 @@ EOM
     end
 
     # called on each parsed document
-    def on_root(in_file, root)
+    def on_root(in_file, root, visitor = nil)
       @in_file  = in_file
     end
 

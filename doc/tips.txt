@@ -9,7 +9,7 @@ same repository because it is very small for now.)
 
 = How to customize css and js files
 
-Original juli.css and juli.js are copied from \{!template} library to output_top
+Original juli.css and juli.js are copied from template library to output_top
 when generating HTML at first time.
 
 You can change by the following sections.
@@ -51,7 +51,7 @@ Then, you can:
 
 = bash completion for je(1)
 
-I added the utility 'lib/juli/template/je-bash-complete'.
+I added the utility \{!'lib/juli/template/je-bash-complete'}.
 Actually, this is not a ruby library, but bash script for je(1)
 wikiname completion.  How to setup and use are described in
 this file.  Enjoy!

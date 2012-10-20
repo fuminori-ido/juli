@@ -1,6 +1,10 @@
 index &gt; \{!template}
 
-Template format is described here.
+Template defines outline of HTML file for juli documents.
+
+(NOTE: Please don't be confused with template(macro),
+which is a macro (command, or directive) to specify which \{!template} here
+is used for each document.)
 
 = template = ERB file = HTML(+ ruby) file
 
@@ -10,7 +14,7 @@ Any ruby script can be written in the tag.
 
 = helper
 
-Helper is a ruby method which can be used in template file.
+Helper is a ruby method which can be used in \{!template} file.
 
 Juli supports two kind of helpers.  One is standard helper, which
 has been already provided by juli.  The other is custom helper.
@@ -18,7 +22,7 @@ has been already provided by juli.  The other is custom helper.
 == Standard helper
 
 Followings are standard helper in alphabetical order.
-You can use them in your template.
+You can use them in your \{!template}.
 
 body::        generated html from juli text page
 fb_like::     Facebook 'Like!' button (>= v1.12)
@@ -34,7 +38,7 @@ Details of these are described below.
 HTML main part generated from juli text page
 
 === fb_like
-You can place 'Like!' button in the template as you like.
+You can place 'Like!' button in the \{!template} as you like.
 
 The following one-shot setup is required.
 
@@ -175,7 +179,7 @@ For now, in juli, I assume facebook 'comments' href is required.
 === fb_comments
 Facebook 'Comments' entry.
 See fb_like description for the detailed setup.
-Also, see lib/juli/template/facebook.html as an example.
+Also, see \{!lib/juli/template/facebook.html} as an example.
 
 === javascript
 javascript url
@@ -199,7 +203,7 @@ lib/juli/visitor/html/helper.rb
 In Juli, helper is quite similar to macro.
 Actually, both ruby script structures are exactly the same,
 but the purpose is different.
-Helper is used for template and macro is used in juli wiki page.
+Helper is used for \{!template} and macro is used in juli wiki page.
 
 Currently, there is no plan to integrate them.
 If you need, please request me it with the detailed reason via sourceforge page

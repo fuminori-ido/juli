@@ -58,7 +58,7 @@ class Juli::Visitor::Html
       end
 
       # called on each parsed document
-      def on_root(in_file, root)
+      def on_root(in_file, root, visitor)
       end
 
       # This will be a helper like 'abstract_helper(args)'

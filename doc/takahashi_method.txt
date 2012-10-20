@@ -17,7 +17,7 @@ Juli implementation of Takahashi method has the following features:
 * Juli wiki formatting (RD like).
 * resonable disk consumption (because it's just text file).
 * style and color of any element (e.g. header, list, text) can be changed
-  by template CSS.
+  by CSS.
 
 = How to generate
 

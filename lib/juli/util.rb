@@ -218,7 +218,7 @@ EOM
     end
     module_function :in_filename
 
-    # find erb template in the following order:
+    # find erb template under the following order:
     #
     # if t_opt ('-t' command-line option arg) is specified:
     #   1st) template_path in absolute or relative from current dir, or

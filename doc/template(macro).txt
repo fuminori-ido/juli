@@ -1,0 +1,44 @@
+index &gt; juli formatting &gt; \{!template(macro)}
+
+= NAME
+\{!template}   - specify \{!template} of this document.
+
+= SYNOPSIS
+\\{\{!template} name}
+
+= DESCRIPTION
+
+Specified \{!template} name is used when generating HTML for this document.
+
+== template search priority
+
+\{!template} can be specified in the following order:
+
+1. juli(1) -t option::
+  * for each command invokation
+1. this macro::
+  * for each document
+1. JULI_REPO/.juli/config \{!'template'} entry::
+  * for default \{!template} on this JULI_REPO
+
+== Example
+
+This:
+
+  \{template takahashi_method.html}
+
+specifies that \{!'takahashi_method.html' template} is used on generating
+this document.
+
+= FILES
+
+See template 'FILES' section.
+
+= SEE ALSO
+
+* juli(1) gen sub-command's -t option
+* juli(1) init sub-command's &gt; \{!'template'} entry description
+* definition of juli ERB template page
+
+
+index &gt; juli formatting &gt; \{!template(macro)}
