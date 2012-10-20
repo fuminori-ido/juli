@@ -315,7 +315,7 @@ Please look at http://w3c.org if you are not familiar with HTML.
 \\{\{!template} name}::     specify \{!template} of this document.  See template(macro).
 \\{wikipedia word}::    Interwiki to Wikipedia.  See wikipedia(macro).
 
-Please see the followings or link for the details.
+Please see the followings or links for the details.
 
 === Escaping wikiname
 
