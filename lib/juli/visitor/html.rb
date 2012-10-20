@@ -364,8 +364,8 @@ module Juli::Visitor
       id = n.dom_id
       content_tag("h#{n.level + 1}", :id=>header_id(n)) do
         content_tag(:span, :class=>'juli_toggle', :onclick=>"Juli.toggle('#{id}');") do
-         #content_tag(:span, '[+] ', :id=>"#{id}_p", :class=>'juli_toggle_node',  :style=>'display:none;') +
-         #content_tag(:span, '[-] ', :id=>"#{id}_m", :class=>'juli_toggle_node') +
+          content_tag(:span, '[+] ', :id=>"#{id}_p", :class=>'juli_toggle_node',  :style=>'display:none;') +
+          content_tag(:span, '[-] ', :id=>"#{id}_m", :class=>'juli_toggle_node') +
           @header_sequence.gen(n.level) + '. ' + n.str
         end
       end + "\n"

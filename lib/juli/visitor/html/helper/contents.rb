@@ -64,7 +64,7 @@ module Juli::Visitor::Html::Helper
       chapter_checker = ChapterChecker.new
       @root.accept(chapter_checker)
       if chapter_checker.chapter_exists
-       #contents_drawer.content_tag(:b, I18n.t('contents')) +
+        contents_drawer.content_tag(:b, I18n.t('contents')) +
         contents_drawer.content_tag(:ol) do
           @root.accept(contents_drawer)
         end
