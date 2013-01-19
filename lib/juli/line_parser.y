@@ -142,7 +142,7 @@ private
     yield [false, nil]
   end
 
-  URL = '(https?:|mailto:|ftp:)\S+'
+  URL = '(https?|mailto|ftp):[\w\./@%^=-]+'
 
   # recursive scan
   def scan_r(str, &block)
@@ -193,7 +193,7 @@ private
         return
       
       # URL is piror to wikiname
-      when /\A(|.*\s+)(#{URL})(.*)\z/m
+      when /\A(|.*[^\w])(#{URL})(.*)\z/m
         scan_r($1, &block)
         yield [:URL, $2]
         scan_r($4, &block)    # not $3 since URL itself has (...)

@@ -1,3 +1,5 @@
+# coding: UTF-8
+
 require 'test_helper'
 
 class LineParserTest < Test::Unit::TestCase
@@ -25,6 +27,10 @@ class LineParserTest < Test::Unit::TestCase
 [['abc ','U:http://def',' ghi'],  'abc http://def ghi',   %w(test)],
 # URL https is also recognized
 [['abc ','U:https://def',' ghi'], 'abc https://def ghi',  %w(test)],
+# (URL) is parsed correctly
+[['abc(','U:https://def',')ghi'], 'abc(https://def)ghi',  %w(test)],
+# '...のURLが' is parsed correctly
+[['abcの','U:https://def','がghi'], 'abcのhttps://defがghi',  %w(test)],
 # URL git:... is NOT recognized :-(
 [['abc git:def ghi'],             'abc git:def ghi',      %w(test)],
 # URL is high priority than wikiname

@@ -30,6 +30,7 @@ module Juli
         if @visitor.respond_to?('template=')
           @visitor.template = args[0]
         end
+        ''
       end
     end
   end
