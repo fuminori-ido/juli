@@ -31,6 +31,8 @@ class LineParserTest < Test::Unit::TestCase
 [['abc(','U:https://def',')ghi'], 'abc(https://def)ghi',  %w(test)],
 # '...のURLが' is parsed correctly
 [['abcの','U:https://def','がghi'], 'abcのhttps://defがghi',  %w(test)],
+# cgi URL is parsed correctly
+[['abc ','U:https://def?a=b&c=%20',' ghi'], 'abc https://def?a=b&c=%20 ghi',  %w(test)],
 # URL git:... is NOT recognized :-(
 [['abc git:def ghi'],             'abc git:def ghi',      %w(test)],
 # URL is high priority than wikiname

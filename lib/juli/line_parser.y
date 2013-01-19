@@ -142,7 +142,7 @@ private
     yield [false, nil]
   end
 
-  URL = '(https?|mailto|ftp):[\w\./@%^=-]+'
+  URL = '(https?|mailto|ftp):[\w\.\?&/@%^=-]+'
 
   # recursive scan
   def scan_r(str, &block)
