@@ -33,6 +33,10 @@ class LineParserTest < Test::Unit::TestCase
 [['abcの','U:https://def','がghi'], 'abcのhttps://defがghi',  %w(test)],
 # cgi URL is parsed correctly
 [['abc ','U:https://def?a=b&c=%20',' ghi'], 'abc https://def?a=b&c=%20 ghi',  %w(test)],
+# URL with tilda(~) is parsed correctly
+[['abc ','U:https://def/~a',' ghi'], 'abc https://def/~a ghi',  %w(test)],
+# URL with hash(#) is parsed correctly
+[['abc ','U:https://def/a#b',' ghi'], 'abc https://def/a#b ghi',  %w(test)],
 # URL git:... is NOT recognized :-(
 [['abc git:def ghi'],             'abc git:def ghi',      %w(test)],
 # URL is high priority than wikiname
