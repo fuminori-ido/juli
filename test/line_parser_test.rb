@@ -37,6 +37,10 @@ class LineParserTest < Test::Unit::TestCase
 [['abc ','U:https://def/~a',' ghi'], 'abc https://def/~a ghi',  %w(test)],
 # URL with hash(#) is parsed correctly
 [['abc ','U:https://def/a#b',' ghi'], 'abc https://def/a#b ghi',  %w(test)],
+# URL with hyphen(-) is parsed correctly
+[['abc ','U:https://def/a-b',' ghi'], 'abc https://def/a-b ghi',  %w(test)],
+# URL with hyphen(-) is parsed correctly(2)
+[['abc ','U:https://def/a/-/b',' ghi'], 'abc https://def/a/-/b ghi',  %w(test)],
 # URL git:... is NOT recognized :-(
 [['abc git:def ghi'],             'abc git:def ghi',      %w(test)],
 # URL is high priority than wikiname
