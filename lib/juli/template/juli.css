@@ -158,3 +158,16 @@ a.juli_tag_07 { font-size: 180%;  }
 a.juli_tag_08 { font-size: 195%;  }
 a.juli_tag_09 { font-size: 210%;  }
 a.juli_tag_10 { font-size: 225%;  }
+
+
+/*----------------------------------------------------------------
+Photo
+----------------------------------------------------------------*/
+img.juli_photo_small {
+  margin:         10px;
+  border-top:     2px solid #888;
+  border-left:    2px solid #888;
+  border-right:   2px solid black;
+  border-bottom:  2px solid black;
+  padding:        0px;
+}
