@@ -13,3 +13,4 @@ facebook:
 jmap:           '<iframe src="http://map_test/%{coord}"></iframe><a href="http://map_test/%{coord}">Map</a>'
 wikipedia:      '<a href="http://ja.wikipedia.org/wiki/%{wikipedia}">%{wikipedia}</a>'
 locale:         ja
+toggle_indent:  false

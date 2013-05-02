@@ -129,9 +129,10 @@ EOM
     # config with hard-coded default
     class Config
       DEFAULT = {
-        'output_top'  => '../html',
-        'template'    => 'default.html',
-        'ext'         => '.shtml'
+        'ext'           => '.shtml',
+        'output_top'    => '../html',
+        'template'      => 'default.html',
+        'toggle_indent' => true,
       }
 
       include Singleton
@@ -140,22 +141,13 @@ EOM
 
       def initialize
         path  = File.join(Juli::Util::juli_repo, Juli::REPO, 'config')
-        @conf = File.exist?(path) ?
+        hash  = File.exist?(path) ?
             YAML::load(ERB.new(File.read(path)).result) :
             {}
 
         # YAML::load('') returns false so that set empty hash
-        @conf = {} if @conf == false
-        set_default
-      end
-
-    private
-      def set_default
-        for k, v in DEFAULT do
-          if !@conf[k]
-            @conf[k] = v
-          end
-        end
+        hash = {} if hash == false
+        @conf = DEFAULT.dup.merge(hash)
       end
     end
 

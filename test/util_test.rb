@@ -39,6 +39,11 @@ class UtilTest < Test::Unit::TestCase
     assert_nil      conf['** NEVER DEFINED KEY! **']
   end
 
+  # set config value to 'false' on default 'true' should work
+  def test_conf_default
+    assert         !conf['toggle_indent']
+  end
+
   def test_to_wikiname
     tests = [
       # expected            in-file

@@ -44,6 +44,10 @@ OUTPUT_TOP_COMMENT = <<EOM
 #
 #locale: en
 
+# toggle indent(default = true) to show/hide on each header
+#
+#toggle_indent: true
+
 
 # Specify output top directory (default = ../html).
 

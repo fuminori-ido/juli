@@ -25,6 +25,10 @@
 #     >> include Juli::Util
 #     >> t = Juli::Macro::Tag.new
 #     >> t.dump
+# 1. access conf
+#     $ test/console
+#     >> Juli::Util.conf['toggle_indent']
+#
 
 Dir.chdir('doc/')
 $LOAD_PATH.insert(0, '../lib')
