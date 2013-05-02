@@ -94,6 +94,15 @@ module Macro
       assert_equal '1', @tag.tag_page_db['t002_, _CAR']
     end
 
+    # test delete_page
+    def test_delete_tag
+      @tag.page_db['t001'] = '1'
+      assert_equal 1, @tag.page_db.keys.count
+
+      @tag.delete_page('t001.txt')
+      assert_equal 0, @tag.page_db.keys.count
+    end
+
   private
     def check_no_tag
     end

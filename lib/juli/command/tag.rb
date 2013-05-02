@@ -55,11 +55,20 @@ module Juli::Command
       begin
         s = ''
         for page in @tag_macro.pages(@tag_macro.to_utf8(tag)) do
+          file = page + '.txt'
+          if !File.exist?(file)
+            # Non-exist file may occur by manual delete/rename so that
+            # delete the entry from tag-DB and don't produce tag entry 
+            # from the tag-list page.
+            @tag_macro.delete_page(file)
+            next
+          end
+
           page_utf8 = @tag_macro.to_utf8(page)
           s += sprintf("<tr><td><a href='%s'>%s</a></td><td>%s</td></tr>\n",
               page_utf8 + @tag_macro.to_utf8(conf['ext']),
               page_utf8,
-              File.stat(page + '.txt').mtime.strftime("%Y/%m/%d %H:%M"))
+              File.stat(file).mtime.strftime("%Y/%m/%d %H:%M"))
         end
         s
       end +

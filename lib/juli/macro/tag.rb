@@ -47,7 +47,7 @@ module Juli
           # +1 on tag
           @tag_db[tag]  = ((@tag_db[tag] || '0').to_i + 1).to_s
           if @wikiname
-            @tag_page_db[sprintf("%s%s%s", @wikiname, SEPARATOR, tag)] = '1'
+            @tag_page_db[tag_page_key(tag, @wikiname)] = '1'
           end
         end
         ''
@@ -92,6 +92,24 @@ module Juli
         (v * 10 / max_tag_weight).to_i
       end
 
+      # delete entry from DB
+      def delete_page(file)
+        wikiname = Juli::Util::to_wikiname(file)
+        @page_db.delete(wikiname)
+
+        tag_on_the_file = {}
+        for tag, val in @tag_db.keys do
+          if @tag_page_db[tag_page_key(tag, wikiname)]
+            tag_on_the_file[tag] = 1
+          end
+        end
+
+        # -1 on tag
+        for tag in tag_on_the_file.keys do
+          @tag_db[tag]  = ((@tag_db[tag] || '1').to_i - 1).to_s
+        end
+      end
+
       # print DB info; debugging purpose.  How to use:
       #
       #   $ test/console
@@ -107,6 +125,11 @@ module Juli
           end
           print "\n"
         end
+      end
+
+    private
+      def tag_page_key(tag, wikiname)
+        sprintf("%s%s%s", wikiname, SEPARATOR, tag)
       end
     end
   end
