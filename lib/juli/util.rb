@@ -129,10 +129,10 @@ EOM
     # config with hard-coded default
     class Config
       DEFAULT = {
-        'ext'           => '.shtml',
-        'output_top'    => '../html',
-        'template'      => 'default.html',
-        'toggle_indent' => true,
+        'ext'                       => '.shtml',
+        'output_top'                => '../html',
+        'show_indent_toggle_button' => true,
+        'template'                  => 'default.html',
       }
 
       include Singleton

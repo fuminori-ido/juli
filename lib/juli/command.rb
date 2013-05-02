@@ -44,9 +44,11 @@ OUTPUT_TOP_COMMENT = <<EOM
 #
 #locale: en
 
-# toggle indent(default = true) to show/hide on each header
+# show_indent_toggle_button (default = true) to show/hide the toggle button
+# for indented scope of the text.  NOTE: toggle action still works even
+# though button is hidden.
 #
-#toggle_indent: true
+#show_indent_toggle_button: true
 
 
 # Specify output top directory (default = ../html).

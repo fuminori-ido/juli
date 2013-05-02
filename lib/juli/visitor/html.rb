@@ -358,14 +358,21 @@ module Juli::Visitor
 
     # draw <hi>... link, where i=2..7
     #
+    # When conf['show_indent_toggle_button'] is true(=default),
+    # toggle-button to show/hide indent is drown.
+    #
     # NOTE: <h1> is reserved for title.  <h2>, <h3>, ... are used for Juli
     # formatting '=', '==', ...
     def header_link(n)
       id = n.dom_id
       content_tag("h#{n.level + 1}", :id=>header_id(n)) do
         content_tag(:span, :class=>'juli_toggle', :onclick=>"Juli.toggle('#{id}');") do
-          content_tag(:span, '[+] ', :id=>"#{id}_p", :class=>'juli_toggle_node',  :style=>'display:none;') +
-          content_tag(:span, '[-] ', :id=>"#{id}_m", :class=>'juli_toggle_node') +
+          if conf['show_indent_toggle_button']
+            content_tag(:span, '[+] ', :id=>"#{id}_p", :class=>'juli_toggle_node',  :style=>'display:none;') +
+            content_tag(:span, '[-] ', :id=>"#{id}_m", :class=>'juli_toggle_node')
+          else
+            ''
+          end +
           @header_sequence.gen(n.level) + '. ' + n.str
         end
       end + "\n"

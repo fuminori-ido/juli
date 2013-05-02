@@ -27,7 +27,7 @@
 #     >> t.dump
 # 1. access conf
 #     $ test/console
-#     >> Juli::Util.conf['toggle_indent']
+#     >> Juli::Util.conf['show_indent_toggle_button']
 #
 
 Dir.chdir('doc/')
