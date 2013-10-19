@@ -26,7 +26,7 @@
 #   $ cp je-bash-complete $HOME/
 #   $ edit ~/.bachrc                      # any editor can be used
 #       :
-#   . $HOME/je-bash-complete
+#   $ . $HOME/je-bash-complete
 #   (quit editor)
 #   (login again)
 #
