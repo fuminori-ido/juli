@@ -57,7 +57,7 @@ end
   Dir.chdir(JULI_STAGE_DIR) do
     before = gather_wiki_entries
     system 'git pull'
-    system 'GIT_SET_FILE_TIMES_CMD'
+    system GIT_SET_FILE_TIMES_CMD
     after  = gather_wiki_entries
     if before != after
       # new entry -> regenerate whole pages
