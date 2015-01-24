@@ -1,8 +1,9 @@
+require 'i18n'
 require 'pathname'
 
 # namespace for all of Juli library elements
 module Juli
-  VERSION       = '1.17.04'
+  VERSION       = '2.00.00'
 
   # sentinel to search juli-repo.  Also it's a directory name to sotre config.
   REPO          = '.juli'
@@ -12,4 +13,10 @@ module Juli
   class JuliError       < StandardError; end
     class NoConfig        < JuliError; end
     class NotImplemented  < JuliError; end
+
+  class << self
+    def init
+      I18n.enforce_available_locales = false
+    end
+  end
 end

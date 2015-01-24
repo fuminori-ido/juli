@@ -1,3 +1,5 @@
+gem 'minitest', '4.7.5'
+require 'minitest/autorun'
 require 'test/unit'
 
 $LOAD_PATH.insert(0,
@@ -10,6 +12,8 @@ require 'juli/command'
 require 'juli/macro'
 require 'juli/visitor'
 require 'juli/wiki'
+
+Juli.init
 
 class Test::Unit::TestCase
   include Juli::Util
