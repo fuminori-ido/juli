@@ -1,6 +1,6 @@
 # coding: UTF-8
 
-require 'gdbm'
+require 'sdbm'
 
 module Juli
   module Macro

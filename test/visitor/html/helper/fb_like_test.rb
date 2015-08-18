@@ -14,7 +14,7 @@ module JuliUnitTest
     def setup
       @saved_cwd = Dir.pwd
       Dir.chdir(repo4test)
-      Dir.glob('.juli/*.gdbm'){|f| FileUtils.rm_f(f) }
+      Dir.glob('.juli/*.sdbm*'){|f| FileUtils.rm_f(f) }
       @fb_like = Juli::Visitor::Html::Helper::FbLike.new
     end
   

@@ -10,6 +10,17 @@
 /parser.output
 
 # tag DB
-/doc/.juli/*.gdbm
-/test/repo/.juli/*.gdbm
-/test/repo2/.juli/*.gdbm
+/doc/.juli/*.sdbm.*
+/test/repo/.juli/*.sdbm.*
+/test/repo2/.juli/*.sdbm.*
+
+# by bundle
+/.bundle/
+/.yardoc
+/Gemfile.lock
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/

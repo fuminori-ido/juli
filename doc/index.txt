@@ -177,7 +177,7 @@ Prerequisites:
 * rsync
 * ruby-1.9
 * RMagick (for photo(macro))
-* gdbm (for tag(macro))
+* sdbm (for tag(macro))
 * i18n
 
 1. download package from http://sourceforge.net/projects/jjjuli/files/
@@ -193,7 +193,7 @@ Prerequisites:
 * rsync
 * ruby-1.9
 * RMagick (for photo(macro))
-* gdbm (for tag(macro))
+* sdbm (for tag(macro))
 * <a href='http://i.loveruby.net/en/projects/racc/'>racc</a>
 * rake
 * git

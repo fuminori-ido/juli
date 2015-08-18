@@ -1,3 +1,10 @@
+if ENV["COVERAGE"]
+  require 'simplecov'
+  require 'simplecov-rcov'
+  SimpleCov.formatter = SimpleCov::Formatter::RcovFormatter
+  SimpleCov.start 'rails'
+end
+
 require 'test/unit'
 
 $LOAD_PATH.insert(0,
@@ -10,6 +17,8 @@ require 'juli/command'
 require 'juli/macro'
 require 'juli/visitor'
 require 'juli/wiki'
+
+Juli.init
 
 class Test::Unit::TestCase
   include Juli::Util
