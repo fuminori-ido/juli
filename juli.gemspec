@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'racc'
   spec.add_runtime_dependency 'simplecov'
-  spec.add_runtime_dependency 'RMagick'
+  spec.add_runtime_dependency 'rmagick'
 
   spec.add_development_dependency "bundler", "~> 1.9"
   spec.add_development_dependency "rake", "~> 10.0"
