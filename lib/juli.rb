@@ -1,10 +1,9 @@
 require 'i18n'
 require 'pathname'
+require "juli/version"
 
 # namespace for all of Juli library elements
 module Juli
-  VERSION       = '2.00.00'
-
   # sentinel to search juli-repo.  Also it's a directory name to sotre config.
   REPO          = '.juli'
   LIB           = File.join(Pathname.new(File.dirname(__FILE__)).realpath, 'juli')

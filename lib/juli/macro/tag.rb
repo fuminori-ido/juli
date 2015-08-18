@@ -1,6 +1,6 @@
 # coding: UTF-8
 
-require 'gdbm'
+require 'sdbm'
 
 module Juli
   module Macro
@@ -15,9 +15,9 @@ module Juli
     # * tag DB value counts number of wikipages
     #
     # === FILES
-    # JURI_REPO/.juli/tag.gdbm::      tag DB
-    # JURI_REPO/.juli/page.gdbm::     page DB
-    # JURI_REPO/.juli/tag_page.gdbm:: tag-page intersection DB
+    # JURI_REPO/.juli/tag.sdbm::      tag DB
+    # JURI_REPO/.juli/page.sdbm::     page DB
+    # JURI_REPO/.juli/tag_page.sdbm:: tag-page intersection DB
     class Tag < Base
       SEPARATOR = '_, _'
       NO_TAG    = '_no_tag_'
@@ -28,9 +28,9 @@ module Juli
         super
 
         repo_dir      = File.join(juli_repo, Juli::REPO)
-        @tag_db       = GDBM.open(File.join(repo_dir, 'tag.gdbm'))
-        @page_db      = GDBM.open(File.join(repo_dir, 'page.gdbm'))
-        @tag_page_db  = GDBM.open(File.join(repo_dir, 'tag_page.gdbm'))
+        @tag_db       = SDBM.open(File.join(repo_dir, 'tag.sdbm'))
+        @page_db      = SDBM.open(File.join(repo_dir, 'page.sdbm'))
+        @tag_page_db  = SDBM.open(File.join(repo_dir, 'tag_page.sdbm'))
       end
 
       # register page
@@ -64,7 +64,7 @@ module Juli
         end
       end
 
-      # value in gdbm in ruby 1.9 looks not to support encoding
+      # value in sdbm in ruby 1.9 looks not to support encoding
       # (in other words, always set to ASCII-8BIT) so that
       # enforce to set it to UTF-8.
       def to_utf8(v)

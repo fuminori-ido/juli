@@ -14,7 +14,7 @@ module Macro
     def setup
       @saved_cwd = Dir.pwd
       Dir.chdir(repo4test)
-      Dir.glob('.juli/*.gdbm'){|f| FileUtils.rm_f(f) }
+      Dir.glob('.juli/*.sdbm*'){|f| FileUtils.rm_f(f) }
       @tag = Juli::Macro::Tag.new
     end
   
@@ -24,7 +24,7 @@ module Macro
 
     # rvm ruby-1.9.2-p318 fails this.  I have already reported this issue
     # to rvm team.  Ruby built from ruby-lang.org works expectedly.
-    def test_gdbm
+    def test_sdbm
       key = 'あいうえおかきくけこ'
       val = 'たちつてとなにぬねの'
       @tag.tag_db[key] = val

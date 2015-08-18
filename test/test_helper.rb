@@ -1,5 +1,10 @@
-gem 'minitest', '4.7.5'
-require 'minitest/autorun'
+if ENV["COVERAGE"]
+  require 'simplecov'
+  require 'simplecov-rcov'
+  SimpleCov.formatter = SimpleCov::Formatter::RcovFormatter
+  SimpleCov.start 'rails'
+end
+
 require 'test/unit'
 
 $LOAD_PATH.insert(0,
