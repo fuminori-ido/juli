@@ -1,8 +1,10 @@
+require "bundler/gem_tasks"
+
 $LOAD_PATH.insert(0, File.join(File.dirname(__FILE__), 'lib'))
 
 require 'rake'
 require 'rake/testtask'
-gem 'rdoc', '~> 3.12'
+gem 'rdoc', '~> 4.2'
 require 'rdoc/task'
 require 'juli'
 require 'racc'
@@ -84,32 +86,4 @@ task :clean => ['doc:clobber_app', :'test:coverage:clobber_juli'] do
   sh 'rm', '-rf', *[parsers, test_conf_outout_top, 
       'InstalledFiles', '.config',    # setup.rb generated
       'doc/html'].flatten
-end
-
-begin
-  require 'rcov/rcovtask'
-  $rcov_exist = true
-rescue LoadError
-  $stderr.puts "rcov is not installed."
-end
-
-# set rcov default options
-def set_rcov_default(t)
-  t.libs << "test"
-  t.verbose = true
-  t.rcov_opts = ["--charset=utf-8", "--rails"]
-  t.rcov_opts << ["-x", ENV["GEM_HOME"]] if ENV["GEM_HOME"] && !ENV["GEM_HOME"].empty?
-  t.rcov_opts << ["-x", File.expand_path('.gem', ENV["HOME"])]
-end
-
-namespace :test do
-  if $rcov_exist
-    namespace :coverage do
-      Rcov::RcovTask.new(:juli) do |t|
-        set_rcov_default(t)
-        t.test_files = FileList["test/**/*_test.rb"]
-      end
-    end
-    task :coverage => "test:coverage:juli"
-  end
 end

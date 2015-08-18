@@ -20,7 +20,7 @@ defines 'DIY' and 'BOOK' tags to this page for tag-search later.
 
 = FILES
 
-.juli/*.gdbm::  tag DB.
+.juli/*.sdbm::  tag DB.
 
 = SEE ALSO
 
