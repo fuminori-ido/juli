@@ -1,3 +1,4 @@
+#require 'byebug'; byebug
 require "bundler/gem_tasks"
 
 $LOAD_PATH.insert(0, File.join(File.dirname(__FILE__), 'lib'))
@@ -30,24 +31,27 @@ Rake::TestTask.new('test' => parsers) do |t|
   t.verbose = true
 end
 
-desc "build package from HEAD with version #{Juli::VERSION}"
+desc "build with parser.tab under right permission(022)"
 task :dist do
-  pkg_name    = "juli-#{Juli::VERSION}"
-  work_prefix = "/tmp/#{pkg_name}"
-  sh "git archive --format=tar --prefix=#{pkg_name}/ HEAD | gzip >#{work_prefix}.tgz"
+  old_umask = File.umask(022); begin
+    pkg_name    = "juli-#{Juli::VERSION}"
+    work_prefix = "/tmp/#{pkg_name}-#{$$}"
+    sh "git archive --format=tar --prefix=#{pkg_name}/ HEAD | gzip >#{work_prefix}.tgz"
 
-  # include racc geneerated files
-  FileUtils.mkdir_p work_prefix
-  Dir.chdir work_prefix do
-    sh "tar zxvf #{work_prefix}.tgz"
-    Dir.chdir pkg_name do
-      sh 'rake'
+    # include racc geneerated files
+    FileUtils.mkdir_p work_prefix
+    Dir.chdir work_prefix do
+      sh "tar zxf #{work_prefix}.tgz"
+      Dir.chdir pkg_name do
+        sh 'rake'
+        sh 'rake build'
+      end
+      sh "tar zcf #{work_prefix}.tgz #{pkg_name}"
     end
-    sh "tar zcvf #{work_prefix}.tgz #{pkg_name}"
-  end
-  FileUtils.rm_rf work_prefix
+    FileUtils.mv "#{work_prefix}/#{pkg_name}/pkg/#{pkg_name}.gem", 'pkg/'
+    FileUtils.rm_rf work_prefix
+  end; File.umask(old_umask)
 end
-
 
 namespace :doc do
   desc 'generate HTML by juli'
