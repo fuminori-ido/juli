@@ -34,21 +34,20 @@ end
 desc "build with parser.tab under right permission(022)"
 task :dist do
   old_umask = File.umask(022); begin
+    curr_dir    = Dir.pwd
     pkg_name    = "juli-#{Juli::VERSION}"
     work_prefix = "/tmp/#{pkg_name}-#{$$}"
-    sh "git archive --format=tar --prefix=#{pkg_name}/ HEAD | gzip >#{work_prefix}.tgz"
 
     # include racc geneerated files
     FileUtils.mkdir_p work_prefix
     Dir.chdir work_prefix do
-      sh "tar zxf #{work_prefix}.tgz"
-      Dir.chdir pkg_name do
+      sh "git clone --local --depth 1 #{curr_dir} juli"
+      Dir.chdir 'juli' do
         sh 'rake'
         sh 'rake build'
       end
-      sh "tar zcf #{work_prefix}.tgz #{pkg_name}"
     end
-    FileUtils.mv "#{work_prefix}/#{pkg_name}/pkg/#{pkg_name}.gem", 'pkg/'
+    FileUtils.mv "#{work_prefix}/juli/pkg/#{pkg_name}.gem", 'pkg/'
     FileUtils.rm_rf work_prefix
   end; File.umask(old_umask)
 end
