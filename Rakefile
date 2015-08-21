@@ -1,3 +1,4 @@
+#require 'byebug'; byebug
 require "bundler/gem_tasks"
 
 $LOAD_PATH.insert(0, File.join(File.dirname(__FILE__), 'lib'))
@@ -14,7 +15,7 @@ juli_line_parser_rb   = 'lib/juli/line_parser.tab.rb'
 parsers               = [juli_parser_rb, juli_line_parser_rb]
 test_conf_outout_top  = 'test/html'
 
-task :default => parsers
+task default: parsers
 
 file juli_parser_rb => 'lib/juli/parser.y' do |t|
   sh "racc -v -g #{t.prerequisites[0]}"
@@ -24,30 +25,32 @@ file juli_line_parser_rb => 'lib/juli/line_parser.y' do |t|
   sh "racc #{t.prerequisites[0]}"
 end
 
-Rake::TestTask.new('test' => parsers) do |t|
+Rake::TestTask.new(test: parsers) do |t|
   t.libs    << 'test'
   t.pattern = 'test/**/*_test.rb'
   t.verbose = true
 end
 
-desc "build package from HEAD with version #{Juli::VERSION}"
+desc "build with parser.tab under right permission(022)"
 task :dist do
-  pkg_name    = "juli-#{Juli::VERSION}"
-  work_prefix = "/tmp/#{pkg_name}"
-  sh "git archive --format=tar --prefix=#{pkg_name}/ HEAD | gzip >#{work_prefix}.tgz"
+  old_umask = File.umask(022); begin
+    curr_dir    = Dir.pwd
+    pkg_name    = "juli-#{Juli::VERSION}"
+    work_prefix = "/tmp/#{pkg_name}-#{$$}"
 
-  # include racc geneerated files
-  FileUtils.mkdir_p work_prefix
-  Dir.chdir work_prefix do
-    sh "tar zxvf #{work_prefix}.tgz"
-    Dir.chdir pkg_name do
-      sh 'rake'
+    # include racc geneerated files
+    FileUtils.mkdir_p work_prefix
+    Dir.chdir work_prefix do
+      sh "git clone --local --depth 1 #{curr_dir} juli"
+      Dir.chdir 'juli' do
+        sh 'rake'
+        sh 'rake build'
+      end
     end
-    sh "tar zcvf #{work_prefix}.tgz #{pkg_name}"
-  end
-  FileUtils.rm_rf work_prefix
+    FileUtils.mv "#{work_prefix}/juli/pkg/#{pkg_name}.gem", 'pkg/'
+    FileUtils.rm_rf work_prefix
+  end; File.umask(old_umask)
 end
-
 
 namespace :doc do
   desc 'generate HTML by juli'
@@ -60,7 +63,7 @@ namespace :doc do
   end
 
   desc 'update project doc to SourceForge site'
-  task :up => :juli do
+  task up: :juli do
     sh <<-EOSH
       cd doc_html/
       find . -type f -exec chmod o+r {} \\;
@@ -81,7 +84,7 @@ namespace :doc do
 end
 
 desc 'clean working files'
-task :clean => ['doc:clobber_app', :'test:coverage:clobber_juli'] do
+task clean: ['doc:clobber_app', :'test:coverage:clobber_juli'] do
   sh "find . -name '*~' -exec rm {} \\;"
   sh 'rm', '-rf', *[parsers, test_conf_outout_top, 
       'InstalledFiles', '.config',    # setup.rb generated

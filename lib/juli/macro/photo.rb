@@ -1,6 +1,6 @@
 require 'fileutils'
 require 'digest/sha1'
-require 'RMagick'
+require 'rmagick'
 require 'pp'
 
 module Juli

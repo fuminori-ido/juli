@@ -170,7 +170,8 @@ text file revision control is handled by je(1).
  
 = Install
 == from gem
-TBD
+
+  $ gem install juli
 
 == from package
 Prerequisites:
