@@ -1,6 +1,6 @@
 == Juli
 
-Juli is an offline wiki &amp; outliner with your favorite editor.
+Juli is an offline wiki & outliner with your favorite editor.
 
 === Installation
 
