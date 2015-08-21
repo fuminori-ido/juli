@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.executables   = 'juli'
   spec.require_paths = ["lib"]
 
+  spec.add_runtime_dependency 'i18n'
   spec.add_runtime_dependency 'racc'
   spec.add_runtime_dependency 'simplecov'
   spec.add_runtime_dependency 'rmagick'
