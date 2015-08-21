@@ -15,7 +15,7 @@ juli_line_parser_rb   = 'lib/juli/line_parser.tab.rb'
 parsers               = [juli_parser_rb, juli_line_parser_rb]
 test_conf_outout_top  = 'test/html'
 
-task :default => parsers
+task default: parsers
 
 file juli_parser_rb => 'lib/juli/parser.y' do |t|
   sh "racc -v -g #{t.prerequisites[0]}"
@@ -25,7 +25,7 @@ file juli_line_parser_rb => 'lib/juli/line_parser.y' do |t|
   sh "racc #{t.prerequisites[0]}"
 end
 
-Rake::TestTask.new('test' => parsers) do |t|
+Rake::TestTask.new(test: parsers) do |t|
   t.libs    << 'test'
   t.pattern = 'test/**/*_test.rb'
   t.verbose = true
@@ -63,7 +63,7 @@ namespace :doc do
   end
 
   desc 'update project doc to SourceForge site'
-  task :up => :juli do
+  task up: :juli do
     sh <<-EOSH
       cd doc_html/
       find . -type f -exec chmod o+r {} \\;
@@ -84,7 +84,7 @@ namespace :doc do
 end
 
 desc 'clean working files'
-task :clean => ['doc:clobber_app', :'test:coverage:clobber_juli'] do
+task clean: ['doc:clobber_app', :'test:coverage:clobber_juli'] do
   sh "find . -name '*~' -exec rm {} \\;"
   sh 'rm', '-rf', *[parsers, test_conf_outout_top, 
       'InstalledFiles', '.config',    # setup.rb generated
