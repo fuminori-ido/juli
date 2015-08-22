@@ -112,6 +112,11 @@ EOM
       # url::   when true, return url, else, return physical file-system path
       def intern(path, size = :small, url = true)
         protected_path    = File.join(conf_photo['mount'], path)
+        if !File.exist?(protected_path)
+          warn("WARN: no source photo path(#{protected_path})")
+          return ''
+        end
+
         public_phys_path  = photo_path(path, size, false)
         if !File.exist?(public_phys_path) ||
             File::Stat.new(public_phys_path).mtime < File::Stat.new(protected_path).mtime
