@@ -23,6 +23,17 @@ Or install it yourself as:
   $ $EDITOR hello.txt     # write your document.
   $ juli                  # compile it to generate static HTML.
 
+=== Document
+
+1. API Document:      http://www.rubydoc.info/gems/juli/
+1. Command Document:
+   1. install juli (see above)
+   1. run following commands:
+        $ cd doc
+        $ juli
+        $ cd ../doc_html/
+        (see index.shtml by any browser)
+
 === Juli Version
 
 1.*:: obsoleted
