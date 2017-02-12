@@ -14,7 +14,7 @@ module Juli::Command
       # tag list
       body = content_tag(:a, '', :name=>'top').force_encoding('UTF-8') +
              "<h2>#{I18n.t('tag_list')}</h2>\n".force_encoding('UTF-8')
-      for tag, val in @tag_macro.tag_db do
+      for tag in @tag_macro.tag_db.keys do
         body += gen_tag_list(tag)
       end
       body += gen_tag_list(
@@ -23,7 +23,7 @@ module Juli::Command
       body += "\n\n" + '<br/>'*50
 
       # tag detail
-      for tag, val in @tag_macro.tag_db do
+      for tag in @tag_macro.tag_db.keys do
         body += gen_tag_detail(tag)
       end
       body += gen_tag_detail(
