@@ -5,7 +5,7 @@ $LOAD_PATH.insert(0, File.join(File.dirname(__FILE__), 'lib'))
 
 require 'rake'
 require 'rake/testtask'
-gem 'rdoc', '~> 4.2'
+gem 'rdoc'
 require 'rdoc/task'
 require 'juli'
 require 'racc'
