@@ -50,6 +50,10 @@ OUTPUT_TOP_COMMENT = <<EOM
 #
 #show_indent_toggle_button: true
 
+# When set to '1st-only' (default), wikiname auto-link is applied at ONLY 1st
+# occurence in a text, otherwise is applied at every occurence:
+#
+#link_wikiname_on:          1st-only
 
 # Specify output top directory (default = ../html).
 

@@ -59,8 +59,8 @@ module Juli::Visitor
       include Juli::Util
       include TagHelper
 
-      def initialize(macros)
-        @_macros = macros
+      def initialize(html_visitor)
+        @_html_visitor  = html_visitor
       end
 
       def visit_array(n)
@@ -74,8 +74,13 @@ module Juli::Visitor
       end
   
       def visit_wikiname(n)
-        decoded = Juli::Wiki.decode(n.str)
-        content_tag(:a, decoded, :class=>'wiki', :href=>decoded + conf['ext'])
+        if conf['link_wikiname_on'] == '1st-only' && @_html_visitor.wikiname_visited[n.str]
+          n.str
+        else
+          @_html_visitor.wikiname_visited[n.str] = true
+          decoded = Juli::Wiki.decode(n.str)
+          content_tag(:a, decoded, :class=>'wiki', :href=>decoded + conf['ext'])
+        end
       end
   
       def visit_url(n)
@@ -83,7 +88,7 @@ module Juli::Visitor
       end
 
       def visit_macro(n)
-        if macro = @_macros[camelize(n.name).to_sym]
+        if macro = @_html_visitor.macros[camelize(n.name).to_sym]
           macro.run(*n.rest.split(' '))
         else
           s = "juli ERR: UNKNOWN macro name: '#{n.name}'"
@@ -92,6 +97,8 @@ module Juli::Visitor
         end
       end
     end
+
+    attr_accessor :wikiname_visited, :macros
 
     # Html sepecific initialization does:
     #
@@ -112,7 +119,7 @@ module Juli::Visitor
 
       register_helper
       register_macro
-      @html_line_visitor  = HtmlLine.new(@_macros)
+      @html_line_visitor  = HtmlLine.new(self)
 
       if !File.directory?(conf['output_top'])
         FileUtils.mkdir_p(conf['output_top'])
@@ -139,7 +146,7 @@ module Juli::Visitor
       for key, helper in @_helpers do
         helper.on_root(in_file, root, self)
       end
-      for macro_symbol, macro in @_macros do
+      for macro_symbol, macro in @macros do
         macro.on_root(in_file, root, self)
       end
 
@@ -150,9 +157,10 @@ module Juli::Visitor
       javascript  = relative_from(in_file, 'juli.js')
       stylesheet  = relative_from(in_file, 'juli.css')
       sitemap     = relative_from(in_file, 'sitemap' + conf['ext'])
+      @wikiname_visited = {}
       body        = root.accept(self)
 
-      for macro_symbol, macro in @_macros do
+      for macro_symbol, macro in @macros do
         macro.after_root(in_file, root)
       end
 
@@ -277,17 +285,17 @@ module Juli::Visitor
     end
 
 
-    # create Macro object and register it in @_macros hash.
+    # create Macro object and register it in @macros hash.
     #
     # call set_conf_default() to set conf[key] default value for each macro
     def register_macro
-      @_macros = {}
+      @macros = {}
       for macro_symbol in Juli::Macro.constants do
         next if macro_symbol == :Base
         macro_class = Juli::Macro.module_eval(macro_symbol.to_s)
         macro = macro_class.new
         macro.set_conf_default(conf)
-        @_macros[macro_symbol] = macro
+        @macros[macro_symbol] = macro
       end
     end
 

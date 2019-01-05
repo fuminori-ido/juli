@@ -133,6 +133,7 @@ EOM
         'output_top'                => '../html',
         'show_indent_toggle_button' => true,
         'template'                  => 'default.html',
+        'link_wikiname_on'          => '1st-only',
       }
 
       include Singleton
