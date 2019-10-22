@@ -206,8 +206,8 @@ but the purpose is different.
 Helper is used for \{!template} and macro is used in juli wiki page.
 
 Currently, there is no plan to integrate them.
-If you need, please request me it with the detailed reason via sourceforge page
-http://sourceforge.net/projects/jjjuli/
+If you need, please request me it with the detailed reason via github page
+https://github.com/fuminori-ido/juli
 -&gt; Tracker
 -&gt; Feature Request, thank you!
 

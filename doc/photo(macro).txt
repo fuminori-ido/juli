@@ -108,7 +108,7 @@ small.width::
 small.style::
   Small photo's style sheet.
   'img.juli_photo_small' entry in the
-  doc/.juli/sourceforge.html file (in this package) is one of the example.
+  doc/.juli/github.html file (in this package) is one of the example.
 large::
   large photo related configurations.  See below for the detail.
 large.width::

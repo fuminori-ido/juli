@@ -173,21 +173,6 @@ text file revision control is handled by je(1).
 
   $ gem install juli
 
-== from package
-Prerequisites:
-* rsync
-* ruby-1.9
-* RMagick (for photo(macro))
-* sdbm (for tag(macro))
-* i18n
-
-1. download package from http://sourceforge.net/projects/jjjuli/files/
-1. run setup.rb as follows:
-
-  $ tar zxvf juli-#.##.##.tgz
-  $ cd juli-#.##.##
-  $ ruby setup.rb                       # you may need 'sudo'
-
 == from repository
 
 Prerequisites:
@@ -199,15 +184,11 @@ Prerequisites:
 * rake
 * git
 
-racc tool is required when you download from Sourceforge repository
-and install it.
 
-  $ git clone git://jjjuli.git.sourceforge.net/gitroot/jjjuli/jjjuli
-  $ cd jjjuli
+  $ git clone git@github.com:fuminori-ido/juli.git
+  $ cd juli
   $ rake                                # generate ruby source from *.y files
   $ ruby setup.rb                       # you may need 'sudo'
-
-* prototype.js is used (included in this package).
 
 = See Also
 
@@ -248,12 +229,10 @@ I found the following competitors also after the comparison research:
 
 Any feedback is welcome.  Please check the followings:
 
-* <a href='http://sourceforge.net/projects/jjjuli/reviews/'>Love/Hate</a>
-* <a href='http://sourceforge.net/projects/jjjuli/forums'>Help</a>
-* <a href='http://sourceforge.net/tracker/?group_id=390715'>Bug Report, Feature Requests</a>
+* <a href='https://github.com/fuminori-ido/juli/issues'>Bug Report, Feature Requests</a>
 
 == Author
-Fuminori Ido, https://sourceforge.net/users/ido00
+Fuminori Ido, https://github.com/fuminori-ido
 
 == License
 

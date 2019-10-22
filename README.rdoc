@@ -37,7 +37,7 @@ Or install it yourself as:
 === Juli Version
 
 1.*:: obsoleted
-2.*:: for ruby2.2
+2.*:: >= ruby2.2
 
 === Development
 

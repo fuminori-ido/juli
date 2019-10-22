@@ -16,7 +16,7 @@ is 0 then it means successful.
 
 = MISC
 == Author
-Fuminori Ido, https://sourceforge.net/users/ido00
+Fuminori Ido, https://github.com/fuminori-ido
 
 == License
 
