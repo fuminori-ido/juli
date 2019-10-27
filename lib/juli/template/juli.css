@@ -1,3 +1,7 @@
+body {
+  line-height:      1.2em;
+}
+
 p.default {
   padding-left:     10px;
 }
@@ -106,7 +110,13 @@ ol, ul {
 
 /* Dictionary list */
 table.juli_compact_dictionary {
-  padding-left:     10px;
+  border:           1px solid #aaa;
+  margin-top:       0.5em;
+  margin-bottom:    0.5em;
+  margin-left:      1em;
+}
+table.juli_compact_dictionary td:nth-child(1) {
+  padding-right:    1em;
 }
 dl.juli_dictionary dt {
   margin-top:       0.5em;
@@ -144,6 +154,54 @@ div.sitemap {
   text-align:       left;
 }
 
+
+/*----------------------------------------------------------------
+Additional
+----------------------------------------------------------------*/
+div#header {
+  background:       #62a5dc;
+  border-radius:    10px;
+  text-align:       center;
+  color:            white;
+  height:           8em;
+}
+div#header div.site_title {
+  padding-top:      30px;
+  padding-bottom:    5px;
+  font-size:        3em;
+  line-height:      1.2em;
+}
+div#header div.site_title a {
+  text-decoration:  none;
+  color:            white;
+}
+div#header div.description {
+  font-size:        90%;
+  padding-bottom:   30px;
+}
+img.juli_photo_small {
+  margin:         10px;
+  border-top:     2px solid #888;
+  border-left:    2px solid #888;
+  border-right:   2px solid black;
+  border-bottom:  2px solid black;
+  padding:        0px;
+}
+
+table.default {
+  border-collapse:  collapse;
+  border:           1px solid #a84;
+}
+table.default th, table.default td {
+  border:           1px solid #888;
+}
+table.default th.digit, table.default td.digit {
+  text-align:       right;
+}
+table.default th {
+  background-color: #8db;
+}
+
 /*----------------------------------------------------------------
 Tag list
 ----------------------------------------------------------------*/
@@ -158,7 +216,6 @@ a.juli_tag_07 { font-size: 180%;  }
 a.juli_tag_08 { font-size: 195%;  }
 a.juli_tag_09 { font-size: 210%;  }
 a.juli_tag_10 { font-size: 225%;  }
-
 
 /*----------------------------------------------------------------
 Photo
