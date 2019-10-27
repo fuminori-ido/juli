@@ -1,7 +1,9 @@
+require 'aws-sdk-s3'
 require 'fileutils'
 require 'digest/sha1'
 require 'rmagick'
 require 'pp'
+require 'tmpdir'
 
 module Juli
   module Macro
@@ -14,7 +16,12 @@ module Juli
       PUBLIC_PHOTO_DIR_DEFAULT  = 'public_photo'
       SEED_DEFAULT              = '-- Juli seed default!! --'
       CONF_DEFAULT = {
-        'mount'     => '/home/YOUR_NAME/Photos',
+        'storages'  => [
+          {
+            'kind'    => 'local',
+            'dir'     => '/home/YOUR_NAME/Photos',
+          },
+        ],
         'small'     => {
           'width'   => 512,           # default small width in pixel
           'style'   => 'float: right'
@@ -32,13 +39,33 @@ module Juli
 # Photo macro setup sample is as follows.
 #
 #photo:
-# mount:    '#{CONF_DEFAULT['mount']}'
+# mount:        '#{CONF_DEFAULT['mount']}'    # DEPERECATED, use storages[].kind = 'local'
+# storages:
+# - kind:       local
+#   dir:        '#{CONF_DEFAULT['mount']}'
+# - kind:       aws
+#   params:
+#     region:   ap-northeast-1
+#     profile:  juli
+#   bucket:     juli
+#   prefix:     photo
 # small:
-#   width:  #{CONF_DEFAULT['small']['width']}
-#   style:  '#{CONF_DEFAULT['small']['style']}'
+#   width:      #{CONF_DEFAULT['small']['width']}
+#   style:      '#{CONF_DEFAULT['small']['style']}'
 # large:
-#   width:  #{CONF_DEFAULT['large']['width']}
+#   width:      #{CONF_DEFAULT['large']['width']}
 EOM
+      end
+
+      def initialize
+        super
+        for storage in conf_photo && conf_photo['storages'] || {}
+          if storage['kind'] == 'aws'
+            _h = {}
+            storage['params'].each{|k,v| _h[k.to_sym] = v}  # to sym
+            @aws = ::Aws::S3::Client.new(_h)
+          end
+        end
       end
 
       def set_conf_default(conf)
@@ -64,8 +91,8 @@ EOM
       # public photo directory is used to:
       #
       # * store converted photo from original one
-      # * protect private photo in 'mount' directory from public web access
-      #   by copying (with conversion) to it on demand.
+      # * protect private photo in 'mount' directory and storage
+      #   from public web access by copying (with conversion) to it on demand.
       #
       # === INPUTS
       # url::   when true, return url, else, return physical file-system path
@@ -106,29 +133,23 @@ EOM
       #
       # and return the path.
       #
+      # source photo is looked up under the following order:
+      # 1. local directory designated by 'mount' config, if defined
+      # 1. remote storage designated by 'storage' config, if defined
+      #
       # === INPUTS
       # path::  photo-macro path argument
       # size::  :small, or :large
       # url::   when true, return url, else, return physical file-system path
       def intern(path, size = :small, url = true)
-        protected_path    = File.join(conf_photo['mount'], path)
-        if !File.exist?(protected_path)
-          warn("WARN: no source photo path(#{protected_path})")
-          return ''
+        if conf_photo['mount']
+          STDERR.printf "DEPERECATED WARNING: 'mount' is deprecated; use 'storages'\n"
+          result = intern_local_mount(conf_photo['mount'], path, size, url)
+          return result if result != ''
         end
 
-        public_phys_path  = photo_path(path, size, false)
-        if !File.exist?(public_phys_path) ||
-            File::Stat.new(public_phys_path).mtime < File::Stat.new(protected_path).mtime
-
-          img     = Magick::ImageList.new(protected_path)
-          width   = (s = conf_photo[size.to_s]) && s['width']
-          img.resize_to_fit!(width, img.rows * width / img.columns)
-          self.rotate(img).
-              strip!.
-              write(public_phys_path).destroy!
-        end
-        photo_path(path, size, url)
+        result = intern_storages(path, size, url)
+        return result if result != ''
       end
 
       # return <img...> HTML tag for the photo with this macro features.
@@ -149,7 +170,8 @@ EOM
         @conf_photo ||= conf['photo']
       end
 
-    private
+      private
+
       def set_conf_default_sub(hash, key, val)
         case val
         when Hash
@@ -160,6 +182,80 @@ EOM
         else
           hash[key] = val if !hash[key]
         end
+      end
+
+      # @return '' if not found
+      def intern_local_mount(mount_dir, path, size, url)
+        protected_path    = File.join(mount_dir, path)
+        if !File.exist?(protected_path)
+         #debug("DEBUG: no source photo path(#{protected_path})")
+          return ''
+        end
+
+        public_phys_path  = photo_path(path, size, false)
+        if !File.exist?(public_phys_path) ||
+            File::Stat.new(public_phys_path).mtime < File::Stat.new(protected_path).mtime
+
+          img     = Magick::ImageList.new(protected_path)
+          width   = (s = conf_photo[size.to_s]) && s['width']
+          img.resize_to_fit!(width, img.rows * width / img.columns)
+          self.rotate(img).
+              strip!.
+              write(public_phys_path).destroy!
+        end
+        photo_path(path, size, url)
+      end
+
+      def intern_storages(path, size, url)
+        result = ''
+        for storage in conf_photo && conf_photo['storages'] || {}
+          result = case storage['kind']
+                   when 'local'
+                    intern_local_mount(storage['dir'], path, size, url)
+                   when 'aws'
+                    intern_aws(storage, path, size, url)
+                   else
+                    raise "unsupported kind of storage(#{storage['kind']})"
+                   end
+          return result if result != ''
+        end
+      end
+
+      # FIXME: I gave up to use 'fog' gem so that I'm using AWS S3 here now.
+      # I welcome somebody implements fog version!
+      def intern_aws(storage, path, size, url)
+        return '' if storage.nil? || storage.empty?
+
+        resp = nil
+        begin
+          resp = @aws.head_object(bucket: storage['bucket'], key: path)
+        rescue ::Aws::S3::Errors::NotFound
+          warn("WARN: no source photo path(#{path}) in storage")
+          return ''
+        end
+
+        public_phys_path  = photo_path(path, size, false)
+        if !File.exist?(public_phys_path) ||
+            File::Stat.new(public_phys_path).mtime < resp.last_modified
+
+          work_path = tmpname('juli_photo')
+          resp      = @aws.get_object(bucket:           storage['bucket'],
+                                      key:              path,
+                                      response_target:  work_path)
+          img       = Magick::ImageList.new(work_path)
+          width     = (s = conf_photo[size.to_s]) && s['width']
+          img.resize_to_fit!(width, img.rows * width / img.columns)
+          self.rotate(img).
+              strip!.
+              write(public_phys_path).destroy!
+         #FileUtils.rm_f(work_path)
+        end
+        photo_path(path, size, url)
+      end
+
+      def tmpname(base_name)
+        t = Time.now.strftime("%Y%m%d")
+        "/tmp/#{base_name}-#{t}-#{$$}-#{rand(0x100000000).to_s(36)}"
       end
     end
   end

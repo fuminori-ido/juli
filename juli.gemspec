@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.name          = "juli"
   spec.version       = Juli::VERSION
   spec.authors       = ["ido"]
-  spec.email         = ["fuminori_ido@yahoo.co.jp"]
+  spec.email         = ["ido-gh@wtech.jp"]
 
   spec.summary       = %q{Offline wiki, and outline processor}
   spec.description   = %q{Offline wiki, and outline processor}
@@ -22,12 +22,15 @@ Gem::Specification.new do |spec|
   spec.executables   = 'juli'
   spec.require_paths = ["lib"]
 
+  spec.add_runtime_dependency 'aws-sdk-s3'
   spec.add_runtime_dependency 'i18n'
   spec.add_runtime_dependency 'rmagick'
 
+  spec.add_development_dependency 'byebug'
   spec.add_development_dependency 'racc'
   spec.add_development_dependency 'simplecov'
-  spec.add_development_dependency "bundler", "~> 1.9"
+  spec.add_development_dependency "bundler", "~> 2.0"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency 'rdoc'
+  spec.add_development_dependency 'test-unit'
 end

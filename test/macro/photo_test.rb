@@ -78,5 +78,52 @@ module Macro
           "</a>",
           @photo.run('2012-04-17/01.jpg'))
     end
+
+    # = AWS
+    # tests only when 'juli-test' profile exists
+    def test_aws
+      if !check_if_juli_test_profile_exists
+        printf("no 'juli-test' AWS credentials profile -> skip aws-related test")
+        return
+      end
+
+      saved = conf['photo']
+        conf['photo']['storages'] = [
+          'kind'      => 'aws',
+          'params'    => {
+            'region'  => 'ap-northeast-1',
+            'profile' => 'juli-test',
+          },
+          'bucket'    => 'fumi-juli-test',
+          'prefix'    => '',
+        ]
+
+        @photo = Juli::Macro::Photo.new
+
+        p_dir = @photo.public_photo_dir(false)
+        FileUtils.rm_rf(p_dir)
+
+        p_path = @photo.photo_path('2019-10-26/green-monster.jpg', :small, false)
+        assert !File.exist?(p_path)
+
+        @photo.intern('2019-10-26/green-monster.jpg')
+        assert File.exist?(p_path)
+
+        # call again
+        @photo.intern('2019-10-26/green-monster.jpg')
+        assert File.exist?(p_path)
+
+      conf['photo'] = saved
+    end
+
+    def check_if_juli_test_profile_exists
+      if @juli_test_profile_exists.nil?
+        path = ENV['HOME'] + '/.aws/credentials'
+        @juli_test_profile_exists = File.exists?(path) &&
+                                    system('grep', '^\[juli-test\]', path)
+      else
+        @juli_test_profile_exists
+      end
+    end
   end
 end
