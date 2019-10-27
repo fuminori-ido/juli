@@ -32,17 +32,23 @@ Example:
 
 will be:
 
+<hr/>
+
 \{photo 2012-04-22/DCIM/101_PANA/P1010441.JPG}
 
 When I visited the ruins of Hachioji-Castle in Japan,
 I saw many beautiful statue of Buddha.
 Here is one of them.
 
+<hr/>
+
+<br clear='all' />
+
 In general, in Juli wiki text, write as follows:
 
   \{photo a/b/c.jpg}
 
-Where, a/b/c.jpg is a relative-path of the photo file from 'mount'
+Where, a/b/c.jpg is a relative-path of the photo file from 'storage'
 directory (see 'setup' section below).
 
 As you see this example, by clicking this small photo,
@@ -64,23 +70,29 @@ Where,
 * 'output_top' above is the juli configuration parameter specified in .juli/config
   for HTML generated document top directory.
   See juli(1) and/or tutorial.
-* 'photo.mount' above is new configuration parameter introduced in this macro
+* 'photo.storages' above is configuration parameter in this macro
   for all of your photo master file directory which may include
   some private photos.  Of course, only photos you specify in
   \\{photo ...} macro are copied to public_photo as above figure shows.
   See 'Setup' section below.
+* 'photo.mount' is deprecated since v2.2.0
 
 == Setup
 
-1. Decide one location of directory of all of your photos
-   on the same file system.
-   We call it 'mount' directory in this macro.
-   Maintenace of the mount directory is up to you.
-   If you have several directories, create one directory, and
-   move the directories under it or symlink to each.
+1. For images in juli, use local photo directory and/or AWS S3.
+   We call it 'photo.storages' in this macro.
+   Maintenace of the 'photo.storages' is up to you.
 1. In .juli/config, setup photo related entries like the followings:
     photo:
-      mount:        /home/wells/photo
+      storages:
+      - kind:       local
+        dir:        /home/wells/photo
+      - kind:       aws
+        params:
+          region:   ap-northeast-1
+          profile:  juli
+        bucket:     juli
+        prefix:     photo
       small:
         width:      512
         style:      '...'
@@ -89,8 +101,10 @@ Where,
 
 Where, each key means as follows:
 
-mount::
-  Top directory of photos.
+storages[].kind::
+  either 'local' or 'aws'
+storages[].dir::
+  Top directory of photos when kind == 'local'.
   It is usually photo master file directory, photo uploade directory, or
   SD-card back-up directory on your PC.
   It SHOULD be NON-PUBLIC directory to protect annonymous
@@ -100,6 +114,12 @@ mount::
   Relative path can be used, which is relative from JULI_REPO, not
   from .juli/config.
   Example: /home/wells/photo
+storages[].params::
+  S3 access information when kind == 'aws'.
+storages[].bucket::
+  S3 bucket name when kind == 'aws'.
+storages[].prefix::
+  (not used now)
 small::
   small photo related configurations.  See below for the detail.
 small.width::
@@ -124,13 +144,13 @@ This setup is one-shot task.
 
 == Maintenance
 
-When you add photo, just sync (by e.g. rsync) your photo SD card and
-'mount' directory.
+When you add photo in you 'storage', just execute 'juli(1)', then
+photo in the storage is copied to public site.
 
 == Security
 
-1. When you set 'mount', it SHOULD be out-of-url so that any photo
-   under the 'mount' cannot be accessed via internet.
+1. When you set 'storages[].dir', it SHOULD be out-of-url so that any photo
+   under the 'dir' cannot be accessed via internet.
 1. Only photo referring by this macro can be accessed via internet.
 
 == File permission
@@ -140,7 +160,7 @@ The following permission is required on juli(1):
 * write permission on output_top/public_photo/ directory.
   Where, output_top is the directory for generated HTML
   specified at .juli/config.
-* read  permission under 'mount' directory.
+* read  permission under 'storage'.
 
 == Example
 
@@ -149,7 +169,15 @@ The following permission is required on juli(1):
 <a href='#'>This document</a>'s \\{photo} macro setup is as follows:
 
   photo:
-    mount:    ../sample/protected_photo/
+    storages:
+    - kind:   local
+      dir:    '/home/wells/photo'
+    - kind:       aws
+      params:
+        region:   ap-northeast-1
+        profile:  juli
+      bucket:     juli
+      prefix:     ''
     small:
       width:  200
       style:  'float: right'
