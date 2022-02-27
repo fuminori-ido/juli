@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'aws-sdk-s3'
   spec.add_runtime_dependency 'i18n'
   spec.add_runtime_dependency 'rmagick'
+  spec.add_runtime_dependency 'sdbm'
 
   spec.add_development_dependency 'byebug'
   spec.add_development_dependency 'racc'

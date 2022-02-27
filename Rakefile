@@ -15,7 +15,7 @@ juli_line_parser_rb   = 'lib/juli/line_parser.tab.rb'
 parsers               = [juli_parser_rb, juli_line_parser_rb]
 test_conf_outout_top  = 'test/html'
 
-task default: parsers
+task build: parsers
 
 file juli_parser_rb => 'lib/juli/parser.y' do |t|
   sh "racc -v -g #{t.prerequisites[0]}"
