@@ -16,6 +16,13 @@ Or install it yourself as:
 
   $ gem install juli
 
+NOTE:
+
+* MX-Linux21 requires the followings before installing:
+
+  $ sudo apt install imagemagick-dev
+
+
 === Usage
 
   $ cd [YOUR-WIKI-ROOT]
