@@ -146,8 +146,8 @@ EOM
             YAML::load(ERB.new(File.read(path)).result) :
             {}
 
-        # YAML::load('') returns false so that set empty hash
-        hash = {} if hash == false
+        hash = {} if hash == false      # YAML::load('') returns false so that set empty hash
+        hash = {} if hash.nil?
         @conf = DEFAULT.dup.merge(hash)
       end
     end

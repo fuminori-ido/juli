@@ -20,7 +20,7 @@ module Juli::Command
       body += gen_tag_list(
                   Juli::Macro::Tag::NO_TAG,
                   I18n.t(Juli::Macro::Tag::NO_TAG))
-      body += "\n\n" + '<br/>'*50
+      body += "\n\n" + '<br/>'*100
 
       # tag detail
       for tag in @tag_macro.tag_db.keys do
@@ -51,7 +51,7 @@ module Juli::Command
     def gen_tag_detail(tag, tag_label=tag)
       content_tag(:a, '', :name=>tag).force_encoding('UTF-8') +
       content_tag(:h2, tag_label).force_encoding('UTF-8') +
-      '<table>' +
+      '<table class="sitemap table table-hover">' +
       begin
         s = ''
         for page in @tag_macro.pages(@tag_macro.to_utf8(tag)) do
