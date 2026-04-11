@@ -27,7 +27,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'rmagick'
   spec.add_runtime_dependency 'sdbm'
 
-  spec.add_development_dependency 'byebug'
   spec.add_development_dependency 'racc'
   spec.add_development_dependency 'simplecov'
   spec.add_development_dependency "bundler", "~> 2.0"

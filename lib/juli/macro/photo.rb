@@ -228,7 +228,7 @@ EOM
 
         resp = nil
         begin
-          resp = @aws.head_object(bucket: storage['bucket'], key: path)
+          resp = @aws.head_object(bucket: storage['bucket'], key: storage['prefix'] + '/' + path)
         rescue ::Aws::S3::Errors::NotFound
           warn("WARN: no source photo path(#{path}) in storage")
           return ''
@@ -240,7 +240,7 @@ EOM
 
           work_path = tmpname('juli_photo')
           resp      = @aws.get_object(bucket:           storage['bucket'],
-                                      key:              path,
+                                      key:              storage['prefix'] + '/' + path,
                                       response_target:  work_path)
           img       = Magick::ImageList.new(work_path)
           width     = (s = conf_photo[size.to_s]) && s['width']
